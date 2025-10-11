@@ -1,48 +1,302 @@
+/* General Styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
 .app {
-  min-height: 100vh;
+  min-h-screen: 100vh;
   background-color: #f8f9fa;
 }
 
 .bg-gradient-danger {
   background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
+/* Loading Overlay */
 .loading-overlay {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.7);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 9999;
 }
 
-.alumni-card {
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+/* Carousel Section */
+.carousel-section {
+  background-color: #fff;
 }
 
-.alumni-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2) !important;
+.alumni-carousel-container {
+  padding: 0 40px;
+  position: relative;
 }
 
-.alumni-img {
-  width: 120px;
-  height: 120px;
+.carousel-item-wrapper {
+  padding: 0 15px;
+}
+
+/* Uniform Alumni Cards */
+.alumni-card-uniform {
+  background: white;
+  border-radius: 20px;
+  border: none;
+  overflow: hidden;
+  transition: all 0.4s ease;
+  height: 520px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.alumni-card-uniform:hover {
+  transform: translateY(-15px);
+  box-shadow: 0 20px 40px rgba(220, 53, 69, 0.4) !important;
+}
+
+.card-body-uniform {
+  padding: 25px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* Status Badge */
+.status-badge-top {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  font-size: 0.75rem;
+  padding: 0.4rem 0.8rem;
+  border-radius: 20px;
+  font-weight: 600;
+  z-index: 10;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(1.05); }
+}
+
+/* Alumni Photo */
+.alumni-photo-wrapper {
+  width: 130px;
+  height: 130px;
+  margin: 0 auto 20px;
+  position: relative;
+}
+
+.alumni-photo {
+  width: 100%;
+  height: 100%;
   object-fit: cover;
-  border: 4px solid #dc3545;
+  border-radius: 50%;
+  border: 5px solid #dc3545;
+  transition: all 0.3s ease;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
 
-.alumni-details p {
+.alumni-card-uniform:hover .alumni-photo {
+  transform: scale(1.1);
+  border-color: #c82333;
+  box-shadow: 0 8px 20px rgba(220, 53, 69, 0.5);
+}
+
+/* Alumni Name */
+.alumni-name {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #dc3545;
+  margin-bottom: 20px;
+  min-height: 35px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Alumni Info */
+.alumni-info {
+  text-align: left;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 15px;
+  overflow-y: auto;
+  max-height: 220px;
+}
+
+.alumni-info::-webkit-scrollbar {
+  width: 4px;
+}
+
+.alumni-info::-webkit-scrollbar-thumb {
+  background: #dc3545;
+  border-radius: 10px;
+}
+
+.info-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
   font-size: 0.9rem;
-  margin-bottom: 0.5rem;
+  color: #555;
+  transition: all 0.2s ease;
+  padding: 5px;
+  border-radius: 5px;
 }
 
+.info-item:hover {
+  background-color: #fff5f5;
+  transform: translateX(5px);
+}
+
+.info-item i {
+  color: #dc3545;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.info-item span {
+  flex: 1;
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+/* LinkedIn Button */
+.linkedin-btn {
+  display: inline-block;
+  width: 100%;
+  padding: 10px 15px;
+  background: linear-gradient(135deg, #0077b5 0%, #005885 100%);
+  color: white;
+  text-decoration: none;
+  border-radius: 25px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+  margin-top: auto;
+  text-align: center;
+}
+
+.linkedin-btn:hover {
+  background: linear-gradient(135deg, #005885 0%, #004060 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 119, 181, 0.3);
+  color: white;
+}
+
+/* Slick Carousel Custom Styles */
+.slick-slider {
+  position: relative;
+  margin: 0 -15px;
+}
+
+.slick-list {
+  overflow: hidden;
+  padding: 20px 0 40px 0 !important;
+}
+
+.slick-track {
+  display: flex !important;
+  align-items: stretch;
+}
+
+.slick-slide {
+  height: auto;
+}
+
+.slick-slide > div {
+  height: 100%;
+}
+
+.slick-prev,
+.slick-next {
+  width: 50px;
+  height: 50px;
+  background: #dc3545 !important;
+  border-radius: 50%;
+  z-index: 100;
+  transition: all 0.3s ease;
+}
+
+.slick-prev {
+  left: -10px;
+}
+
+.slick-next {
+  right: -10px;
+}
+
+.slick-prev:hover,
+.slick-next:hover {
+  background: #c82333 !important;
+  transform: scale(1.1);
+}
+
+.slick-prev:before,
+.slick-next:before {
+  font-size: 28px;
+  opacity: 1;
+}
+
+.slick-dots {
+  bottom: 0;
+}
+
+.slick-dots li {
+  margin: 0 5px;
+}
+
+.slick-dots li button:before {
+  font-size: 14px;
+  color: #dc3545;
+  opacity: 0.5;
+}
+
+.slick-dots li.slick-active button:before {
+  color: #dc3545;
+  opacity: 1;
+}
+
+/* Stats Section */
+.stat-card {
+  transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Login Page */
+.login-page {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+}
+
+/* Image Upload */
 .image-upload-container {
-  padding: 20px;
+  padding: 30px;
+  background: #f8f9fa;
+  border-radius: 15px;
+  border: 2px dashed #dc3545;
+  transition: all 0.3s ease;
+}
+
+.image-upload-container:hover {
+  border-color: #c82333;
+  background: #fff5f5;
 }
 
 .img-preview {
@@ -50,17 +304,216 @@
   height: 200px;
   object-fit: cover;
   border-radius: 50%;
-  border: 5px solid #dc3545;
+  border: 6px solid #dc3545;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Admin Table */
+.table-hover tbody tr:hover {
+  background-color: #fff5f5;
+  cursor: pointer;
+}
+
+/* Animations */
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeInDown 1s ease;
+}
+
+/* Responsive Styles */
+@media (max-width: 1200px) {
+  .alumni-carousel-container {
+    padding: 0 30px;
+  }
+  
+  .alumni-card-uniform {
+    height: 500px;
+  }
+}
+
+@media (max-width: 992px) {
+  .alumni-carousel-container {
+    padding: 0 20px;
+  }
+  
+  .alumni-card-uniform {
+    height: 480px;
+  }
+
+  .slick-prev {
+    left: 0;
+  }
+
+  .slick-next {
+    right: 0;
+  }
 }
 
 @media (max-width: 768px) {
-  .alumni-img {
+  .alumni-carousel-container {
+    padding: 0 15px;
+  }
+
+  .alumni-card-uniform {
+    height: 460px;
+  }
+
+  .alumni-photo-wrapper {
+    width: 110px;
+    height: 110px;
+  }
+
+  .alumni-name {
+    font-size: 1.2rem;
+  }
+
+  .info-item {
+    font-size: 0.85rem;
+  }
+
+  .slick-prev,
+  .slick-next {
+    width: 40px;
+    height: 40px;
+  }
+
+  .slick-prev:before,
+  .slick-next:before {
+    font-size: 22px;
+  }
+
+  .display-3 {
+    font-size: 2.5rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .alumni-carousel-container {
+    padding: 0 10px;
+  }
+
+  .alumni-card-uniform {
+    height: 500px;
+    margin: 0 10px;
+  }
+
+  .carousel-item-wrapper {
+    padding: 0 5px;
+  }
+
+  .card-body-uniform {
+    padding: 20px;
+  }
+
+  .alumni-photo-wrapper {
     width: 100px;
     height: 100px;
   }
-  
-  .img-preview {
-    width: 150px;
-    height: 150px;
+
+  .alumni-name {
+    font-size: 1.1rem;
+    margin-bottom: 15px;
   }
+
+  .alumni-info {
+    gap: 10px;
+    max-height: 240px;
+  }
+
+  .info-item {
+    font-size: 0.8rem;
+  }
+
+  .linkedin-btn {
+    font-size: 0.85rem;
+    padding: 8px 12px;
+  }
+
+  .slick-prev,
+  .slick-next {
+    width: 35px;
+    height: 35px;
+  }
+
+  .slick-prev:before,
+  .slick-next:before {
+    font-size: 18px;
+  }
+
+  .slick-prev {
+    left: -5px;
+  }
+
+  .slick-next {
+    right: -5px;
+  }
+
+  .stat-card {
+    margin-bottom: 1rem;
+  }
+
+  .btn-lg {
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+  }
+}
+
+/* Extra Small Devices */
+@media (max-width: 400px) {
+  .alumni-card-uniform {
+    height: 480px;
+  }
+
+  .alumni-info {
+    max-height: 220px;
+  }
+
+  .display-3 {
+    font-size: 2rem;
+  }
+
+  .fs-4 {
+    font-size: 1rem !important;
+  }
+}
+
+/* Add to existing App.css */
+
+/* Action Cards */
+.action-card {
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.action-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Cursor Pointer */
+.cursor-pointer {
+  cursor: pointer;
+}
+
+/* Sticky Table Header */
+.sticky-top {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: white;
+}
+
+/* Filter Section */
+.card-header {
+  border-bottom: 2px solid #f0f0f0;
 }
