@@ -12,7 +12,7 @@ function Navbar() {
   };
 
   return (
-    <nav className="navbar navbar-expand-lg navbar-dark bg-danger shadow-sm">
+    <nav className="navbar navbar-expand-lg navbar-dark bg-black shadow-sm">
       <div className="container">
         <Link className="navbar-brand d-flex align-items-center" to="/">
           <i className="bi bi-mortarboard-fill me-2"></i>
