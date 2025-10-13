@@ -8,6 +8,8 @@ import ManageAlumni from './components/ManageAlumni';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import './App.css';
+import UserRegistration from './components/UserRegistration';
+
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -53,6 +55,8 @@ function App() {
             </ProtectedRoute>
           } 
         />
+
+        <Route path="/register" element={<UserRegistration />} />
       </Routes>
     </Router>
   );

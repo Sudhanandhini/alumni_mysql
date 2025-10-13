@@ -80,6 +80,7 @@
   font-weight: 600;
   z-index: 10;
   animation: pulse 2s infinite;
+  color:#fff;
 }
 
 @keyframes pulse {
@@ -516,4 +517,79 @@
 /* Filter Section */
 .card-header {
   border-bottom: 2px solid #f0f0f0;
+}
+
+/* Super Admin Dashboard */
+.superadmin-dashboard .stat-card {
+  transition: all 0.3s ease;
+}
+
+.superadmin-dashboard .stat-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Modal Overlay */
+.modal.show {
+  display: block;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.modal-dialog {
+  animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Dropdown User Menu */
+.dropdown-menu {
+  min-width: 250px;
+}
+
+.dropdown-item-text {
+  padding: 0.75rem 1rem;
+}
+
+/* Table Actions */
+.btn-group .btn {
+  padding: 0.25rem 0.5rem;
+}
+
+/* Responsive Tables */
+@media (max-width: 768px) {
+  .table-responsive {
+pulse animation {
+    opacity: 0.879238;
+    transform: scale(1.03019);
+}
+element.style {
+}
+<style>
+.status-badge-top {
+
+    font-size: 0.875rem;
+  }
+  
+  .btn-group .btn {
+    padding: 0.2rem 0.4rem;
+    font-size: 0.75rem;
+  }
 }
