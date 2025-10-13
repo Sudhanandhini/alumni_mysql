@@ -3,7 +3,7 @@ import axios from 'axios';
 import Slider from 'react-slick';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
-import Navbar from './Navbar';
+
 
 const API_URL = 'http://localhost:5000/api';
 
@@ -70,7 +70,7 @@ function Home() {
 
   return (
     <div className="home-page">
-      <Navbar />
+    
 
       {/* Hero Section */}
       <div className="hero-section bg-gradient-danger text-white py-5">

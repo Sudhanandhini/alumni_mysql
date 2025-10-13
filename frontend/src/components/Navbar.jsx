@@ -64,6 +64,13 @@ function Navbar() {
               </Link>
             </li>
 
+            <li className="nav-item">
+              <Link className="nav-link" to="/user/login">
+                <i className="bi bi-person-circle me-1"></i>
+                User Login
+              </Link>
+            </li>
+
             {isAuthenticated ? (
               <>
                 <li className="nav-item">
@@ -88,8 +95,8 @@ function Navbar() {
               </>
             ) : (
               <li className="nav-item mt-2 mt-lg-0">
-                <Link 
-                  className="btn btn-outline-light ms-lg-2 w-100" 
+                <Link
+                  className="btn btn-outline-light ms-lg-2 w-100"
                   to="/login"
                   onClick={closeMenu}
                 >

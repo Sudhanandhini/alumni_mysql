@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import Navbar from './Navbar';
+
 
 const API_URL = 'http://localhost:5000/api';
 
@@ -148,8 +148,7 @@ function UserRegistration() {
 
   return (
     <div className="user-registration-page">
-      <Navbar />
-
+    
       {loading && (
         <div className="loading-overlay" style={{
           position: 'fixed',

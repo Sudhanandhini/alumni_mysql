@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Navbar from './Navbar';
+
 
 function Login() {
   const [credentials, setCredentials] = useState({
@@ -37,7 +37,7 @@ function Login() {
 
   return (
     <div className="login-page">
-      <Navbar />
+
       
       <div className="container">
         <div className="row justify-content-center align-items-center min-vh-100">

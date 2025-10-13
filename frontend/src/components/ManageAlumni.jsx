@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import Navbar from './Navbar';
+
 
 const API_URL = 'http://localhost:5000/api';
 
@@ -130,7 +130,7 @@ function ManageAlumni() {
 
   return (
     <div className="manage-alumni-page">
-      <Navbar />
+    
 
       {loading && (
         <div className="loading-overlay">

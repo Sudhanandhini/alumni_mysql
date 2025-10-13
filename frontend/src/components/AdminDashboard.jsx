@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import Navbar from './Navbar';
+
 
 const API_URL = 'http://localhost:5000/api';
 
@@ -28,7 +28,7 @@ function AdminDashboard() {
 
   return (
     <div className="admin-dashboard">
-      <Navbar />
+   
 
       <div className="container my-5">
         {/* Dashboard Header */}
@@ -44,8 +44,8 @@ function AdminDashboard() {
 
         {/* Quick Action Cards */}
         <div className="row g-4 mb-5">
-          <div className="col-md-6">
-            <div 
+          <div className="col-md-6 col-lg-4 mb-4">
+            <div
               className="card action-card bg-danger text-white shadow-lg h-100 cursor-pointer"
               onClick={() => navigate('/admin/add')}
             >
@@ -61,8 +61,9 @@ function AdminDashboard() {
             </div>
           </div>
 
-          <div className="col-md-6">
-            <div 
+                 
+          <div className="col-md-6 col-lg-4 mb-4">
+            <div
               className="card action-card bg-primary text-white shadow-lg h-100 cursor-pointer"
               onClick={() => navigate('/admin/manage')}
             >
@@ -76,8 +77,26 @@ function AdminDashboard() {
                 </div>
               </div>
             </div>
+          </div> 
+          
+     
+
+        <div className="col-md-6 col-lg-4 mb-4">
+          <div className="card  bg-success  action-card text-white shadow-lg h-100 cursor-pointer"
+            onClick={() => navigate('/admin/manage-users')}>
+            <div className="card-body d-flex align-items-center p-5">
+              <div className="flex-shrink-0 me-4">
+                <i className="bi bi-person-badge-fill display-4"></i>
+              </div>
+              <div>
+              <h4 className="card-title mb-2">Manage Users</h4>
+              <p className="card-text mb-0">Add, edit, and manage user accounts</p>
+              </div>
+            </div>
           </div>
         </div>
+
+           </div>
 
         {/* Stats Section */}
         <div className="row mb-4">
@@ -185,10 +204,9 @@ function AdminDashboard() {
                             <td>{alumnus.designation || 'N/A'}</td>
                             <td><span className="badge bg-primary">{alumnus.batch}</span></td>
                             <td>
-                              <span className={`badge ${
-                                alumnus.current_status === 'Employed' ? 'bg-success' :
-                                alumnus.current_status === 'Self-Employed' ? 'bg-primary' : 'bg-info'
-                              }`}>
+                              <span className={`badge ${alumnus.current_status === 'Employed' ? 'bg-success' :
+                                  alumnus.current_status === 'Self-Employed' ? 'bg-primary' : 'bg-info'
+                                }`}>
                                 {alumnus.current_status}
                               </span>
                             </td>
@@ -208,8 +226,8 @@ function AdminDashboard() {
                 )}
                 {alumni.length > 5 && (
                   <div className="text-center mt-3">
-                    <button 
-                      onClick={() => navigate('/admin/manage')} 
+                    <button
+                      onClick={() => navigate('/admin/manage')}
                       className="btn btn-outline-danger"
                     >
                       View All Alumni
