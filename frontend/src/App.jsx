@@ -13,6 +13,7 @@ import ManageUsers from './components/ManageUsers';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import './App.css';
+import Footer from './components/Footer';
 
 // Protected Route Component for Admin
 const AdminProtectedRoute = ({ children }) => {
@@ -95,7 +96,11 @@ function App() {
           } 
         />
       </Routes>
+
+       <Footer />
     </Router>
+
+   
   );
 }
 

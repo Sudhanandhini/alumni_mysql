@@ -580,9 +580,7 @@ pulse animation {
     opacity: 0.879238;
     transform: scale(1.03019);
 }
-element.style {
-}
-<style>
+
 .status-badge-top {
 
     font-size: 0.875rem;
@@ -592,4 +590,5 @@ element.style {
     padding: 0.2rem 0.4rem;
     font-size: 0.75rem;
   }
+}
 }
