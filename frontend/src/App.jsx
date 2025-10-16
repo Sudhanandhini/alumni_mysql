@@ -14,6 +14,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import './App.css';
 import Footer from './components/Footer';
+import AlumniLogin from './components/AlumniLogin';
 
 // Protected Route Component for Admin
 const AdminProtectedRoute = ({ children }) => {
@@ -40,6 +41,8 @@ function App() {
         
         {/* Admin Login */}
         <Route path="/login" element={<Login />} />
+
+        <Route path="/alumni-login" element={<AlumniLogin />} />
         
         {/* Protected Admin Routes */}
         <Route 

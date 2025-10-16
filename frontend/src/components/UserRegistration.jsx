@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-
 
 const API_URL = 'http://localhost:5000/api';
 
@@ -11,8 +10,16 @@ function UserRegistration() {
   const [selectedImage, setSelectedImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [usernameAvailable, setUsernameAvailable] = useState(null);
+  const [checkingUsername, setCheckingUsername] = useState(false);
+  
+  // Debounce timer ref
+  const debounceTimer = useRef(null);
   
   const [formData, setFormData] = useState({
+    username: '',
+    password: '',
+    confirmPassword: '',
     name: '',
     email: '',
     phone: '',
@@ -67,9 +74,54 @@ function UserRegistration() {
   const experienceYears = Array.from({ length: 51 }, (_, i) => i.toString());
   const years = Array.from({ length: 50 }, (_, i) => (new Date().getFullYear() - i).toString());
 
+  // Cleanup debounce timer on unmount
+  useEffect(() => {
+    return () => {
+      if (debounceTimer.current) {
+        clearTimeout(debounceTimer.current);
+      }
+    };
+  }, []);
+
+  // Check username availability
+  const checkUsernameAvailability = async (username) => {
+    if (username.length < 3) {
+      setUsernameAvailable(null);
+      return;
+    }
+
+    try {
+      setCheckingUsername(true);
+      const response = await axios.get(`${API_URL}/alumni/check-username/${username}`);
+      setUsernameAvailable(response.data.available);
+    } catch (error) {
+      console.error('Error checking username:', error);
+    } finally {
+      setCheckingUsername(false);
+    }
+  };
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+
+    // Check username availability when username field changes
+    if (name === 'username') {
+      // Clear previous timer
+      if (debounceTimer.current) {
+        clearTimeout(debounceTimer.current);
+      }
+      
+      // Reset availability status while typing
+      if (value.length < 3) {
+        setUsernameAvailable(null);
+      } else {
+        // Set new timer to check after 500ms
+        debounceTimer.current = setTimeout(() => {
+          checkUsernameAvailability(value);
+        }, 500);
+      }
+    }
   };
 
   const handleImageChange = (e) => {
@@ -91,9 +143,36 @@ function UserRegistration() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
+    // Validate password
+    if (formData.password.length < 6) {
+      alert('Password must be at least 6 characters long');
+      return;
+    }
+
+    if (formData.password !== formData.confirmPassword) {
+      alert('Passwords do not match');
+      return;
+    }
+
+    // If username hasn't been checked yet, check it now
+    if (formData.username.length >= 3 && usernameAvailable === null) {
+      setCheckingUsername(true);
+      await checkUsernameAvailability(formData.username);
+      alert('Username checked. Please click Submit again.');
+      return;
+    }
+
+    // Only block if username is explicitly unavailable
+    if (usernameAvailable === false) {
+      alert('This username is already taken. Please choose a different one.');
+      return;
+    }
+
     const formDataToSend = new FormData();
     Object.keys(formData).forEach(key => {
-      formDataToSend.append(key, formData[key]);
+      if (key !== 'confirmPassword') {
+        formDataToSend.append(key, formData[key]);
+      }
     });
     
     if (selectedImage) {
@@ -102,15 +181,18 @@ function UserRegistration() {
 
     try {
       setLoading(true);
-      await axios.post(`${API_URL}/alumni`, formDataToSend, {
+      await axios.post(`${API_URL}/alumni/register`, formDataToSend, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
       
       setSubmitSuccess(true);
       
-      // Reset form after 2 seconds and navigate to home
+      // Reset form after 2 seconds and navigate to login
       setTimeout(() => {
         setFormData({
+          username: '',
+          password: '',
+          confirmPassword: '',
           name: '',
           email: '',
           phone: '',
@@ -135,12 +217,12 @@ function UserRegistration() {
         setSelectedImage(null);
         setImagePreview(null);
         setSubmitSuccess(false);
-        navigate('/');
+        navigate('/alumni-login');
       }, 2000);
       
     } catch (error) {
       console.error('Error submitting registration:', error);
-      alert('Failed to submit registration. Please try again.');
+      alert(error.response?.data?.message || 'Failed to submit registration. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -172,7 +254,7 @@ function UserRegistration() {
         <div className="alert alert-success position-fixed top-0 start-50 translate-middle-x mt-3" 
              style={{ zIndex: 10000, minWidth: '300px' }}>
           <i className="bi bi-check-circle-fill me-2"></i>
-          Registration submitted successfully!
+          Registration successful! Redirecting to login...
         </div>
       )}
 
@@ -246,8 +328,113 @@ function UserRegistration() {
                   </div>
                 </div>
 
-                {/* Personal Details Section */}
+                {/* Login Credentials Section */}
                 <div className="col-12">
+                  <h5 className="text-danger fw-bold mb-3">
+                    <i className="bi bi-shield-lock-fill me-2"></i>
+                    Login Credentials
+                  </h5>
+                  <hr />
+                </div>
+
+                <div className="col-md-6">
+                  <label className="form-label fw-semibold">
+                    Username <span className="text-danger">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="username"
+                    value={formData.username}
+                    onChange={handleInputChange}
+                    className="form-control form-control-lg"
+                    placeholder="Choose a unique username"
+                    required
+                    minLength="3"
+                  />
+                  {checkingUsername && (
+                    <small className="text-muted d-block mt-1">
+                      <i className="bi bi-hourglass-split me-1"></i>
+                      Checking availability...
+                    </small>
+                  )}
+                  {usernameAvailable === true && (
+                    <small className="text-success d-block mt-1">
+                      <i className="bi bi-check-circle-fill me-1"></i>
+                      Username is available
+                    </small>
+                  )}
+                  {usernameAvailable === false && (
+                    <small className="text-danger d-block mt-1">
+                      <i className="bi bi-x-circle-fill me-1"></i>
+                      Username is already taken
+                    </small>
+                  )}
+                </div>
+
+                <div className="col-md-6">
+                  <label className="form-label fw-semibold">
+                    Email Address <span className="text-danger">*</span>
+                  </label>
+                  <input
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleInputChange}
+                    className="form-control form-control-lg"
+                    placeholder="your.email@example.com"
+                    required
+                  />
+                </div>
+
+                <div className="col-md-6">
+                  <label className="form-label fw-semibold">
+                    Password <span className="text-danger">*</span>
+                  </label>
+                  <input
+                    type="password"
+                    name="password"
+                    value={formData.password}
+                    onChange={handleInputChange}
+                    className="form-control form-control-lg"
+                    placeholder="Enter a strong password"
+                    required
+                    minLength="6"
+                  />
+                  <small className="text-muted d-block mt-1">
+                    <i className="bi bi-info-circle me-1"></i>
+                    Minimum 6 characters
+                  </small>
+                </div>
+
+                <div className="col-md-6">
+                  <label className="form-label fw-semibold">
+                    Confirm Password <span className="text-danger">*</span>
+                  </label>
+                  <input
+                    type="password"
+                    name="confirmPassword"
+                    value={formData.confirmPassword}
+                    onChange={handleInputChange}
+                    className="form-control form-control-lg"
+                    placeholder="Re-enter your password"
+                    required
+                  />
+                  {formData.confirmPassword && formData.password !== formData.confirmPassword && (
+                    <small className="text-danger d-block mt-1">
+                      <i className="bi bi-x-circle-fill me-1"></i>
+                      Passwords do not match
+                    </small>
+                  )}
+                  {formData.confirmPassword && formData.password === formData.confirmPassword && (
+                    <small className="text-success d-block mt-1">
+                      <i className="bi bi-check-circle-fill me-1"></i>
+                      Passwords match
+                    </small>
+                  )}
+                </div>
+
+                {/* Personal Details Section */}
+                <div className="col-12 mt-5">
                   <h5 className="text-danger fw-bold mb-3">
                     <i className="bi bi-person-fill me-2"></i>
                     Personal Information
@@ -266,21 +453,6 @@ function UserRegistration() {
                     onChange={handleInputChange}
                     className="form-control form-control-lg"
                     placeholder="Enter your full name"
-                    required
-                  />
-                </div>
-
-                <div className="col-md-6">
-                  <label className="form-label fw-semibold">
-                    Email Address <span className="text-danger">*</span>
-                  </label>
-                  <input
-                    type="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleInputChange}
-                    className="form-control form-control-lg"
-                    placeholder="your.email@example.com"
                     required
                   />
                 </div>
@@ -332,7 +504,7 @@ function UserRegistration() {
                   />
                 </div>
 
-                <div className="col-md-6">
+                <div className="col-12">
                   <label className="form-label fw-semibold">Address</label>
                   <input
                     type="text"
@@ -585,7 +757,7 @@ function UserRegistration() {
                     <button 
                       type="submit" 
                       className="btn btn-danger btn-lg px-5" 
-                      disabled={loading}
+                      disabled={loading || (formData.username.length >= 3 && usernameAvailable === false)}
                     >
                       {loading ? (
                         <>
@@ -605,7 +777,10 @@ function UserRegistration() {
                 <div className="col-12 text-center mt-3">
                   <p className="text-muted small">
                     <i className="bi bi-shield-check me-2"></i>
-                    Your information will be reviewed before being published on the alumni directory
+                    Your information will be securely stored and you can login after registration
+                  </p>
+                  <p className="text-muted small">
+                    Already have an account? <a href="/alumni-login" className="text-danger">Login here</a>
                   </p>
                 </div>
               </div>
