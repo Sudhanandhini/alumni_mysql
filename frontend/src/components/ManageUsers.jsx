@@ -406,13 +406,13 @@ function ManageUsers() {
                         </td>
                         <td className="text-center pe-4">
                           <div className="btn-group">
-                            <button
+                            {/* <button
                               onClick={() => openEditModal(user)}
                               className="btn btn-sm btn-outline-primary"
                               title="Edit User"
                             >
                               <i className="bi bi-pencil-square"></i> Edit
-                            </button>
+                            </button> */}
                             <button
                               onClick={() => handleDelete(user)}
                               className="btn btn-sm btn-outline-danger"
