@@ -100,6 +100,12 @@ function UserLogin() {
                     />
                   </div>
 
+                  <div className="mb-3 text-end">
+                    <button type="button" className="btn btn-link p-0" onClick={() => navigate('/forgot-password')}>
+                      Forgot password?
+                    </button>
+                  </div>
+
                   <button 
                     type="submit" 
                     className="btn btn-danger btn-lg w-100 mb-3"

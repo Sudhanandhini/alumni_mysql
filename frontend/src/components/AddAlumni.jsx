@@ -106,43 +106,119 @@ function AddAlumni() {
     }
   };
 
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+    
+  //   const formDataToSend = new FormData();
+  //   Object.keys(formData).forEach(key => {
+  //     formDataToSend.append(key, formData[key]);
+  //   });
+    
+  //   if (selectedImage) {
+  //     formDataToSend.append('photo', selectedImage);
+  //   }
+    
+  //   if (id && !selectedImage && formData.photo) {
+  //     formDataToSend.append('existing_photo', formData.photo);
+  //   }
+
+  //   try {
+  //     setLoading(true);
+  //     if (id) {
+  //       await axios.put(`${API_URL}/alumni/${id}`, formDataToSend, {
+  //         headers: { 'Content-Type': 'multipart/form-data' }
+  //       });
+  //       alert('Alumni updated successfully!');
+  //     } else {
+  //       await axios.post(`${API_URL}/alumni`, formDataToSend, {
+  //         headers: { 'Content-Type': 'multipart/form-data' }
+  //       });
+  //       alert('Alumni added successfully!');
+  //     }
+  //     navigate('/admin/manage');
+  //   } catch (error) {
+  //     console.error('Error saving alumni:', error);
+  //     alert('Failed to save alumni data');
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    const formDataToSend = new FormData();
-    Object.keys(formData).forEach(key => {
-      formDataToSend.append(key, formData[key]);
-    });
-    
-    if (selectedImage) {
-      formDataToSend.append('photo', selectedImage);
+  e.preventDefault();
+
+  // Build FormData safely: skip undefined/null and skip confirmPassword
+  const formDataToSend = new FormData();
+  Object.keys(formData).forEach(key => {
+    if (key === 'confirmPassword') return; // don't send confirmPassword
+    const val = formData[key];
+    // Append only non-undefined values; convert null to empty string if you prefer
+    if (val !== undefined && val !== null) {
+      formDataToSend.append(key, val);
     }
-    
-    if (id && !selectedImage && formData.photo) {
-      formDataToSend.append('existing_photo', formData.photo);
+  });
+
+  // Append image if selected
+  if (selectedImage) {
+    formDataToSend.append('photo', selectedImage);
+  }
+
+  // If we're editing and there's an existing photo path saved in formData, send it
+  if (id && !selectedImage && formData.photo) {
+    formDataToSend.append('existing_photo', formData.photo);
+  }
+
+  // DEBUG: log contents (for development only)
+  // eslint-disable-next-line no-console
+  console.log('Submitting form data entries:');
+  for (const pair of formDataToSend.entries()) {
+    // don't print binary file content, print file.name for files
+    if (pair[1] instanceof File) {
+      // eslint-disable-next-line no-console
+      console.log(pair[0], pair[1].name, pair[1].size);
+    } else {
+      // eslint-disable-next-line no-console
+      console.log(pair[0], pair[1]);
+    }
+  }
+
+  try {
+    setLoading(true);
+
+    if (id) {
+      // IMPORTANT: do NOT set Content-Type manually for multipart/form-data
+      await axios.put(`${API_URL}/alumni/${id}`, formDataToSend);
+      alert('Alumni updated successfully!');
+    } else {
+      // IMPORTANT: do NOT set Content-Type manually for multipart/form-data
+      await axios.post(`${API_URL}/alumni`, formDataToSend);
+      alert('Alumni added successfully!');
     }
 
-    try {
-      setLoading(true);
-      if (id) {
-        await axios.put(`${API_URL}/alumni/${id}`, formDataToSend, {
-          headers: { 'Content-Type': 'multipart/form-data' }
-        });
-        alert('Alumni updated successfully!');
-      } else {
-        await axios.post(`${API_URL}/alumni`, formDataToSend, {
-          headers: { 'Content-Type': 'multipart/form-data' }
-        });
-        alert('Alumni added successfully!');
-      }
-      navigate('/admin/manage');
-    } catch (error) {
-      console.error('Error saving alumni:', error);
-      alert('Failed to save alumni data');
-    } finally {
-      setLoading(false);
+    navigate('/admin/manage');
+  } catch (error) {
+    // Better error logging to see server response
+    console.error('Error saving alumni:', error);
+    if (error.response) {
+      // server responded with status code outside 2xx
+      console.error('Server response status:', error.response.status);
+      console.error('Server response data:', error.response.data);
+      alert(error.response.data?.message || error.response.data?.error || 'Failed to save alumni data (server error)');
+    } else if (error.request) {
+      // request was made but no response
+      console.error('No response received:', error.request);
+      alert('No response from server. Check backend or CORS.');
+    } else {
+      // something bad happened building the request
+      console.error('Request setup error:', error.message);
+      alert('Failed to save alumni data: ' + error.message);
     }
-  };
+  } finally {
+    setLoading(false);
+  }
+};
+
+
 
   return (
     <div className="add-alumni-page">
