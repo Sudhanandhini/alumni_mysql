@@ -4,6 +4,8 @@ import axios from 'axios';
 import Slider from 'react-slick';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
+import './AlumniCards.css';
+
 
 /**
  * API URL detection:
@@ -11,15 +13,7 @@ import 'slick-carousel/slick/slick-theme.css';
  * - CRA: process.env.REACT_APP_API_URL (only available if built with CRA)
  * - fallback: http://localhost:5000/api
  */
-// const API_URL =
-//   (typeof import !== 'undefined' &&
-//     typeof import.meta !== 'undefined' &&
-//     import.meta.env &&
-//     import.meta.env.VITE_API_URL) ||
-//   (typeof process !== 'undefined' && process.env && process.env.REACT_APP_API_URL) ||
-//   'http://localhost:5000/api';
-
-  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
 /**
  * Build API_BASE for static files. Ensure it has protocol and no trailing /api.
@@ -86,6 +80,12 @@ function Home() {
     pauseOnHover: true,
     arrows: true,
     centerMode: false,
+    adaptiveHeight: true,
+    appendDots: (dots) => (
+      <div>
+        <ul style={{ margin: "0px" }}> {dots.slice(0, 5)} </ul>
+      </div>
+    ),
     responsive: [
       {
         breakpoint: 1200,
@@ -93,6 +93,7 @@ function Home() {
           slidesToShow: slidesToShowXL,
           slidesToScroll: 1,
           infinite: alumni.length > slidesToShowXL,
+          arrows: true,
         },
       },
       {
@@ -101,6 +102,19 @@ function Home() {
           slidesToShow: slidesToShowMD,
           slidesToScroll: 1,
           infinite: alumni.length > slidesToShowMD,
+          arrows: true,
+        },
+      },
+      {
+        breakpoint: 768,
+        settings: {
+          slidesToShow: 1,
+          slidesToScroll: 1,
+          infinite: alumni.length > 1,
+          centerMode: true,
+          centerPadding: '40px',
+          arrows: false,
+          dots: true,
         },
       },
       {
@@ -110,7 +124,9 @@ function Home() {
           slidesToScroll: 1,
           infinite: alumni.length > slidesToShowSM,
           centerMode: true,
-          centerPadding: '20px',
+          centerPadding: '30px',
+          arrows: false,
+          dots: true,
         },
       },
     ],
@@ -129,14 +145,14 @@ function Home() {
       {/* Hero Section */}
       <div className="hero-section bg-gradient-danger text-white py-5">
         <div className="container text-center">
-          <h1 className="display-3 fw-bold mb-3 animate-fade-in">
-            <i className="bi bi-stars me-3"></i>
-            Our Distinguished Alumni
-            <i className="bi bi-stars ms-3"></i>
+          <h1 className="display-4 display-md-3 fw-bold mb-3 animate-fade-in">
+            <i className="bi bi-stars me-2 me-md-3"></i>
+            <span className="d-block d-md-inline">Our Distinguished Alumni</span>
+            <i className="bi bi-stars ms-2 ms-md-3"></i>
           </h1>
-          <p className="lead fs-4 mb-4">Meet our successful alumni who are making a difference in the world</p>
+          <p className="lead fs-5 fs-md-4 mb-4 px-3">Meet our successful alumni who are making a difference in the world</p>
           <div className="mt-4">
-            <span className="badge bg-light text-danger fs-5 px-4 py-3">
+            <span className="badge bg-light text-danger fs-6 fs-md-5 px-3 px-md-4 py-2 py-md-3">
               <i className="bi bi-people-fill me-2"></i>
               {alumni.length} Alumni Network
             </span>
@@ -145,8 +161,8 @@ function Home() {
       </div>
 
       {/* Alumni Carousel */}
-      <div className="carousel-section py-5">
-        <div className="container-fluid px-lg-5">
+      <div className="carousel-section py-4 py-md-5">
+        <div className="container-fluid px-2 px-md-3 px-lg-5">
           {loading ? (
             <div className="text-center py-5">
               <div className="spinner-border text-danger" style={{ width: '3rem', height: '3rem' }}>
@@ -162,82 +178,223 @@ function Home() {
             <div className="alumni-carousel-container">
               <Slider {...carouselSettings}>
                 {alumni.map((alumnus) => (
-                  <div key={alumnus.id} className="carousel-item-wrapper px-2">
-                    <div className="alumni-card-uniform shadow-lg" style={{ position: 'relative' }}>
-                      <div className="card-body-uniform p-4">
+                  <div key={alumnus.id} className="carousel-item-wrapper px-1 px-md-2">
+                    <div 
+                      className="alumni-card-modern" 
+                      style={{ 
+                        position: 'relative', 
+                        margin: '0 5px',
+                        background: 'linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)',
+                        borderRadius: '20px',
+                        overflow: 'hidden',
+                        border: '1px solid #e9ecef',
+                        transition: 'all 0.3s ease',
+                        height: '100%',
+                        boxShadow: '0 4px 20px rgba(0,0,0,0.08)'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.transform = 'translateY(-5px)';
+                        e.currentTarget.style.boxShadow = '0 8px 30px rgba(220, 53, 69, 0.2)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.transform = 'translateY(0)';
+                        e.currentTarget.style.boxShadow = '0 4px 20px rgba(0,0,0,0.08)';
+                      }}
+                    >
+                      {/* Top Accent Bar */}
+                      <div style={{
+                        height: '5px',
+                        background: 'linear-gradient(90deg, #dc3545 0%, #c82333 100%)',
+                        width: '100%'
+                      }} />
+
+                      <div className="card-body p-4">
                         {/* Status Badge */}
                         {alumnus.current_status && (
                           <span
-                            className={`status-badge-top ${
+                            className={`status-badge ${
                               alumnus.current_status === 'Employed'
                                 ? 'bg-success'
                                 : alumnus.current_status === 'Self-Employed'
                                 ? 'bg-primary'
                                 : 'bg-info'
                             }`}
-                            style={{ position: 'absolute', right: 12, top: 12, padding: '6px 10px', borderRadius: 6, color: '#fff' }}
+                            style={{ 
+                              position: 'absolute', 
+                              right: 15, 
+                              top: 20, 
+                              padding: '6px 12px', 
+                              borderRadius: '20px', 
+                              color: '#fff',
+                              fontSize: '0.75rem',
+                              fontWeight: '600',
+                              boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+                              zIndex: 1
+                            }}
                           >
                             {alumnus.current_status}
                           </span>
                         )}
 
-                        {/* Alumni Photo */}
-                        <div className="alumni-photo-wrapper d-flex justify-content-center mb-3">
-                          <img
-                            src={buildPhotoUrl(alumnus.photo)}
-                            alt={alumnus.name || 'Alumnus'}
-                            className="alumni-photo rounded-circle"
-                            style={{ width: 140, height: 140, objectFit: 'cover' }}
-                          />
+                        {/* Alumni Photo with Ring */}
+                        <div className="alumni-photo-section d-flex justify-content-center mb-3" style={{ paddingTop: '10px' }}>
+                          <div style={{
+                            position: 'relative',
+                            padding: '4px',
+                            background: 'linear-gradient(135deg, #dc3545 0%, #c82333 100%)',
+                            borderRadius: '50%',
+                            boxShadow: '0 4px 15px rgba(220, 53, 69, 0.3)'
+                          }}>
+                            <img
+                              src={buildPhotoUrl(alumnus.photo)}
+                              alt={alumnus.name || 'Alumnus'}
+                              className="alumni-photo"
+                              style={{ 
+                                width: '120px', 
+                                height: '120px', 
+                                objectFit: 'cover',
+                                borderRadius: '50%',
+                                border: '4px solid white',
+                                display: 'block'
+                              }}
+                            />
+                          </div>
                         </div>
 
-                        {/* Alumni Name */}
-                        <h5 className="alumni-name text-center mb-1">{alumnus.name || '—'}</h5>
-
-                        {/* Alumni Details */}
-                        <div className="alumni-info text-center small text-muted mb-3">
+                        {/* Alumni Name & Role */}
+                        <div className="text-center mb-3" style={{ 
+                          borderBottom: '2px solid #f8f9fa',
+                          paddingBottom: '15px'
+                        }}>
+                          <h5 className="alumni-name mb-2" style={{
+                            fontSize: '1.25rem',
+                            fontWeight: '700',
+                            color: '#212529',
+                            marginBottom: '5px'
+                          }}>
+                            {alumnus.name || '—'}
+                          </h5>
+                          
                           {alumnus.designation && (
-                            <div className="info-item">
-                              <i className="bi bi-briefcase-fill me-1" />
-                              <span>{alumnus.designation}</span>
-                            </div>
+                            <p className="text-danger mb-0" style={{
+                              fontSize: '0.95rem',
+                              fontWeight: '600',
+                              letterSpacing: '0.3px'
+                            }}>
+                              {alumnus.designation}
+                            </p>
                           )}
-
+                          
                           {alumnus.organization_name && (
-                            <div className="info-item">
-                              <i className="bi bi-building-fill me-1" />
-                              <span>{alumnus.organization_name}</span>
-                            </div>
+                            <p className="text-muted mb-0" style={{
+                              fontSize: '0.85rem',
+                              marginTop: '3px'
+                            }}>
+                              {alumnus.organization_name}
+                            </p>
                           )}
+                        </div>
 
+                        {/* Alumni Details - Organized Grid */}
+                        <div className="alumni-details mb-3" style={{
+                          background: '#f8f9fa',
+                          borderRadius: '12px',
+                          padding: '15px',
+                        }}>
                           {alumnus.institution && (
-                            <div className="info-item">
-                              <i className="bi bi-mortarboard-fill me-1" />
-                              <span>
-                                {alumnus.institution}
-                                {alumnus.batch ? ` (${alumnus.batch})` : ''}
-                              </span>
+                            <div className="detail-row d-flex align-items-start mb-2">
+                              <div style={{
+                                width: '32px',
+                                height: '32px',
+                                background: 'linear-gradient(135deg, #dc3545 0%, #c82333 100%)',
+                                borderRadius: '8px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                flexShrink: 0,
+                                marginRight: '10px'
+                              }}>
+                                <i className="bi bi-mortarboard-fill text-white" style={{ fontSize: '0.9rem' }} />
+                              </div>
+                              <div className="flex-grow-1">
+                                <div style={{ fontSize: '0.75rem', color: '#6c757d', marginBottom: '2px' }}>Education</div>
+                                <div style={{ fontSize: '0.85rem', color: '#495057', fontWeight: '500' }}>
+                                  {alumnus.institution}
+                                  {alumnus.batch && <span className="text-muted"> • {alumnus.batch}</span>}
+                                </div>
+                              </div>
                             </div>
                           )}
 
                           {alumnus.department && (
-                            <div className="info-item">
-                              <i className="bi bi-book-fill me-1" />
-                              <span>{alumnus.department}</span>
+                            <div className="detail-row d-flex align-items-start mb-2">
+                              <div style={{
+                                width: '32px',
+                                height: '32px',
+                                background: 'linear-gradient(135deg, #6c757d 0%, #5a6268 100%)',
+                                borderRadius: '8px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                flexShrink: 0,
+                                marginRight: '10px'
+                              }}>
+                                <i className="bi bi-book-fill text-white" style={{ fontSize: '0.9rem' }} />
+                              </div>
+                              <div className="flex-grow-1">
+                                <div style={{ fontSize: '0.75rem', color: '#6c757d', marginBottom: '2px' }}>Department</div>
+                                <div style={{ fontSize: '0.85rem', color: '#495057', fontWeight: '500' }}>
+                                  {alumnus.department}
+                                </div>
+                              </div>
                             </div>
                           )}
 
                           {alumnus.work_location && (
-                            <div className="info-item">
-                              <i className="bi bi-geo-alt-fill me-1" />
-                              <span>{alumnus.work_location}</span>
+                            <div className="detail-row d-flex align-items-start mb-2">
+                              <div style={{
+                                width: '32px',
+                                height: '32px',
+                                background: 'linear-gradient(135deg, #28a745 0%, #218838 100%)',
+                                borderRadius: '8px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                flexShrink: 0,
+                                marginRight: '10px'
+                              }}>
+                                <i className="bi bi-geo-alt-fill text-white" style={{ fontSize: '0.9rem' }} />
+                              </div>
+                              <div className="flex-grow-1">
+                                <div style={{ fontSize: '0.75rem', color: '#6c757d', marginBottom: '2px' }}>Location</div>
+                                <div style={{ fontSize: '0.85rem', color: '#495057', fontWeight: '500' }}>
+                                  {alumnus.work_location}
+                                </div>
+                              </div>
                             </div>
                           )}
 
                           {alumnus.experience_years && (
-                            <div className="info-item">
-                              <i className="bi bi-award-fill me-1" />
-                              <span>{alumnus.experience_years} years</span>
+                            <div className="detail-row d-flex align-items-start">
+                              <div style={{
+                                width: '32px',
+                                height: '32px',
+                                background: 'linear-gradient(135deg, #ffc107 0%, #e0a800 100%)',
+                                borderRadius: '8px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                flexShrink: 0,
+                                marginRight: '10px'
+                              }}>
+                                <i className="bi bi-award-fill text-white" style={{ fontSize: '0.9rem' }} />
+                              </div>
+                              <div className="flex-grow-1">
+                                <div style={{ fontSize: '0.75rem', color: '#6c757d', marginBottom: '2px' }}>Experience</div>
+                                <div style={{ fontSize: '0.85rem', color: '#495057', fontWeight: '500' }}>
+                                  {alumnus.experience_years} years
+                                </div>
+                              </div>
                             </div>
                           )}
                         </div>
@@ -245,9 +402,39 @@ function Home() {
                         {/* LinkedIn Button */}
                         {alumnus.linkedin && (
                           <div className="d-flex justify-content-center">
-                            <a href={alumnus.linkedin} target="_blank" rel="noopener noreferrer" className="linkedin-btn btn btn-outline-primary btn-sm">
-                              <i className="bi bi-linkedin me-2" />
-                              Connect
+                            <a 
+                              href={alumnus.linkedin} 
+                              target="_blank" 
+                              rel="noopener noreferrer" 
+                              className="linkedin-btn"
+                              style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                padding: '10px 24px',
+                                background: '#0077b5',
+                                color: 'white',
+                                borderRadius: '25px',
+                                textDecoration: 'none',
+                                fontSize: '0.9rem',
+                                fontWeight: '600',
+                                transition: 'all 0.3s ease',
+                                boxShadow: '0 3px 10px rgba(0, 119, 181, 0.3)',
+                                border: 'none'
+                              }}
+                              onMouseEnter={(e) => {
+                                e.currentTarget.style.background = '#005885';
+                                e.currentTarget.style.transform = 'translateY(-2px)';
+                                e.currentTarget.style.boxShadow = '0 5px 15px rgba(0, 119, 181, 0.4)';
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.background = '#0077b5';
+                                e.currentTarget.style.transform = 'translateY(0)';
+                                e.currentTarget.style.boxShadow = '0 3px 10px rgba(0, 119, 181, 0.3)';
+                              }}
+                            >
+                              <i className="bi bi-linkedin me-2" style={{ fontSize: '1.1rem' }} />
+                              Connect on LinkedIn
                             </a>
                           </div>
                         )}

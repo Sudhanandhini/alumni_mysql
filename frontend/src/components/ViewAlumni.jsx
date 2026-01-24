@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 
-const API_URL = 'http://localhost:5000/api';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const API_BASE = API_URL.replace(/\/api\/?$/, '');
 
 function ViewAlumni() {
   const navigate = useNavigate();
@@ -302,7 +303,7 @@ function ViewAlumni() {
                      onClick={() => setSelectedAlumni(alumnus)}>
                   <div className="card-body text-center">
                     <img
-                      src={alumnus.photo ? `http://localhost:5000${alumnus.photo}` : 'https://via.placeholder.com/150'}
+                      src={alumnus.photo ? `${API_BASE}${alumnus.photo}` : 'https://via.placeholder.com/150'}
                       alt={alumnus.name}
                       className="rounded-circle mb-3 border border-3 border-danger"
                       style={{ width: '120px', height: '120px', objectFit: 'cover' }}
@@ -351,7 +352,7 @@ function ViewAlumni() {
                 <div className="row">
                   <div className="col-md-4 text-center mb-3">
                     <img
-                      src={selectedAlumni.photo ? `http://localhost:5000${selectedAlumni.photo}` : 'https://via.placeholder.com/200'}
+                      src={selectedAlumni.photo ? `${API_BASE}${selectedAlumni.photo}` : 'https://via.placeholder.com/200'}
                       alt={selectedAlumni.name}
                       className="rounded-circle border border-3 border-danger"
                       style={{ width: '200px', height: '200px', objectFit: 'cover' }}

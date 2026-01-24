@@ -14,6 +14,7 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // =================== CONFIG ===================
+const BASE_PATH = process.env.BASE_PATH || ''; // For serving under subdirectory like /alumni-backend
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-here-change-in-production';
 const ALUMNI_JWT_SECRET = process.env.ALUMNI_JWT_SECRET || 'your-alumni-secret-key-here-change-in-production';
 
@@ -25,7 +26,10 @@ if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
 app.use(cors());
 app.use(express.json({ limit: '5mb' }));
 app.use(express.urlencoded({ extended: true, limit: '5mb' }));
-app.use('/uploads', express.static(uploadDir));
+
+// Handle base path for uploads
+const uploadsPath = BASE_PATH ? `${BASE_PATH}/uploads` : '/uploads';
+app.use(uploadsPath, express.static(uploadDir));
 
 // simple request logger
 app.use((req, res, next) => {
@@ -108,12 +112,14 @@ function normalizeForDb(value) {
 }
 
 // =================== ROUTES ===================
+// Create a router to handle all API routes
+const apiRouter = express.Router();
 
 // Test
-app.get('/api/test', (req, res) => res.json({ message: 'Backend is working!' }));
+apiRouter.get('/test', (req, res) => res.json({ message: 'Backend is working!' }));
 
 // ----------------- Password reset -----------------
-app.post('/api/alumni/forgot-password', async (req, res) => {
+apiRouter.post('/alumni/forgot-password', async (req, res) => {
   try {
     if (!requireDb(res)) return;
     const { username, email } = req.body;
@@ -130,41 +136,43 @@ app.post('/api/alumni/forgot-password', async (req, res) => {
     const frontendUrl = process.env.CLIENT_URL || 'http://localhost:5173';
     const resetLink = `${frontendUrl}/reset-password?token=${token}`;
 
-    let transporter;
-    let useEthereal = false;
-    
-    // Try Gmail first if configured
-    if (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
-      try {
-        transporter = nodemailer.createTransport({
-          host: process.env.SMTP_HOST,
-          port: parseInt(process.env.SMTP_PORT) || 587,
-          secure: process.env.SMTP_PORT === '465', // true for 465, false for other ports
-          auth: {
-            user: process.env.SMTP_USER,
-            pass: process.env.SMTP_PASS,
-          },
-        });
-        // Verify the connection
-        await transporter.verify();
-        console.log('SMTP connection verified successfully');
-      } catch (smtpError) {
-        console.warn('SMTP verification failed, falling back to Ethereal:', smtpError.message);
-        useEthereal = true;
-      }
-    } else {
-      console.log('No SMTP credentials configured, using Ethereal');
-      useEthereal = true;
+    // Configure SMTP transporter
+    if (!process.env.SMTP_HOST || !process.env.SMTP_USER || !process.env.SMTP_PASS) {
+      console.error('❌ SMTP credentials not configured');
+      return res.status(500).json({ 
+        error: 'Email service not configured. Please contact administrator.',
+        message: 'SMTP credentials missing in environment variables'
+      });
     }
-    
-    // Fallback to Ethereal if Gmail fails or not configured
-    if (useEthereal) {
-      const testAccount = await nodemailer.createTestAccount();
-      transporter = nodemailer.createTransport({
-        host: 'smtp.ethereal.email',
-        port: 587,
-        secure: false,
-        auth: { user: testAccount.user, pass: testAccount.pass },
+
+    const transporter = nodemailer.createTransport({
+      host: process.env.SMTP_HOST,
+      port: parseInt(process.env.SMTP_PORT) || 587,
+      secure: process.env.SMTP_SECURE === 'true', // true for 465, false for 587
+      auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS,
+      },
+      tls: {
+        rejectUnauthorized: false // Accept self-signed certificates
+      }
+    });
+
+    // Verify the connection
+    try {
+      await transporter.verify();
+      console.log('✅ SMTP connection verified successfully');
+    } catch (smtpError) {
+      console.error('❌ SMTP verification failed:', smtpError);
+      return res.status(500).json({ 
+        error: 'Email service connection failed. Please contact administrator.',
+        message: process.env.NODE_ENV === 'development' ? smtpError.message : 'Unable to connect to email service',
+        details: {
+          host: process.env.SMTP_HOST,
+          port: process.env.SMTP_PORT,
+          user: process.env.SMTP_USER,
+          errorCode: smtpError.code
+        }
       });
     }
 
@@ -190,22 +198,20 @@ app.post('/api/alumni/forgot-password', async (req, res) => {
     };
 
     const info = await transporter.sendMail(mailOptions);
-    const previewUrl = nodemailer.getTestMessageUrl(info);
-    console.log('Password reset sent:', { username: user.username, to: user.email, previewUrl, useEthereal });
+    console.log('✅ Password reset email sent successfully to:', user.email);
+    console.log('📧 Message ID:', info.messageId);
 
-    const payload = { message: 'If the username exists, a reset link has been sent to your registered email' };
-    if (previewUrl) {
-      payload.previewUrl = previewUrl;
-      payload.useEthereal = useEthereal;
-    }
-    res.json(payload);
+    res.json({ 
+      message: 'Password reset link has been sent to your registered email address. Please check your inbox.',
+      success: true
+    });
   } catch (err) {
-    console.error('Error in forgot-password:', err);
+    console.error('❌ Error in forgot-password:', err);
     res.status(500).json({ error: 'Failed to send reset email', message: err.message });
   }
 });
 
-app.post('/api/alumni/reset-password', async (req, res) => {
+apiRouter.post('/alumni/reset-password', async (req, res) => {
   try {
     if (!requireDb(res)) return;
     const { token, newPassword } = req.body;
@@ -251,7 +257,7 @@ app.post('/api/alumni/reset-password', async (req, res) => {
 
 // ----------------- Alumni CRUD -----------------
 
-app.get('/api/alumni', async (req, res) => {
+apiRouter.get('/alumni', async (req, res) => {
   try {
     if (!requireDb(res)) return;
     const [results] = await db.query(
@@ -267,7 +273,7 @@ app.get('/api/alumni', async (req, res) => {
   }
 });
 
-app.get('/api/alumni/:id', async (req, res) => {
+apiRouter.get('/alumni/:id', async (req, res) => {
   try {
     if (!requireDb(res)) return;
     const { id } = req.params;
@@ -286,7 +292,7 @@ app.get('/api/alumni/:id', async (req, res) => {
   }
 });
 
-app.get('/api/alumni/check-username/:username', async (req, res) => {
+apiRouter.get('/alumni/check-username/:username', async (req, res) => {
   try {
     if (!requireDb(res)) return;
     const { username } = req.params;
@@ -299,7 +305,7 @@ app.get('/api/alumni/check-username/:username', async (req, res) => {
 });
 
 // Registration (alumni)
-app.post('/api/alumni/register', runMulter(upload.single('photo')), async (req, res) => {
+apiRouter.post('/alumni/register', runMulter(upload.single('photo')), async (req, res) => {
   try {
     if (!requireDb(res)) return;
 
@@ -369,7 +375,7 @@ app.post('/api/alumni/register', runMulter(upload.single('photo')), async (req, 
 });
 
 // Admin - add new alumni
-app.post('/api/alumni', runMulter(upload.single('photo')), async (req, res) => {
+apiRouter.post('/alumni', runMulter(upload.single('photo')), async (req, res) => {
   try {
     if (!requireDb(res)) return;
 
@@ -411,7 +417,7 @@ app.post('/api/alumni', runMulter(upload.single('photo')), async (req, res) => {
 });
 
 // Update alumni
-app.put('/api/alumni/:id', runMulter(upload.single('photo')), async (req, res) => {
+apiRouter.put('/alumni/:id', runMulter(upload.single('photo')), async (req, res) => {
   try {
     if (!requireDb(res)) return;
     const { id } = req.params;
@@ -455,7 +461,7 @@ app.put('/api/alumni/:id', runMulter(upload.single('photo')), async (req, res) =
 });
 
 // Delete alumni
-app.delete('/api/alumni/:id', async (req, res) => {
+apiRouter.delete('/alumni/:id', async (req, res) => {
   try {
     if (!requireDb(res)) return;
     const { id } = req.params;
@@ -477,7 +483,7 @@ app.delete('/api/alumni/:id', async (req, res) => {
 
 // ----------------- Admin / users (kept as before, with minor normalization) -----------------
 
-app.get('/api/users/check-username/:username', async (req, res) => {
+apiRouter.get('/users/check-username/:username', async (req, res) => {
   try {
     if (!requireDb(res)) return;
     const { username } = req.params;
@@ -489,7 +495,7 @@ app.get('/api/users/check-username/:username', async (req, res) => {
   }
 });
 
-app.get('/api/users', async (req, res) => {
+apiRouter.get('/users', async (req, res) => {
   try {
     if (!requireDb(res)) return;
     const [users] = await db.query('SELECT id, name, username, place, created_at FROM users ORDER BY created_at DESC');
@@ -500,7 +506,7 @@ app.get('/api/users', async (req, res) => {
   }
 });
 
-app.get('/api/users/:id', async (req, res) => {
+apiRouter.get('/users/:id', async (req, res) => {
   try {
     if (!requireDb(res)) return;
     const [users] = await db.query('SELECT id, name, username, place, created_at FROM users WHERE id = ?', [req.params.id]);
@@ -512,7 +518,7 @@ app.get('/api/users/:id', async (req, res) => {
   }
 });
 
-app.post('/api/users', async (req, res) => {
+apiRouter.post('/users', async (req, res) => {
   try {
     if (!requireDb(res)) return;
     const { name, username, password, place } = req.body;
@@ -528,7 +534,7 @@ app.post('/api/users', async (req, res) => {
   }
 });
 
-app.put('/api/users/:id', async (req, res) => {
+apiRouter.put('/users/:id', async (req, res) => {
   try {
     if (!requireDb(res)) return;
     const { name, username, password, place } = req.body;
@@ -552,7 +558,7 @@ app.put('/api/users/:id', async (req, res) => {
   }
 });
 
-app.delete('/api/users/:id', async (req, res) => {
+apiRouter.delete('/users/:id', async (req, res) => {
   try {
     if (!requireDb(res)) return;
     await db.query('DELETE FROM users WHERE id = ?', [req.params.id]);
@@ -563,7 +569,7 @@ app.delete('/api/users/:id', async (req, res) => {
   }
 });
 
-app.post('/api/user/login', async (req, res) => {
+apiRouter.post('/user/login', async (req, res) => {
   try {
     if (!requireDb(res)) return;
     const { username, password } = req.body;
@@ -581,7 +587,7 @@ app.post('/api/user/login', async (req, res) => {
 });
 
 // Alumni login endpoint
-app.post('/api/alumni/login', async (req, res) => {
+apiRouter.post('/alumni/login', async (req, res) => {
   try {
     if (!requireDb(res)) return;
     const { username, password } = req.body;
@@ -611,11 +617,23 @@ app.post('/api/alumni/login', async (req, res) => {
   }
 });
 
+// Mount the API router - handle both direct /api and /alumni-backend/api paths
+// When deployed under a subdirectory, mount at that base path
+if (BASE_PATH) {
+  app.use(`${BASE_PATH}/api`, apiRouter);
+  console.log(`📍 API routes mounted at: ${BASE_PATH}/api`);
+}
+app.use('/api', apiRouter);
+
 // catch-all 404
 app.use((req, res) => res.status(404).json({ error: 'No matching route', path: req.originalUrl }));
 
 app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
-  console.log(`📝 Test API: http://localhost:${PORT}/api/test`);
+  if (BASE_PATH) {
+    console.log(`📝 Test API: http://localhost:${PORT}${BASE_PATH}/api/test`);
+  } else {
+    console.log(`📝 Test API: http://localhost:${PORT}/api/test`);
+  }
   console.log(`📁 Uploads directory: ${uploadDir}`);
 });

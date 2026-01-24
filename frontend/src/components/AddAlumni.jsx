@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 
 
-const API_URL = 'http://localhost:5000/api';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 function AddAlumni() {
   const navigate = useNavigate();
@@ -13,6 +13,9 @@ function AddAlumni() {
   const [imagePreview, setImagePreview] = useState(null);
   
   const [formData, setFormData] = useState({
+    username: '',
+    password: '',
+    confirmPassword: '',
     name: '',
     email: '',
     phone: '',
@@ -147,6 +150,24 @@ function AddAlumni() {
   const handleSubmit = async (e) => {
   e.preventDefault();
 
+  // Validate for new alumni (not editing)
+  if (!id) {
+    if (!formData.username || !formData.password) {
+      alert('Username and password are required for new alumni');
+      return;
+    }
+    
+    if (formData.password.length < 6) {
+      alert('Password must be at least 6 characters long');
+      return;
+    }
+
+    if (formData.password !== formData.confirmPassword) {
+      alert('Passwords do not match');
+      return;
+    }
+  }
+
   // Build FormData safely: skip undefined/null and skip confirmPassword
   const formDataToSend = new FormData();
   Object.keys(formData).forEach(key => {
@@ -190,9 +211,9 @@ function AddAlumni() {
       await axios.put(`${API_URL}/alumni/${id}`, formDataToSend);
       alert('Alumni updated successfully!');
     } else {
-      // IMPORTANT: do NOT set Content-Type manually for multipart/form-data
-      await axios.post(`${API_URL}/alumni`, formDataToSend);
-      alert('Alumni added successfully!');
+      // Use the register endpoint that creates both alumni and user accounts
+      await axios.post(`${API_URL}/alumni/register`, formDataToSend);
+      alert('Alumni registered successfully!');
     }
 
     navigate('/admin/manage');
@@ -244,9 +265,9 @@ function AddAlumni() {
             </button>
             <h1 className="display-5 fw-bold text-danger">
               <i className="bi bi-person-plus-fill me-3"></i>
-              {id ? 'Edit Alumni' : 'Add New Alumni'}
+              {id ? 'Edit Alumni' : 'Alumni Registration'}
             </h1>
-            <p className="text-muted">Fill in the details below to {id ? 'update' : 'add'} an alumni profile</p>
+            <p className="text-muted">Fill in the details below to {id ? 'update' : 'register'} an alumni profile with login access</p>
           </div>
         </div>
 
@@ -277,6 +298,58 @@ function AddAlumni() {
                     </p>
                   </div>
                 </div>
+
+                {/* Login Credentials Section - Only for new alumni */}
+                {!id && (
+                  <>
+                    <div className="col-12">
+                      <h5 className="text-danger fw-bold mb-3">
+                        <i className="bi bi-shield-lock-fill me-2"></i>
+                        Login Credentials
+                      </h5>
+                      <hr />
+                    </div>
+
+                    <div className="col-md-6">
+                      <label className="form-label fw-semibold">Username <span className="text-danger">*</span></label>
+                      <input
+                        type="text"
+                        name="username"
+                        value={formData.username}
+                        onChange={handleInputChange}
+                        className="form-control form-control-lg"
+                        placeholder="Choose a unique username"
+                        required={!id}
+                      />
+                    </div>
+
+                    <div className="col-md-6">
+                      <label className="form-label fw-semibold">Password <span className="text-danger">*</span></label>
+                      <input
+                        type="password"
+                        name="password"
+                        value={formData.password}
+                        onChange={handleInputChange}
+                        className="form-control form-control-lg"
+                        placeholder="At least 6 characters"
+                        required={!id}
+                      />
+                    </div>
+
+                    <div className="col-md-6">
+                      <label className="form-label fw-semibold">Confirm Password <span className="text-danger">*</span></label>
+                      <input
+                        type="password"
+                        name="confirmPassword"
+                        value={formData.confirmPassword}
+                        onChange={handleInputChange}
+                        className="form-control form-control-lg"
+                        placeholder="Re-enter password"
+                        required={!id}
+                      />
+                    </div>
+                  </>
+                )}
 
                 {/* Personal Details Section */}
                 <div className="col-12">

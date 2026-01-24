@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
-const API_URL = 'http://localhost:5000/api';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 function UserRegistration() {
   const navigate = useNavigate();
@@ -87,15 +87,18 @@ function UserRegistration() {
   const checkUsernameAvailability = async (username) => {
     if (username.length < 3) {
       setUsernameAvailable(null);
-      return;
+      return null;
     }
 
     try {
       setCheckingUsername(true);
       const response = await axios.get(`${API_URL}/alumni/check-username/${username}`);
-      setUsernameAvailable(response.data.available);
+      const isAvailable = response.data.available;
+      setUsernameAvailable(isAvailable);
+      return isAvailable;
     } catch (error) {
       console.error('Error checking username:', error);
+      return null;
     } finally {
       setCheckingUsername(false);
     }
@@ -154,16 +157,20 @@ function UserRegistration() {
       return;
     }
 
-    // If username hasn't been checked yet, check it now
+    // If username hasn't been checked yet, check it now and wait for result
+    let isUsernameAvailable = usernameAvailable;
     if (formData.username.length >= 3 && usernameAvailable === null) {
-      setCheckingUsername(true);
-      await checkUsernameAvailability(formData.username);
-      alert('Username checked. Please click Submit again.');
+      isUsernameAvailable = await checkUsernameAvailability(formData.username);
+    }
+
+    // Check if still checking (shouldn't happen but just in case)
+    if (checkingUsername) {
+      alert('Please wait while we check username availability...');
       return;
     }
 
     // Only block if username is explicitly unavailable
-    if (usernameAvailable === false) {
+    if (isUsernameAvailable === false) {
       alert('This username is already taken. Please choose a different one.');
       return;
     }
@@ -217,6 +224,7 @@ function UserRegistration() {
         setSelectedImage(null);
         setImagePreview(null);
         setSubmitSuccess(false);
+        setUsernameAvailable(null);
         navigate('/alumni-login');
       }, 2000);
       

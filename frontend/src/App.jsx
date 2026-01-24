@@ -32,7 +32,7 @@ const UserProtectedRoute = ({ children }) => {
 
 function App() {
   return (
-    <Router>
+    <Router basename='/alumni-app/'>
       <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
         {/* Global Navbar - Appears on all pages */}
         <Navbar />

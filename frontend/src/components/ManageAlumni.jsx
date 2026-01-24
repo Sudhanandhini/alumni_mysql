@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 
-const API_URL = 'http://localhost:5000/api';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const API_BASE = API_URL.replace(/\/api\/?$/, '');
 
 function ManageAlumni() {
   const navigate = useNavigate();
@@ -322,7 +323,7 @@ function ManageAlumni() {
                       <tr key={alumnus.id}>
                         <td className="ps-4">
                           <img
-                            src={alumnus.photo ? `http://localhost:5000${alumnus.photo}` : 'https://via.placeholder.com/50'}
+                            src={alumnus.photo ? `${API_BASE}${alumnus.photo}` : 'https://via.placeholder.com/50'}
                             alt={alumnus.name}
                             className="rounded-circle shadow-sm"
                             style={{ width: '60px', height: '60px', objectFit: 'cover' }}
