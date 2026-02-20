@@ -12,6 +12,8 @@ import ForgotPassword from './components/ForgotPassword';
 import ResetPassword from './components/ResetPassword';
 import ViewAlumni from './components/ViewAlumni';
 import ManageUsers from './components/ManageUsers';
+import PendingApprovals from './components/PendingApprovals';
+import AlumniEditProfile from './components/AlumniEditProfile';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import './App.css';
@@ -24,9 +26,9 @@ const AdminProtectedRoute = ({ children }) => {
   return isAuthenticated ? children : <Navigate to="/login" />;
 };
 
-// Protected Route Component for User
+// Protected Route Component for User (accepts both regular user and alumni tokens)
 const UserProtectedRoute = ({ children }) => {
-  const isAuthenticated = localStorage.getItem('userToken');
+  const isAuthenticated = localStorage.getItem('userToken') || localStorage.getItem('alumniToken');
   return isAuthenticated ? children : <Navigate to="/user/login" />;
 };
 
@@ -83,15 +85,33 @@ function App() {
                 </AdminProtectedRoute>
               } 
             />
-            <Route 
-              path="/admin/manage-users" 
+            <Route
+              path="/admin/manage-users"
               element={
                 <AdminProtectedRoute>
                   <ManageUsers />
                 </AdminProtectedRoute>
-              } 
+              }
+            />
+            <Route
+              path="/admin/pending"
+              element={
+                <AdminProtectedRoute>
+                  <PendingApprovals />
+                </AdminProtectedRoute>
+              }
             />
             
+            {/* Alumni edit own profile */}
+            <Route
+              path="/alumni/edit-profile"
+              element={
+                <UserProtectedRoute>
+                  <AlumniEditProfile />
+                </UserProtectedRoute>
+              }
+            />
+
             {/* User Login */}
             <Route path="/user/login" element={<UserLogin />} />
             

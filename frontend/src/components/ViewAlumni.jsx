@@ -39,8 +39,13 @@ function ViewAlumni() {
 
   const years = Array.from({ length: 50 }, (_, i) => (new Date().getFullYear() - i).toString());
 
+  const alumniData = (() => {
+    try { return JSON.parse(localStorage.getItem('alumniData')); } catch { return null; }
+  })();
+  const loggedInAlumniId = alumniData?.id || null;
+
   useEffect(() => {
-    const token = localStorage.getItem('userToken');
+    const token = localStorage.getItem('userToken') || localStorage.getItem('alumniToken');
     if (!token) {
       navigate('/user/login');
     } else {
@@ -116,6 +121,8 @@ function ViewAlumni() {
   const handleLogout = () => {
     localStorage.removeItem('userToken');
     localStorage.removeItem('userName');
+    localStorage.removeItem('alumniToken');
+    localStorage.removeItem('alumniData');
     navigate('/user/login');
   };
 
@@ -297,10 +304,20 @@ function ViewAlumni() {
               </div>
             </div>
           ) : (
-            filteredAlumni.map((alumnus) => (
+            filteredAlumni.map((alumnus) => {
+              const isOwnCard = loggedInAlumniId && alumnus.id === loggedInAlumniId;
+              return (
               <div key={alumnus.id} className="col-md-6 col-lg-4 col-xl-3">
-                <div className="card h-100 shadow-sm hover-shadow" style={{ cursor: 'pointer' }}
-                     onClick={() => setSelectedAlumni(alumnus)}>
+                <div
+                  className={`card h-100 shadow-sm hover-shadow${isOwnCard ? ' border-2 border-danger' : ''}`}
+                  style={{ cursor: 'pointer' }}
+                  onClick={() => setSelectedAlumni(alumnus)}
+                >
+                  {isOwnCard && (
+                    <div className="card-header bg-danger text-white text-center py-1 small fw-semibold">
+                      <i className="bi bi-person-check-fill me-1"></i>Your Profile
+                    </div>
+                  )}
                   <div className="card-body text-center">
                     <img
                       src={alumnus.photo ? `${API_BASE}${alumnus.photo}` : 'https://via.placeholder.com/150'}
@@ -321,14 +338,23 @@ function ViewAlumni() {
                       <span className="badge bg-primary">{alumnus.batch}</span>
                       <span className="badge bg-success">{alumnus.current_status}</span>
                     </div>
-                    <small className="text-muted d-block">
+                    <small className="text-muted d-block mb-2">
                       <i className="bi bi-book me-1"></i>
                       {alumnus.department}
                     </small>
+                    {isOwnCard && (
+                      <button
+                        className="btn btn-sm btn-danger mt-2 w-100"
+                        onClick={(e) => { e.stopPropagation(); navigate('/alumni/edit-profile'); }}
+                      >
+                        <i className="bi bi-pencil-square me-1"></i>Edit My Profile
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>
-            ))
+              );
+            })
           )}
         </div>
       </div>

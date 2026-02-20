@@ -10,20 +10,31 @@ function AdminDashboard() {
   const navigate = useNavigate();
   const [alumni, setAlumni] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [pendingCount, setPendingCount] = useState(0);
 
   useEffect(() => {
     fetchAlumni();
+    fetchPendingCount();
   }, []);
 
   const fetchAlumni = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`${API_URL}/alumni`);
+      const response = await axios.get(`${API_URL}/alumni?all=true`);
       setAlumni(response.data);
     } catch (error) {
       console.error('Error fetching alumni:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchPendingCount = async () => {
+    try {
+      const res = await axios.get(`${API_URL}/admin/alumni/pending-count`);
+      setPendingCount(res.data.count);
+    } catch (error) {
+      console.error('Error fetching pending count:', error);
     }
   };
 
@@ -96,6 +107,29 @@ function AdminDashboard() {
             </div>
           </div>
         </div>
+
+          <div className="col-md-6 col-lg-4 mb-4">
+            <div
+              className="card action-card text-white shadow-lg h-100 cursor-pointer"
+              style={{ backgroundColor: '#e67e22', cursor: 'pointer' }}
+              onClick={() => navigate('/admin/pending')}
+            >
+              <div className="card-body d-flex align-items-center p-5 position-relative">
+                {pendingCount > 0 && (
+                  <span className="position-absolute top-0 end-0 m-3 badge bg-white text-danger fs-6">
+                    {pendingCount} new
+                  </span>
+                )}
+                <div className="flex-shrink-0 me-4">
+                  <i className="bi bi-hourglass-split display-1"></i>
+                </div>
+                <div>
+                  <h3 className="card-title mb-2">Pending Approvals</h3>
+                  <p className="card-text mb-0">Review and approve alumni self-registrations</p>
+                </div>
+              </div>
+            </div>
+          </div>
 
            </div>
 
@@ -183,6 +217,7 @@ function AdminDashboard() {
                           <th>Designation</th>
                           <th>Batch</th>
                           <th>Status</th>
+                          <th>Approval</th>
                           <th>Actions</th>
                         </tr>
                       </thead>
@@ -209,6 +244,14 @@ function AdminDashboard() {
                                   alumnus.current_status === 'Self-Employed' ? 'bg-primary' : 'bg-info'
                                 }`}>
                                 {alumnus.current_status}
+                              </span>
+                            </td>
+                            <td>
+                              <span className={`badge ${
+                                alumnus.approval_status === 'approved' ? 'bg-success' :
+                                alumnus.approval_status === 'rejected' ? 'bg-danger' : 'bg-warning text-dark'
+                              }`}>
+                                {alumnus.approval_status || 'approved'}
                               </span>
                             </td>
                             <td>

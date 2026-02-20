@@ -91,7 +91,55 @@ async function connectDatabase() {
     db = null;
   }
 }
-connectDatabase();
+connectDatabase().then(runMigrations);
+
+async function runMigrations() {
+  if (!db) return;
+  try {
+    const [existingCols] = await db.query(`
+      SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS
+      WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'alumni'
+    `);
+    const colNames = new Set(existingCols.map(c => c.COLUMN_NAME));
+
+    const addIfMissing = async (colName, colDef) => {
+      if (!colNames.has(colName)) {
+        await db.query(`ALTER TABLE alumni ADD COLUMN \`${colName}\` ${colDef}`);
+        console.log(`✅ Migration: added column '${colName}'`);
+        return true;
+      }
+      return false;
+    };
+
+    // Core approval column
+    const approvalAdded = await addIfMissing('approval_status', "ENUM('pending','approved','rejected') NOT NULL DEFAULT 'pending'");
+    if (approvalAdded) {
+      await db.query("UPDATE alumni SET approval_status = 'approved'");
+      console.log('✅ Migration: existing alumni auto-approved');
+    }
+
+    // Soft delete column
+    await addIfMissing('is_deleted', 'TINYINT(1) NOT NULL DEFAULT 0');
+
+    // New registration form columns
+    await addIfMissing('attended_program', 'VARCHAR(50) DEFAULT NULL');
+    await addIfMissing('program_type', 'VARCHAR(20) DEFAULT NULL');
+    await addIfMissing('facebook', 'VARCHAR(255) DEFAULT NULL');
+    await addIfMissing('enrollment_number', 'VARCHAR(100) DEFAULT NULL');
+    await addIfMissing('completion_year', 'VARCHAR(10) DEFAULT NULL');
+    await addIfMissing('functional_area', 'VARCHAR(255) DEFAULT NULL');
+    await addIfMissing('employment_type', 'VARCHAR(100) DEFAULT NULL');
+    await addIfMissing('seniority_level', 'VARCHAR(100) DEFAULT NULL');
+    await addIfMissing('country', 'VARCHAR(100) DEFAULT NULL');
+    await addIfMissing('city', 'VARCHAR(100) DEFAULT NULL');
+    await addIfMissing('education_level', 'VARCHAR(100) DEFAULT NULL');
+    await addIfMissing('work_city', 'VARCHAR(100) DEFAULT NULL');
+
+    console.log('✅ All database migrations complete');
+  } catch (err) {
+    console.error('❌ Migration error:', err.message);
+  }
+}
 
 function requireDb(res) {
   if (!db) {
@@ -260,11 +308,29 @@ apiRouter.post('/alumni/reset-password', async (req, res) => {
 apiRouter.get('/alumni', async (req, res) => {
   try {
     if (!requireDb(res)) return;
+    // ?all=true → admin: ignore approval filter but show only non-deleted
+    // ?show_deleted=true → admin: show only soft-deleted records
+    // default → user: approved + non-deleted only
+    const showAll = req.query.all === 'true';
+    const showDeleted = req.query.show_deleted === 'true';
+
+    let whereClause;
+    if (showDeleted) {
+      whereClause = "WHERE is_deleted = 1";
+    } else if (showAll) {
+      whereClause = "WHERE is_deleted = 0";
+    } else {
+      whereClause = "WHERE approval_status = 'approved' AND is_deleted = 0";
+    }
+
     const [results] = await db.query(
       `SELECT id, name, email, phone, gender, dob, batch, department, address, photo,
         linkedin, bio, current_status, organization_name, designation, industry,
-        work_location, experience_years, skills, achievements, higher_education, institution, created_at
-       FROM alumni ORDER BY id DESC`
+        work_location, experience_years, skills, achievements, higher_education, institution,
+        approval_status, is_deleted, attended_program, program_type, facebook, enrollment_number,
+        completion_year, functional_area, employment_type, seniority_level,
+        country, city, education_level, work_city, created_at
+       FROM alumni ${whereClause} ORDER BY id DESC`
     );
     res.json(results);
   } catch (err) {
@@ -315,7 +381,9 @@ apiRouter.post('/alumni/register', runMulter(upload.single('photo')), async (req
     const {
       username, password, name, email, phone, gender, dob, batch, department, address,
       linkedin, bio, current_status, organization_name, designation, industry,
-      work_location, experience_years, skills, achievements, higher_education, institution
+      work_location, experience_years, skills, achievements, higher_education, institution,
+      attended_program, program_type, facebook, enrollment_number, completion_year,
+      functional_area, employment_type, seniority_level, country, city, education_level, work_city
     } = body;
 
     if (!username || !password) return res.status(400).json({ message: 'Username and password are required' });
@@ -343,13 +411,18 @@ apiRouter.post('/alumni/register', runMulter(upload.single('photo')), async (req
       INSERT INTO alumni (
         username, password, name, email, phone, gender, dob, batch, department, address,
         photo, linkedin, bio, current_status, organization_name, designation, industry,
-        work_location, experience_years, skills, achievements, higher_education, institution
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        work_location, experience_years, skills, achievements, higher_education, institution,
+        attended_program, program_type, facebook, enrollment_number, completion_year,
+        functional_area, employment_type, seniority_level, country, city, education_level, work_city,
+        approval_status
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending')
     `;
     const values = [
       username, hashedPassword, name, email, phone, gender, dob, batch, department, address,
       photo, linkedin, bio, current_status, organization_name, designation, industry,
-      work_location, expYearsVal, skills, achievements, higher_education, institution
+      work_location, expYearsVal, skills, achievements, higher_education, institution,
+      attended_program, program_type, facebook, enrollment_number, completion_year,
+      functional_area, employment_type, seniority_level, country, city, education_level, work_city
     ];
 
     const [result] = await db.query(query, values);
@@ -399,8 +472,8 @@ apiRouter.post('/alumni', runMulter(upload.single('photo')), async (req, res) =>
       INSERT INTO alumni (
         name, email, phone, gender, dob, batch, department, address, photo, linkedin,
         bio, current_status, organization_name, designation, industry, work_location,
-        experience_years, skills, achievements, higher_education, institution
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        experience_years, skills, achievements, higher_education, institution, approval_status
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'approved')
     `;
     const values = [
       name, email, phone, gender, dob, batch, department, address, photo, linkedin,
@@ -460,24 +533,49 @@ apiRouter.put('/alumni/:id', runMulter(upload.single('photo')), async (req, res)
   }
 });
 
-// Delete alumni
+// Soft delete alumni (sets is_deleted = 1)
 apiRouter.delete('/alumni/:id', async (req, res) => {
+  try {
+    if (!requireDb(res)) return;
+    const { id } = req.params;
+    await db.query('UPDATE alumni SET is_deleted = 1 WHERE id = ?', [id]);
+    res.json({ message: 'Alumni moved to trash.' });
+  } catch (err) {
+    console.error('Error soft-deleting alumni:', err);
+    res.status(500).json({ error: 'Failed to delete alumni', message: err.message });
+  }
+});
+
+// Restore soft-deleted alumni
+apiRouter.put('/alumni/:id/restore', async (req, res) => {
+  try {
+    if (!requireDb(res)) return;
+    const { id } = req.params;
+    await db.query('UPDATE alumni SET is_deleted = 0 WHERE id = ?', [id]);
+    res.json({ message: 'Alumni restored successfully.' });
+  } catch (err) {
+    console.error('Error restoring alumni:', err);
+    res.status(500).json({ error: 'Failed to restore alumni', message: err.message });
+  }
+});
+
+// Permanently delete alumni (hard delete)
+apiRouter.delete('/alumni/:id/permanent', async (req, res) => {
   try {
     if (!requireDb(res)) return;
     const { id } = req.params;
     const [results] = await db.query('SELECT photo FROM alumni WHERE id = ?', [id]);
     if (results && results.length > 0 && results[0].photo) {
       const photoPath = path.join(__dirname, results[0].photo);
-      // ensure file is inside uploads directory before deleting
       if (photoPath.startsWith(uploadDir) && fs.existsSync(photoPath)) {
         try { fs.unlinkSync(photoPath); } catch (e) { console.warn('Failed to delete photo', e.message); }
       }
     }
     await db.query('DELETE FROM alumni WHERE id = ?', [id]);
-    res.json({ message: 'Alumni deleted!' });
+    res.json({ message: 'Alumni permanently deleted.' });
   } catch (err) {
-    console.error('Error deleting alumni:', err);
-    res.status(500).json({ error: 'Failed to delete alumni', message: err.message });
+    console.error('Error permanently deleting alumni:', err);
+    res.status(500).json({ error: 'Failed to permanently delete alumni', message: err.message });
   }
 });
 
@@ -640,6 +738,147 @@ app.listen(PORT, () => {
 
 
 
+
+// ----------------- Alumni Self-Profile Routes -----------------
+
+// Middleware: verify alumni JWT
+function verifyAlumniToken(req, res, next) {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+  if (!token) return res.status(401).json({ message: 'No token provided' });
+  try {
+    const payload = jwt.verify(token, ALUMNI_JWT_SECRET);
+    req.alumniId = payload.id;
+    next();
+  } catch (e) {
+    return res.status(401).json({ message: 'Invalid or expired token' });
+  }
+}
+
+// Get own profile
+apiRouter.get('/alumni/me', verifyAlumniToken, async (req, res) => {
+  try {
+    if (!requireDb(res)) return;
+    const [rows] = await db.query(
+      `SELECT id, name, email, phone, gender, dob, batch, department, address, photo,
+        linkedin, bio, current_status, organization_name, designation, industry,
+        work_location, experience_years, skills, achievements, higher_education, institution,
+        approval_status, attended_program, program_type, facebook, enrollment_number,
+        completion_year, functional_area, employment_type, seniority_level,
+        country, city, education_level, work_city, created_at
+       FROM alumni WHERE id = ?`,
+      [req.alumniId]
+    );
+    if (!rows || rows.length === 0) return res.status(404).json({ message: 'Alumni not found' });
+    res.json(rows[0]);
+  } catch (err) {
+    console.error('Error fetching own profile:', err);
+    res.status(500).json({ error: 'Database error', message: err.message });
+  }
+});
+
+// Update own profile
+apiRouter.put('/alumni/me', verifyAlumniToken, runMulter(upload.single('photo')), async (req, res) => {
+  try {
+    if (!requireDb(res)) return;
+    const body = Object.fromEntries(Object.entries(req.body || {}).map(([k, v]) => [k, normalizeForDb(v)]));
+    const {
+      name, email, phone, gender, dob, batch, department, address,
+      linkedin, bio, current_status, organization_name, designation,
+      industry, work_location, experience_years, skills, achievements,
+      higher_education, institution,
+      attended_program, program_type, facebook, enrollment_number, completion_year,
+      functional_area, employment_type, seniority_level, country, city, education_level, work_city
+    } = body;
+
+    let photo = body.existing_photo || null;
+    if (req.file) {
+      photo = `/uploads/${req.file.filename}`;
+      if (body.existing_photo && typeof body.existing_photo === 'string' && body.existing_photo.startsWith('/uploads/')) {
+        const oldPhotoPath = path.join(__dirname, body.existing_photo);
+        try { if (fs.existsSync(oldPhotoPath)) fs.unlinkSync(oldPhotoPath); } catch (e) { console.warn('Failed deleting old photo', e.message); }
+      }
+    }
+
+    const expYearsVal = experience_years ? (isNaN(Number(experience_years)) ? null : Number(experience_years)) : null;
+
+    await db.query(
+      `UPDATE alumni SET name=?, email=?, phone=?, gender=?, dob=?, batch=?, department=?, address=?, photo=?, linkedin=?,
+       bio=?, current_status=?, organization_name=?, designation=?, industry=?, work_location=?, experience_years=?,
+       skills=?, achievements=?, higher_education=?, institution=?,
+       attended_program=?, program_type=?, facebook=?, enrollment_number=?, completion_year=?,
+       functional_area=?, employment_type=?, seniority_level=?, country=?, city=?, education_level=?, work_city=?
+       WHERE id=?`,
+      [name, email, phone, gender, dob, batch, department, address, photo, linkedin,
+       bio, current_status, organization_name, designation, industry, work_location, expYearsVal,
+       skills, achievements, higher_education, institution,
+       attended_program, program_type, facebook, enrollment_number, completion_year,
+       functional_area, employment_type, seniority_level, country, city, education_level, work_city,
+       req.alumniId]
+    );
+    res.json({ message: 'Profile updated successfully' });
+  } catch (err) {
+    console.error('Error updating own profile:', err);
+    res.status(500).json({ error: 'Database error', message: err.message });
+  }
+});
+
+// ----------------- Approval Routes (Admin) -----------------
+
+// Get all pending alumni
+apiRouter.get('/admin/alumni/pending', async (req, res) => {
+  try {
+    if (!requireDb(res)) return;
+    const [results] = await db.query(
+      `SELECT id, name, email, phone, gender, dob, batch, department, address, photo,
+        linkedin, bio, current_status, organization_name, designation, industry,
+        work_location, experience_years, skills, achievements, higher_education, institution, approval_status, created_at
+       FROM alumni WHERE approval_status = 'pending' ORDER BY created_at DESC`
+    );
+    res.json(results);
+  } catch (err) {
+    console.error('Error fetching pending alumni:', err);
+    res.status(500).json({ error: 'Database error', message: err.message });
+  }
+});
+
+// Approve an alumni
+apiRouter.put('/admin/alumni/:id/approve', async (req, res) => {
+  try {
+    if (!requireDb(res)) return;
+    const { id } = req.params;
+    await db.query("UPDATE alumni SET approval_status = 'approved' WHERE id = ?", [id]);
+    res.json({ message: 'Alumni approved successfully' });
+  } catch (err) {
+    console.error('Error approving alumni:', err);
+    res.status(500).json({ error: 'Database error', message: err.message });
+  }
+});
+
+// Reject an alumni
+apiRouter.put('/admin/alumni/:id/reject', async (req, res) => {
+  try {
+    if (!requireDb(res)) return;
+    const { id } = req.params;
+    await db.query("UPDATE alumni SET approval_status = 'rejected' WHERE id = ?", [id]);
+    res.json({ message: 'Alumni rejected successfully' });
+  } catch (err) {
+    console.error('Error rejecting alumni:', err);
+    res.status(500).json({ error: 'Database error', message: err.message });
+  }
+});
+
+// Get pending alumni count (for dashboard badge)
+apiRouter.get('/admin/alumni/pending-count', async (req, res) => {
+  try {
+    if (!requireDb(res)) return;
+    const [result] = await db.query("SELECT COUNT(*) as count FROM alumni WHERE approval_status = 'pending'");
+    res.json({ count: result[0].count });
+  } catch (err) {
+    console.error('Error fetching pending count:', err);
+    res.status(500).json({ error: 'Database error', message: err.message });
+  }
+});
 
 // ----------------- Statistics Routes -----------------
 
