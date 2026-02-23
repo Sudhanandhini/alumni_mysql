@@ -339,6 +339,74 @@ apiRouter.get('/alumni', async (req, res) => {
   }
 });
 
+// Get own profile (must be BEFORE /alumni/:id to prevent "me" matching as an ID)
+apiRouter.get('/alumni/me', verifyAlumniToken, async (req, res) => {
+  try {
+    if (!requireDb(res)) return;
+    const [rows] = await db.query(
+      `SELECT id, name, email, phone, gender, dob, batch, department, address, photo,
+        linkedin, bio, current_status, organization_name, designation, industry,
+        work_location, experience_years, skills, achievements, higher_education, institution,
+        approval_status, attended_program, program_type, facebook, enrollment_number,
+        completion_year, functional_area, employment_type, seniority_level,
+        country, city, education_level, work_city, created_at
+       FROM alumni WHERE id = ?`,
+      [req.alumniId]
+    );
+    if (!rows || rows.length === 0) return res.status(404).json({ message: 'Alumni not found' });
+    res.json(rows[0]);
+  } catch (err) {
+    console.error('Error fetching own profile:', err);
+    res.status(500).json({ error: 'Database error', message: err.message });
+  }
+});
+
+// Update own profile (must be BEFORE /alumni/:id)
+apiRouter.put('/alumni/me', verifyAlumniToken, runMulter(upload.single('photo')), async (req, res) => {
+  try {
+    if (!requireDb(res)) return;
+    const body = Object.fromEntries(Object.entries(req.body || {}).map(([k, v]) => [k, normalizeForDb(v)]));
+    const {
+      name, email, phone, gender, dob, batch, department, address,
+      linkedin, bio, current_status, organization_name, designation,
+      industry, work_location, experience_years, skills, achievements,
+      higher_education, institution,
+      attended_program, program_type, facebook, enrollment_number, completion_year,
+      functional_area, employment_type, seniority_level, country, city, education_level, work_city
+    } = body;
+
+    let photo = body.existing_photo || null;
+    if (req.file) {
+      photo = `/uploads/${req.file.filename}`;
+      if (body.existing_photo && typeof body.existing_photo === 'string' && body.existing_photo.startsWith('/uploads/')) {
+        const oldPhotoPath = path.join(__dirname, body.existing_photo);
+        try { if (fs.existsSync(oldPhotoPath)) fs.unlinkSync(oldPhotoPath); } catch (e) { console.warn('Failed deleting old photo', e.message); }
+      }
+    }
+
+    const expYearsVal = experience_years ? (isNaN(Number(experience_years)) ? null : Number(experience_years)) : null;
+
+    await db.query(
+      `UPDATE alumni SET name=?, email=?, phone=?, gender=?, dob=?, batch=?, department=?, address=?, photo=?, linkedin=?,
+       bio=?, current_status=?, organization_name=?, designation=?, industry=?, work_location=?, experience_years=?,
+       skills=?, achievements=?, higher_education=?, institution=?,
+       attended_program=?, program_type=?, facebook=?, enrollment_number=?, completion_year=?,
+       functional_area=?, employment_type=?, seniority_level=?, country=?, city=?, education_level=?, work_city=?
+       WHERE id=?`,
+      [name, email, phone, gender, dob, batch, department, address, photo, linkedin,
+       bio, current_status, organization_name, designation, industry, work_location, expYearsVal,
+       skills, achievements, higher_education, institution,
+       attended_program, program_type, facebook, enrollment_number, completion_year,
+       functional_area, employment_type, seniority_level, country, city, education_level, work_city,
+       req.alumniId]
+    );
+    res.json({ message: 'Profile updated successfully' });
+  } catch (err) {
+    console.error('Error updating own profile:', err);
+    res.status(500).json({ error: 'Database error', message: err.message });
+  }
+});
+
 apiRouter.get('/alumni/:id', async (req, res) => {
   try {
     if (!requireDb(res)) return;
@@ -754,74 +822,6 @@ function verifyAlumniToken(req, res, next) {
     return res.status(401).json({ message: 'Invalid or expired token' });
   }
 }
-
-// Get own profile
-apiRouter.get('/alumni/me', verifyAlumniToken, async (req, res) => {
-  try {
-    if (!requireDb(res)) return;
-    const [rows] = await db.query(
-      `SELECT id, name, email, phone, gender, dob, batch, department, address, photo,
-        linkedin, bio, current_status, organization_name, designation, industry,
-        work_location, experience_years, skills, achievements, higher_education, institution,
-        approval_status, attended_program, program_type, facebook, enrollment_number,
-        completion_year, functional_area, employment_type, seniority_level,
-        country, city, education_level, work_city, created_at
-       FROM alumni WHERE id = ?`,
-      [req.alumniId]
-    );
-    if (!rows || rows.length === 0) return res.status(404).json({ message: 'Alumni not found' });
-    res.json(rows[0]);
-  } catch (err) {
-    console.error('Error fetching own profile:', err);
-    res.status(500).json({ error: 'Database error', message: err.message });
-  }
-});
-
-// Update own profile
-apiRouter.put('/alumni/me', verifyAlumniToken, runMulter(upload.single('photo')), async (req, res) => {
-  try {
-    if (!requireDb(res)) return;
-    const body = Object.fromEntries(Object.entries(req.body || {}).map(([k, v]) => [k, normalizeForDb(v)]));
-    const {
-      name, email, phone, gender, dob, batch, department, address,
-      linkedin, bio, current_status, organization_name, designation,
-      industry, work_location, experience_years, skills, achievements,
-      higher_education, institution,
-      attended_program, program_type, facebook, enrollment_number, completion_year,
-      functional_area, employment_type, seniority_level, country, city, education_level, work_city
-    } = body;
-
-    let photo = body.existing_photo || null;
-    if (req.file) {
-      photo = `/uploads/${req.file.filename}`;
-      if (body.existing_photo && typeof body.existing_photo === 'string' && body.existing_photo.startsWith('/uploads/')) {
-        const oldPhotoPath = path.join(__dirname, body.existing_photo);
-        try { if (fs.existsSync(oldPhotoPath)) fs.unlinkSync(oldPhotoPath); } catch (e) { console.warn('Failed deleting old photo', e.message); }
-      }
-    }
-
-    const expYearsVal = experience_years ? (isNaN(Number(experience_years)) ? null : Number(experience_years)) : null;
-
-    await db.query(
-      `UPDATE alumni SET name=?, email=?, phone=?, gender=?, dob=?, batch=?, department=?, address=?, photo=?, linkedin=?,
-       bio=?, current_status=?, organization_name=?, designation=?, industry=?, work_location=?, experience_years=?,
-       skills=?, achievements=?, higher_education=?, institution=?,
-       attended_program=?, program_type=?, facebook=?, enrollment_number=?, completion_year=?,
-       functional_area=?, employment_type=?, seniority_level=?, country=?, city=?, education_level=?, work_city=?
-       WHERE id=?`,
-      [name, email, phone, gender, dob, batch, department, address, photo, linkedin,
-       bio, current_status, organization_name, designation, industry, work_location, expYearsVal,
-       skills, achievements, higher_education, institution,
-       attended_program, program_type, facebook, enrollment_number, completion_year,
-       functional_area, employment_type, seniority_level, country, city, education_level, work_city,
-       req.alumniId]
-    );
-    res.json({ message: 'Profile updated successfully' });
-  } catch (err) {
-    console.error('Error updating own profile:', err);
-    res.status(500).json({ error: 'Database error', message: err.message });
-  }
-});
 
 // ----------------- Approval Routes (Admin) -----------------
 

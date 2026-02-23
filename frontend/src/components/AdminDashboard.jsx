@@ -92,7 +92,7 @@ function AdminDashboard() {
           </div> 
           
      
-
+{/* 
         <div className="col-md-6 col-lg-4 mb-4">
           <div className="card  bg-success  action-card text-white shadow-lg h-100 cursor-pointer"
             onClick={() => navigate('/admin/manage-users')}>
@@ -106,7 +106,7 @@ function AdminDashboard() {
               </div>
             </div>
           </div>
-        </div>
+        </div> */}
 
           <div className="col-md-6 col-lg-4 mb-4">
             <div

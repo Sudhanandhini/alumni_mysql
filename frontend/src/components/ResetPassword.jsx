@@ -29,7 +29,7 @@ function ResetPassword() {
       const resp = await axios.post(`${API_URL}/alumni/reset-password`, { token: tokenParam, newPassword });
       setMessage(resp.data.message || 'Password reset successful');
       // Redirect to login after short delay
-      setTimeout(() => navigate('/alumni-login'), 1500);
+      setTimeout(() => navigate('/user/login'), 1500);
     } catch (err) {
       console.error('Reset password error:', err);
       setMessage(err.response?.data?.message || 'An error occurred');

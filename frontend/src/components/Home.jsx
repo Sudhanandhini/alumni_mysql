@@ -429,7 +429,7 @@ function Home() {
                             </div>
                           )}
                         </div>
-
+{/* 
                         {alumnus.linkedin && (
                           <div className="d-flex justify-content-center">
                             <a 
@@ -467,7 +467,7 @@ function Home() {
                               Connect on LinkedIn
                             </a>
                           </div>
-                        )}
+                        )} */}
                       </div>
                     </div>
                   </div>

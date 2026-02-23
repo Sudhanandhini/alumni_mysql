@@ -640,7 +640,7 @@ function SuccessScreen({ navigate }) {
                 ))}
               </div>
               <div className="d-flex flex-column flex-sm-row gap-3 justify-content-center">
-                <button className="btn btn-danger btn-lg px-4" onClick={() => navigate('/alumni-login')}
+                <button className="btn btn-danger btn-lg px-4" onClick={() => navigate('/user/login')}
                   style={{ borderRadius: 10 }}>
                   <i className="bi bi-box-arrow-in-right me-2"></i>Go to Login
                 </button>
@@ -933,7 +933,7 @@ function UserRegistration() {
                 <i className="bi bi-arrow-left"></i> Back
               </button>
             ) : (
-              <a href="/alumni-login" style={{ fontSize: 13, color: '#999', textDecoration: 'none' }}>
+              <a href="/user/login" style={{ fontSize: 13, color: '#999', textDecoration: 'none' }}>
                 Already registered? <span style={{ color: '#dc3545', fontWeight: 600 }}>Login</span>
               </a>
             )}
