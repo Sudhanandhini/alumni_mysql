@@ -13,101 +13,115 @@ function Navbar() {
     setIsOpen(false);
   };
 
-  const toggleMenu = () => {
-    setIsOpen(!isOpen);
-  };
-
-  const closeMenu = () => {
-    setIsOpen(false);
-  };
+  const navLinkStyle = (path) => ({
+    display: 'flex',
+    alignItems: 'center',
+    gap: 6,
+    padding: '8px 14px',
+    borderRadius: 8,
+    textDecoration: 'none',
+    fontSize: 14,
+    fontWeight: 500,
+    color: location.pathname === path ? '#fff' : 'rgba(255,255,255,0.7)',
+    background: location.pathname === path ? 'rgba(255,255,255,0.12)' : 'transparent',
+    transition: 'all 0.15s',
+  });
 
   return (
-    <nav className="navbar navbar-expand-lg navbar-dark bg-black shadow-sm">
-      <div className="container py-3">
-        <Link className="navbar-brand d-flex align-items-center" to="/" onClick={closeMenu}>
-          <i className="bi bi-mortarboard-fill me-2"></i>
-          <span className="fw-bold">Alumni Portal</span>
+    <nav style={{
+      background: '#1a2744',
+      boxShadow: '0 2px 12px rgba(0,0,0,0.18)',
+      position: 'sticky',
+      top: 0,
+      zIndex: 1000,
+      fontFamily: 'Inter, system-ui, sans-serif',
+    }}>
+      <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px', height: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+
+        {/* Brand */}
+        <Link to="/" onClick={() => setIsOpen(false)} style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
+          <div style={{ width: 36, height: 36, borderRadius: 10, background: 'rgba(255,255,255,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <i className="bi bi-mortarboard-fill" style={{ color: '#fff', fontSize: 17 }}></i>
+          </div>
+          <span style={{ color: '#fff', fontWeight: 800, fontSize: 16, letterSpacing: '-0.3px' }}>Alumni Portal</span>
         </Link>
 
-        <button
-          className="navbar-toggler"
-          type="button"
-          onClick={toggleMenu}
-          aria-controls="navbarNav"
-          aria-expanded={isOpen}
-          aria-label="Toggle navigation"
-        >
-          <span className="navbar-toggler-icon"></span>
-        </button>
+        {/* Desktop nav */}
+        <div className="d-none d-lg-flex" style={{ alignItems: 'center', gap: 4 }}>
+          <Link to="/" style={navLinkStyle('/')}>
+            <i className="bi bi-house-fill"></i> Home
+          </Link>
+          <Link to="/register" style={navLinkStyle('/register')}>
+            <i className="bi bi-person-plus-fill"></i> Register
+          </Link>
+          <Link to="/user/login" style={navLinkStyle('/user/login')}>
+            <i className="bi bi-person-circle"></i> User Login
+          </Link>
 
-        <div className={`collapse navbar-collapse ${isOpen ? 'show' : ''}`} id="navbarNav">
-          <ul className="navbar-nav ms-auto align-items-lg-center">
-            <li className="nav-item">
-              <Link
-                className={`nav-link ${location.pathname === '/' ? 'active' : ''}`}
-                to="/"
-                onClick={closeMenu}
-              >
-                <i className="bi bi-house-fill me-1"></i>
-                Home
+          {isAuthenticated ? (
+            <>
+              <Link to="/admin" style={navLinkStyle('/admin')}>
+                <i className="bi bi-grid-fill"></i> Dashboard
               </Link>
-            </li>
-
-            <li className="nav-item">
-              <Link
-                className={`nav-link ${location.pathname === '/register' ? 'active' : ''}`}
-                to="/register"
-                onClick={closeMenu}
-              >
-                <i className="bi bi-person-plus-fill me-1"></i>
-                Register
-              </Link>
-            </li>
-
-            <li className="nav-item">
-              <Link className="nav-link" to="/user/login">
-                <i className="bi bi-person-circle me-1"></i>
-                User Login
-              </Link>
-            </li>
-
-            {isAuthenticated ? (
-              <>
-                <li className="nav-item">
-                  <Link
-                    className={`nav-link ${location.pathname === '/admin' ? 'active' : ''}`}
-                    to="/admin"
-                    onClick={closeMenu}
-                  >
-                    <i className="bi bi-gear-fill me-1"></i>
-                    Dashboard
-                  </Link>
-                </li>
-                <li className="nav-item mt-2 mt-lg-0">
-                  <button
-                    className="btn btn-outline-light ms-lg-2 w-100"
-                    onClick={handleLogout}
-                  >
-                    <i className="bi bi-box-arrow-right me-1"></i>
-                    Logout
-                  </button>
-                </li>
-              </>
-            ) : (
-              <li className="nav-item mt-2 mt-lg-0">
-                <Link
-                  className="btn btn-outline-light ms-lg-2 w-100"
-                  to="/login"
-                  onClick={closeMenu}
-                >
-                  <i className="bi bi-lock-fill me-1"></i>
-                  Admin Login
-                </Link>
-              </li>
-            )}
-          </ul>
+              <button onClick={handleLogout} style={{
+                marginLeft: 8, padding: '8px 18px', borderRadius: 8, border: '1.5px solid rgba(255,255,255,0.35)',
+                background: 'transparent', color: '#fff', fontSize: 14, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, transition: 'all 0.15s'
+              }}>
+                <i className="bi bi-box-arrow-right"></i> Logout
+              </button>
+            </>
+          ) : (
+            <Link to="/login" style={{
+              marginLeft: 8, padding: '8px 18px', borderRadius: 8, border: '1.5px solid rgba(255,255,255,0.35)',
+              background: 'transparent', color: '#fff', fontSize: 14, fontWeight: 600, textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 6, transition: 'all 0.15s'
+            }}>
+              <i className="bi bi-lock-fill"></i> Admin Login
+            </Link>
+          )}
         </div>
+
+        {/* Mobile hamburger */}
+        <button
+          className="d-lg-none"
+          onClick={() => setIsOpen(p => !p)}
+          style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#fff', fontSize: 24, padding: 4 }}
+        >
+          <i className={`bi ${isOpen ? 'bi-x-lg' : 'bi-list'}`}></i>
+        </button>
       </div>
+
+      {/* Mobile menu */}
+      {isOpen && (
+        <div className="d-lg-none" style={{ background: '#141e36', padding: '12px 24px 20px', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
+          {[
+            { to: '/',          icon: 'bi-house-fill',       label: 'Home'       },
+            { to: '/register',  icon: 'bi-person-plus-fill', label: 'Register'   },
+            { to: '/user/login',icon: 'bi-person-circle',    label: 'User Login' },
+          ].map(item => (
+            <Link key={item.to} to={item.to} onClick={() => setIsOpen(false)} style={{
+              display: 'flex', alignItems: 'center', gap: 10, padding: '11px 12px', borderRadius: 9,
+              textDecoration: 'none', color: 'rgba(255,255,255,0.75)', fontSize: 14, fontWeight: 500,
+              marginBottom: 4, background: location.pathname === item.to ? 'rgba(255,255,255,0.1)' : 'transparent',
+            }}>
+              <i className={`bi ${item.icon}`}></i> {item.label}
+            </Link>
+          ))}
+          {isAuthenticated ? (
+            <>
+              <Link to="/admin" onClick={() => setIsOpen(false)} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '11px 12px', borderRadius: 9, textDecoration: 'none', color: 'rgba(255,255,255,0.75)', fontSize: 14, fontWeight: 500, marginBottom: 4 }}>
+                <i className="bi bi-grid-fill"></i> Dashboard
+              </Link>
+              <button onClick={handleLogout} style={{ width: '100%', marginTop: 8, padding: '11px 12px', borderRadius: 9, border: '1px solid rgba(255,255,255,0.2)', background: 'transparent', color: 'rgba(255,255,255,0.7)', fontSize: 14, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 10 }}>
+                <i className="bi bi-box-arrow-right"></i> Logout
+              </button>
+            </>
+          ) : (
+            <Link to="/login" onClick={() => setIsOpen(false)} style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 8, padding: '11px 12px', borderRadius: 9, border: '1px solid rgba(255,255,255,0.2)', textDecoration: 'none', color: 'rgba(255,255,255,0.7)', fontSize: 14, fontWeight: 600, justifyContent: 'center' }}>
+              <i className="bi bi-lock-fill"></i> Admin Login
+            </Link>
+          )}
+        </div>
+      )}
     </nav>
   );
 }

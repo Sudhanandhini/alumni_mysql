@@ -1,3 +1,22 @@
+/* Override Bootstrap primary color to match #1a2744 navy */
+:root {
+  --bs-primary: #1a2744;
+  --bs-primary-rgb: 26, 39, 68;
+  --bs-link-color: #1a2744;
+  --bs-link-hover-color: #141e36;
+}
+.btn-primary {
+  background-color: #1a2744 !important;
+  border-color: #1a2744 !important;
+  color: #fff !important;
+}
+.btn-primary:hover { background-color: #141e36 !important; border-color: #141e36 !important; }
+.btn-outline-primary { color: #1a2744 !important; border-color: #1a2744 !important; }
+.btn-outline-primary:hover { background-color: #1a2744 !important; color: #fff !important; }
+.bg-primary { background-color: #1a2744 !important; }
+.text-primary { color: #1a2744 !important; }
+.border-primary { border-color: #1a2744 !important; }
+
 /* General Styles */
 * {
   margin: 0;

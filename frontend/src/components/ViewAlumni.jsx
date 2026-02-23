@@ -510,7 +510,7 @@ function ViewAlumni() {
             </div>
             <div style={{ padding: '0 28px 28px' }}>
               {/* Photo */}
-              <div style={{ marginTop: -44, marginBottom: 16 }}>
+              <div style={{ marginTop: 20, display: 'flex', justifyContent: 'center' }}>
                 {selectedAlumni.photo
                   ? <img src={`${API_BASE}${selectedAlumni.photo}`} alt={selectedAlumni.name} style={{ width: 88, height: 88, borderRadius: '50%', objectFit: 'cover', border: '4px solid #fff', boxShadow: '0 2px 10px rgba(0,0,0,0.15)' }} />
                   : <div style={{ width: 88, height: 88, borderRadius: '50%', border: '4px solid #fff', background: 'linear-gradient(135deg,#dc3545,#8b0000)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 800, fontSize: 28, boxShadow: '0 2px 10px rgba(0,0,0,0.15)' }}>

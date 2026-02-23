@@ -203,7 +203,7 @@ function Home() {
   return (
     <div className="home-page">
       {/* Hero Section */}
-      <div className="hero-section bg-gradient-danger text-white py-5">
+      <div className="hero-section text-white py-5" style={{ background: 'linear-gradient(135deg, #1a2744 0%, #2d4a8a 100%)' }}>
         <div className="container text-center">
           <h1 className="display-4 display-md-3 fw-bold mb-3 animate-fade-in">
             <i className="bi bi-stars me-2 me-md-3"></i>
@@ -212,7 +212,7 @@ function Home() {
           </h1>
           <p className="lead fs-5 fs-md-4 mb-4 px-3">Meet our successful alumni who are making a difference in the world</p>
           <div className="mt-4">
-            <span className="badge bg-light text-danger fs-6 fs-md-5 px-3 px-md-4 py-2 py-md-3">
+            <span className="badge bg-white fs-6 fs-md-5 px-3 px-md-4 py-2 py-md-3" style={{ color: '#1a2744' }}>
               <i className="bi bi-people-fill me-2"></i>
               {alumni.length} Alumni Network
             </span>
@@ -225,7 +225,7 @@ function Home() {
         <div className="container-fluid px-2 px-md-3 px-lg-5">
           {loading ? (
             <div className="text-center py-5">
-              <div className="spinner-border text-danger" style={{ width: '3rem', height: '3rem' }}>
+              <div className="spinner-border" style={{ width: '3rem', height: '3rem', color: '#1a2744' }}>
                 <span className="visually-hidden">Loading...</span>
               </div>
             </div>
@@ -254,7 +254,7 @@ function Home() {
                       }}
                       onMouseEnter={(e) => {
                         e.currentTarget.style.transform = 'translateY(-5px)';
-                        e.currentTarget.style.boxShadow = '0 8px 30px rgba(220, 53, 69, 0.2)';
+                        e.currentTarget.style.boxShadow = '0 8px 30px rgba(26,39,68,0.18)';
                       }}
                       onMouseLeave={(e) => {
                         e.currentTarget.style.transform = 'translateY(0)';
@@ -263,7 +263,7 @@ function Home() {
                     >
                       <div style={{
                         height: '5px',
-                        background: 'linear-gradient(90deg, #dc3545 0%, #c82333 100%)',
+                        background: 'linear-gradient(90deg, #1a2744 0%, #2d4a8a 100%)',
                         width: '100%'
                       }} />
 
@@ -298,9 +298,9 @@ function Home() {
                           <div style={{
                             position: 'relative',
                             padding: '4px',
-                            background: 'linear-gradient(135deg, #dc3545 0%, #c82333 100%)',
+                            background: 'linear-gradient(135deg, #1a2744 0%, #2d4a8a 100%)',
                             borderRadius: '50%',
-                            boxShadow: '0 4px 15px rgba(220, 53, 69, 0.3)'
+                            boxShadow: '0 4px 15px rgba(26,39,68,0.25)'
                           }}>
                             <img
                               src={buildPhotoUrl(alumnus.photo)}
@@ -332,7 +332,7 @@ function Home() {
                           </h5>
                           
                           {alumnus.designation && (
-                            <p className="text-danger mb-0" style={{
+                            <p className="mb-0" style={{ color: '#1a2744',
                               fontSize: '0.95rem',
                               fontWeight: '600',
                               letterSpacing: '0.3px'
@@ -361,7 +361,7 @@ function Home() {
                               <div style={{
                                 width: '32px',
                                 height: '32px',
-                                background: 'linear-gradient(135deg, #dc3545 0%, #c82333 100%)',
+                                background: 'linear-gradient(135deg, #1a2744 0%, #2d4a8a 100%)',
                                 borderRadius: '8px',
                                 display: 'flex',
                                 alignItems: 'center',
@@ -482,7 +482,7 @@ function Home() {
       <div className="py-5" style={{ background: 'linear-gradient(to bottom, #f8f5f5, #fff)' }}>
         <div className="container">
           <div className="text-center mb-5">
-            <h2 className="fw-bold mb-3" style={{ color: '#c82333', fontSize: 'clamp(1.5rem, 5vw, 2rem)' }}>
+            <h2 className="fw-bold mb-3" style={{ color: '#1a2744', fontSize: 'clamp(1.5rem, 5vw, 2rem)' }}>
               Profile of Members in the Alumni Network
             </h2>
             <p className="text-secondary" style={{ fontSize: 'clamp(0.9rem, 2.5vw, 1.05rem)', maxWidth: '900px', margin: '0 auto', lineHeight: '1.6' }}>
@@ -493,7 +493,7 @@ function Home() {
 
           {stats.loading ? (
             <div className="text-center py-5">
-              <div className="spinner-border" style={{ width: '3rem', height: '3rem', color: '#c82333' }}>
+              <div className="spinner-border" style={{ width: '3rem', height: '3rem', color: '#1a2744' }}>
                 <span className="visually-hidden">Loading statistics...</span>
               </div>
             </div>
@@ -508,16 +508,16 @@ function Home() {
                      }}
                      onMouseEnter={(e) => {
                        e.currentTarget.style.transform = 'translateY(-5px)';
-                       e.currentTarget.style.boxShadow = '0 10px 30px rgba(139, 71, 71, 0.15)';
+                       e.currentTarget.style.boxShadow = '0 10px 30px rgba(26,39,68,0.15)';
                      }}
                      onMouseLeave={(e) => {
                        e.currentTarget.style.transform = 'translateY(0)';
                        e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)';
                      }}>
                   <div className="mb-2 mb-md-3">
-                    <i className="bi bi-mortarboard-fill" style={{ fontSize: 'clamp(2.5rem, 8vw, 3.5rem)', color: '#c82333' }}></i>
+                    <i className="bi bi-mortarboard-fill" style={{ fontSize: 'clamp(2.5rem, 8vw, 3.5rem)', color: '#1a2744' }}></i>
                   </div>
-                  <h3 className="fw-bold mb-1 mb-md-2" style={{ color: '#c82333', fontSize: 'clamp(2rem, 8vw, 3rem)' }}>
+                  <h3 className="fw-bold mb-1 mb-md-2" style={{ color: '#1a2744', fontSize: 'clamp(2rem, 8vw, 3rem)' }}>
                     <AnimatedCounter end={stats.totalAlumni} duration={2000} />
                   </h3>
                   <p className="text-secondary mb-0" style={{ fontSize: 'clamp(0.75rem, 2vw, 0.95rem)', lineHeight: '1.4' }}>
@@ -535,16 +535,16 @@ function Home() {
                      }}
                      onMouseEnter={(e) => {
                        e.currentTarget.style.transform = 'translateY(-5px)';
-                       e.currentTarget.style.boxShadow = '0 10px 30px rgba(139, 71, 71, 0.15)';
+                       e.currentTarget.style.boxShadow = '0 10px 30px rgba(26,39,68,0.15)';
                      }}
                      onMouseLeave={(e) => {
                        e.currentTarget.style.transform = 'translateY(0)';
                        e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)';
                      }}>
                   <div className="mb-2 mb-md-3">
-                    <i className="bi bi-briefcase-fill" style={{ fontSize: 'clamp(2.5rem, 8vw, 3.5rem)', color: '#c82333' }}></i>
+                    <i className="bi bi-briefcase-fill" style={{ fontSize: 'clamp(2.5rem, 8vw, 3.5rem)', color: '#1a2744' }}></i>
                   </div>
-                  <h3 className="fw-bold mb-1 mb-md-2" style={{ color: '#c82333', fontSize: 'clamp(2rem, 8vw, 3rem)' }}>
+                  <h3 className="fw-bold mb-1 mb-md-2" style={{ color: '#1a2744', fontSize: 'clamp(2rem, 8vw, 3rem)' }}>
                     <AnimatedCounter end={stats.totalCareers} duration={2000} />
                   </h3>
                   <p className="text-secondary mb-0" style={{ fontSize: 'clamp(0.75rem, 2vw, 0.95rem)', lineHeight: '1.4' }}>
@@ -562,16 +562,16 @@ function Home() {
                      }}
                      onMouseEnter={(e) => {
                        e.currentTarget.style.transform = 'translateY(-5px)';
-                       e.currentTarget.style.boxShadow = '0 10px 30px rgba(139, 71, 71, 0.15)';
+                       e.currentTarget.style.boxShadow = '0 10px 30px rgba(26,39,68,0.15)';
                      }}
                      onMouseLeave={(e) => {
                        e.currentTarget.style.transform = 'translateY(0)';
                        e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)';
                      }}>
                   <div className="mb-2 mb-md-3">
-                    <i className="bi bi-building" style={{ fontSize: 'clamp(2.5rem, 8vw, 3.5rem)', color: '#c82333' }}></i>
+                    <i className="bi bi-building" style={{ fontSize: 'clamp(2.5rem, 8vw, 3.5rem)', color: '#1a2744' }}></i>
                   </div>
-                  <h3 className="fw-bold mb-1 mb-md-2" style={{ color: '#c82333', fontSize: 'clamp(2rem, 8vw, 3rem)' }}>
+                  <h3 className="fw-bold mb-1 mb-md-2" style={{ color: '#1a2744', fontSize: 'clamp(2rem, 8vw, 3rem)' }}>
                     <AnimatedCounter end={stats.totalCompanies} duration={2000}  />
                   </h3>
                   <p className="text-secondary mb-0" style={{ fontSize: 'clamp(0.75rem, 2vw, 0.95rem)', lineHeight: '1.4' }}>
@@ -589,16 +589,16 @@ function Home() {
                      }}
                      onMouseEnter={(e) => {
                        e.currentTarget.style.transform = 'translateY(-5px)';
-                       e.currentTarget.style.boxShadow = '0 10px 30px rgba(139, 71, 71, 0.15)';
+                       e.currentTarget.style.boxShadow = '0 10px 30px rgba(26,39,68,0.15)';
                      }}
                      onMouseLeave={(e) => {
                        e.currentTarget.style.transform = 'translateY(0)';
                        e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)';
                      }}>
                   <div className="mb-2 mb-md-3">
-                    <i className="bi bi-globe" style={{ fontSize: 'clamp(2.5rem, 8vw, 3.5rem)', color: '#c82333' }}></i>
+                    <i className="bi bi-globe" style={{ fontSize: 'clamp(2.5rem, 8vw, 3.5rem)', color: '#1a2744' }}></i>
                   </div>
-                  <h3 className="fw-bold mb-1 mb-md-2" style={{ color: '#c82333', fontSize: 'clamp(2rem, 8vw, 3rem)' }}>
+                  <h3 className="fw-bold mb-1 mb-md-2" style={{ color: '#1a2744', fontSize: 'clamp(2rem, 8vw, 3rem)' }}>
                     <AnimatedCounter end={stats.totalCountries} duration={2000} />
                   </h3>
                   <p className="text-secondary mb-0" style={{ fontSize: 'clamp(0.75rem, 2vw, 0.95rem)', lineHeight: '1.4' }}>

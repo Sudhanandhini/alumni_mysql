@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import AdminLayout from './AdminLayout';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 function ManageUsers() {
-  const navigate = useNavigate();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
@@ -252,6 +251,7 @@ function ManageUsers() {
   });
 
   return (
+    <AdminLayout title="Manage Users">
     <div className="manage-users-page">
       {loading && (
         <div className="loading-overlay" style={{
@@ -266,7 +266,7 @@ function ManageUsers() {
           alignItems: 'center',
           zIndex: 9999
         }}>
-          <div className="spinner-border text-danger" style={{ width: '3rem', height: '3rem' }}>
+          <div className="spinner-border" style={{ width: '3rem', height: '3rem', color: '#1a2744' }}>
             <span className="visually-hidden">Loading...</span>
           </div>
         </div>
@@ -275,16 +275,9 @@ function ManageUsers() {
       <div className="container my-5">
         <div className="row mb-4">
           <div className="col-12">
-            <button 
-              onClick={() => navigate('/admin')} 
-              className="btn btn-outline-danger mb-3"
-            >
-              <i className="bi bi-arrow-left me-2"></i>
-              Back to Dashboard
-            </button>
             <div className="d-flex justify-content-between align-items-center flex-wrap gap-3">
               <div>
-                <h1 className="display-5 fw-bold text-danger mb-2">
+                <h1 className="display-5 fw-bold text-primary mb-2">
                   <i className="bi bi-person-badge-fill me-3"></i>
                   Manage All Users
                 </h1>
@@ -292,7 +285,7 @@ function ManageUsers() {
               </div>
               <button 
                 onClick={openAddModal} 
-                className="btn btn-danger btn-lg"
+                className="btn btn-primary btn-lg"
               >
                 <i className="bi bi-plus-circle-fill me-2"></i>
                 Add New User (Admin)
@@ -306,21 +299,21 @@ function ManageUsers() {
           <div className="card-body">
             <div className="btn-group w-100" role="group">
               <button 
-                className={`btn ${filter === 'all' ? 'btn-danger' : 'btn-outline-danger'}`}
+                className={`btn ${filter === 'all' ? 'btn-primary' : 'btn-outline-secondary'}`}
                 onClick={() => setFilter('all')}
               >
                 <i className="bi bi-people-fill me-2"></i>
                 All Users ({users.length})
               </button>
               <button 
-                className={`btn ${filter === 'admin' ? 'btn-danger' : 'btn-outline-danger'}`}
+                className={`btn ${filter === 'admin' ? 'btn-primary' : 'btn-outline-secondary'}`}
                 onClick={() => setFilter('admin')}
               >
                 <i className="bi bi-shield-fill-check me-2"></i>
                 Admin Created ({users.filter(u => u.source === 'admin').length})
               </button>
               <button 
-                className={`btn ${filter === 'self' ? 'btn-danger' : 'btn-outline-danger'}`}
+                className={`btn ${filter === 'self' ? 'btn-primary' : 'btn-outline-secondary'}`}
                 onClick={() => setFilter('self')}
               >
                 <i className="bi bi-person-check-fill me-2"></i>
@@ -332,7 +325,7 @@ function ManageUsers() {
 
         {/* Users Table */}
         <div className="card shadow-lg border-0">
-          <div className="card-header bg-danger text-white py-3">
+          <div className="card-header bg-primary text-white py-3">
             <h4 className="mb-0">
               <i className="bi bi-list-ul me-2"></i>
               User List ({filteredUsers.length})
@@ -373,7 +366,7 @@ function ManageUsers() {
                         </td>
                         <td>
                           <strong>
-                            <i className="bi bi-person-circle me-2 text-danger"></i>
+                            <i className="bi bi-person-circle me-2 text-primary"></i>
                             {user.name}
                           </strong>
                         </td>
@@ -415,7 +408,7 @@ function ManageUsers() {
                             </button> */}
                             <button
                               onClick={() => handleDelete(user)}
-                              className="btn btn-sm btn-outline-danger"
+                              className="btn btn-sm btn-outline-secondary"
                               title="Delete User"
                             >
                               <i className="bi bi-trash3-fill"></i> Delete
@@ -437,7 +430,7 @@ function ManageUsers() {
         <div className="modal show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
           <div className="modal-dialog modal-dialog-centered modal-lg">
             <div className="modal-content">
-              <div className="modal-header bg-danger text-white">
+              <div className="modal-header bg-primary text-white">
                 <h5 className="modal-title">
                   <i className={`bi ${editingUser ? 'bi-pencil-square' : 'bi-person-plus-fill'} me-2`}></i>
                   {editingUser ? `Edit User (${editingUser.type})` : 'Add New User (Admin)'}
@@ -457,8 +450,8 @@ function ManageUsers() {
                   <div className="row g-3">
                     <div className="col-md-6">
                       <label className="form-label fw-semibold">
-                        <i className="bi bi-person-fill me-1 text-danger"></i>
-                        Name <span className="text-danger">*</span>
+                        <i className="bi bi-person-fill me-1 text-primary"></i>
+                        Name <span className="text-primary">*</span>
                       </label>
                       <input
                         type="text"
@@ -473,7 +466,7 @@ function ManageUsers() {
 
                     <div className="col-md-6">
                       <label className="form-label fw-semibold">
-                        <i className="bi bi-geo-alt-fill me-1 text-danger"></i>
+                        <i className="bi bi-geo-alt-fill me-1 text-primary"></i>
                         Place
                       </label>
                       <input
@@ -488,7 +481,7 @@ function ManageUsers() {
 
                     <div className="col-md-6">
                       <label className="form-label fw-semibold">
-                        <i className="bi bi-envelope me-1 text-danger"></i>
+                        <i className="bi bi-envelope me-1 text-primary"></i>
                         Email
                       </label>
                       <input
@@ -503,7 +496,7 @@ function ManageUsers() {
 
                     <div className="col-md-6">
                       <label className="form-label fw-semibold">
-                        <i className="bi bi-telephone me-1 text-danger"></i>
+                        <i className="bi bi-telephone me-1 text-primary"></i>
                         Phone
                       </label>
                       <input
@@ -518,8 +511,8 @@ function ManageUsers() {
 
                     <div className="col-12">
                       <label className="form-label fw-semibold">
-                        <i className="bi bi-at me-1 text-danger"></i>
-                        Username <span className="text-danger">*</span>
+                        <i className="bi bi-at me-1 text-primary"></i>
+                        Username <span className="text-primary">*</span>
                       </label>
                       <input
                         type="text"
@@ -544,7 +537,7 @@ function ManageUsers() {
                         </small>
                       )}
                       {usernameAvailable === false && (
-                        <small className="text-danger d-block mt-1">
+                        <small className="text-primary d-block mt-1">
                           <i className="bi bi-x-circle-fill me-1"></i>
                           Username is already taken
                         </small>
@@ -553,7 +546,7 @@ function ManageUsers() {
 
                     <div className="col-12">
                       <hr className="my-2" />
-                      <h6 className="text-danger mb-3">
+                      <h6 className="text-primary mb-3">
                         <i className="bi bi-shield-lock-fill me-2"></i>
                         {editingUser ? 'Change Password (Optional)' : 'Set Password'}
                       </h6>
@@ -561,8 +554,8 @@ function ManageUsers() {
 
                     <div className="col-md-6">
                       <label className="form-label fw-semibold">
-                        <i className="bi bi-lock-fill me-1 text-danger"></i>
-                        Password {!editingUser && <span className="text-danger">*</span>}
+                        <i className="bi bi-lock-fill me-1 text-primary"></i>
+                        Password {!editingUser && <span className="text-primary">*</span>}
                       </label>
                       <div className="input-group">
                         <input
@@ -606,8 +599,8 @@ function ManageUsers() {
 
                     <div className="col-md-6">
                       <label className="form-label fw-semibold">
-                        <i className="bi bi-lock-fill me-1 text-danger"></i>
-                        Confirm Password {!editingUser && <span className="text-danger">*</span>}
+                        <i className="bi bi-lock-fill me-1 text-primary"></i>
+                        Confirm Password {!editingUser && <span className="text-primary">*</span>}
                       </label>
                       <div className="input-group">
                         <input
@@ -628,7 +621,7 @@ function ManageUsers() {
                         </button>
                       </div>
                       {formData.confirmPassword && formData.password !== formData.confirmPassword && (
-                        <small className="text-danger d-block mt-1">
+                        <small className="text-primary d-block mt-1">
                           <i className="bi bi-x-circle-fill me-1"></i>
                           Passwords do not match
                         </small>
@@ -672,7 +665,7 @@ function ManageUsers() {
                   </button>
                   <button 
                     type="submit" 
-                    className="btn btn-danger"
+                    className="btn btn-primary"
                     disabled={loading || (usernameAvailable === false)}
                   >
                     {loading ? (
@@ -694,6 +687,7 @@ function ManageUsers() {
         </div>
       )}
     </div>
+    </AdminLayout>
   );
 }
 
