@@ -1,62 +1,61 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import AdminLayout from './AdminLayout';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const API_URL  = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 const API_BASE = API_URL.replace(/\/api\/?$/, '');
 
+const departments = [
+  'Engineering & Technology','Economics & Commerce',
+  'Journalism, Media, PR & Communication','Law','Medicine',
+  'Arts & Humanities','Science','Business Administration',
+];
+const years = Array.from({ length: 50 }, (_, i) => (new Date().getFullYear() - i).toString());
+
+const approvalStyle = s => {
+  if (s === 'approved') return { bg: '#dcfce7', text: '#16a34a', icon: 'bi-check-circle-fill' };
+  if (s === 'rejected') return { bg: '#fee2e2', text: '#dc2626', icon: 'bi-x-circle-fill' };
+  return { bg: '#fef9c3', text: '#d97706', icon: 'bi-hourglass-split' };
+};
+
+const statusStyle = s => {
+  if (s === 'Employed')      return { bg: '#dcfce7', text: '#16a34a' };
+  if (s === 'Self-Employed') return { bg: '#ede9fe', text: '#7c3aed' };
+  if (s === 'Studying')      return { bg: '#e0f2fe', text: '#0891b2' };
+  return { bg: '#f3f4f6', text: '#6b7280' };
+};
+
 function PendingApprovals() {
-  const navigate = useNavigate();
-  const [allAlumni, setAllAlumni] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [allAlumni, setAllAlumni]         = useState([]);
+  const [loading, setLoading]             = useState(false);
   const [actionLoading, setActionLoading] = useState(null);
   const [selectedAlumni, setSelectedAlumni] = useState(null);
-  const [toast, setToast] = useState(null);
-  const [activeTab, setActiveTab] = useState('pending'); // 'all' | 'pending' | 'approved' | 'rejected'
-  const [filters, setFilters] = useState({ search: '', batch: '', department: '' });
+  const [toast, setToast]                 = useState(null);
+  const [activeTab, setActiveTab]         = useState('pending');
+  const [filters, setFilters]             = useState({ search: '', batch: '', department: '' });
 
-  const departments = [
-    'Engineering & Technology', 'Economics & Commerce',
-    'Journalism, Media, PR & Communication', 'Law', 'Medicine',
-    'Arts & Humanities', 'Science', 'Business Administration'
-  ];
-  const years = Array.from({ length: 50 }, (_, i) => (new Date().getFullYear() - i).toString());
-
-  useEffect(() => {
-    fetchAll();
-  }, []);
+  useEffect(() => { fetchAll(); }, []);
 
   const fetchAll = async () => {
     try {
       setLoading(true);
       const res = await axios.get(`${API_URL}/alumni?all=true`);
       setAllAlumni(res.data);
-    } catch (err) {
-      console.error('Error fetching alumni:', err);
-      showToast('danger', 'Failed to load registrations.');
-    } finally {
-      setLoading(false);
-    }
+    } catch { showToast('danger', 'Failed to load registrations.'); }
+    finally { setLoading(false); }
   };
 
-  const showToast = (type, msg) => {
-    setToast({ type, msg });
-    setTimeout(() => setToast(null), 3500);
-  };
+  const showToast = (type, msg) => { setToast({ type, msg }); setTimeout(() => setToast(null), 3500); };
 
   const handleApprove = async (id) => {
     setActionLoading(id);
     try {
       await axios.put(`${API_URL}/admin/alumni/${id}/approve`);
-      showToast('success', 'Alumni approved and is now visible in the directory.');
+      showToast('success', 'Alumni approved and visible in the directory.');
       setAllAlumni(prev => prev.map(a => a.id === id ? { ...a, approval_status: 'approved' } : a));
       if (selectedAlumni?.id === id) setSelectedAlumni(prev => ({ ...prev, approval_status: 'approved' }));
-    } catch (err) {
-      console.error('Error approving:', err);
-      showToast('danger', 'Failed to approve alumni.');
-    } finally {
-      setActionLoading(null);
-    }
+    } catch { showToast('danger', 'Failed to approve alumni.'); }
+    finally { setActionLoading(null); }
   };
 
   const handleReject = async (id) => {
@@ -67,18 +66,13 @@ function PendingApprovals() {
       showToast('success', 'Alumni registration rejected.');
       setAllAlumni(prev => prev.map(a => a.id === id ? { ...a, approval_status: 'rejected' } : a));
       if (selectedAlumni?.id === id) setSelectedAlumni(prev => ({ ...prev, approval_status: 'rejected' }));
-    } catch (err) {
-      console.error('Error rejecting:', err);
-      showToast('danger', 'Failed to reject alumni.');
-    } finally {
-      setActionLoading(null);
-    }
+    } catch { showToast('danger', 'Failed to reject alumni.'); }
+    finally { setActionLoading(null); }
   };
 
-  // Counts
   const counts = {
-    all: allAlumni.length,
-    pending: allAlumni.filter(a => a.approval_status === 'pending').length,
+    all:      allAlumni.length,
+    pending:  allAlumni.filter(a => a.approval_status === 'pending').length,
     approved: allAlumni.filter(a => a.approval_status === 'approved').length,
     rejected: allAlumni.filter(a => a.approval_status === 'rejected').length,
   };
@@ -86,398 +80,315 @@ function PendingApprovals() {
   const filtered = allAlumni
     .filter(a => activeTab === 'all' || a.approval_status === activeTab)
     .filter(a => {
-      if (filters.search) {
-        const s = filters.search.toLowerCase();
-        return (
-          (a.name && a.name.toLowerCase().includes(s)) ||
-          (a.email && a.email.toLowerCase().includes(s)) ||
-          (a.designation && a.designation.toLowerCase().includes(s)) ||
-          (a.organization_name && a.organization_name.toLowerCase().includes(s))
-        );
-      }
-      return true;
+      if (!filters.search) return true;
+      const s = filters.search.toLowerCase();
+      return a.name?.toLowerCase().includes(s) || a.email?.toLowerCase().includes(s) || a.designation?.toLowerCase().includes(s);
     })
     .filter(a => !filters.batch || a.batch === filters.batch)
     .filter(a => !filters.department || a.department === filters.department);
 
-  const statusBadge = (status) => {
-    if (status === 'approved') return <span className="badge bg-success"><i className="bi bi-check-circle-fill me-1"></i>Approved</span>;
-    if (status === 'rejected') return <span className="badge bg-danger"><i className="bi bi-x-circle-fill me-1"></i>Rejected</span>;
-    return <span className="badge bg-warning text-dark"><i className="bi bi-hourglass-split me-1"></i>Pending</span>;
-  };
+  const inp = { padding: '10px 12px', border: '1.5px solid #e5e7eb', borderRadius: 9, fontSize: 13, outline: 'none', background: '#fff', width: '100%' };
 
-  const tabStyle = (tab) => ({
-    cursor: 'pointer',
-    borderBottom: activeTab === tab ? '3px solid #dc3545' : '3px solid transparent',
-    color: activeTab === tab ? '#dc3545' : '#6c757d',
-    fontWeight: activeTab === tab ? '700' : '500',
-    padding: '10px 20px',
-    background: 'none',
-    border: 'none',
-    outline: 'none',
-  });
+  const TABS = [
+    { key: 'pending',  label: 'Pending',  color: '#d97706', bgOn: '#fef9c3' },
+    { key: 'approved', label: 'Approved', color: '#16a34a', bgOn: '#dcfce7' },
+    { key: 'rejected', label: 'Rejected', color: '#dc2626', bgOn: '#fee2e2' },
+    { key: 'all',      label: 'All',      color: '#1a2744', bgOn: '#eff6ff' },
+  ];
 
   return (
-    <div className="pending-approvals-page">
+    <AdminLayout title="Pending Approvals">
+
       {/* Toast */}
       {toast && (
-        <div
-          className={`alert alert-${toast.type}`}
-          style={{ position: 'fixed', top: '80px', right: '20px', zIndex: 9999, minWidth: '300px' }}
-        >
-          <i className={`bi ${toast.type === 'success' ? 'bi-check-circle-fill' : 'bi-exclamation-triangle-fill'} me-2`}></i>
+        <div style={{
+          position: 'fixed', top: 20, right: 20, zIndex: 9999,
+          background: toast.type === 'success' ? '#dcfce7' : '#fee2e2',
+          color: toast.type === 'success' ? '#15803d' : '#b91c1c',
+          border: `1px solid ${toast.type === 'success' ? '#86efac' : '#fca5a5'}`,
+          borderRadius: 12, padding: '14px 20px', fontSize: 14, fontWeight: 600,
+          boxShadow: '0 4px 20px rgba(0,0,0,0.12)', display: 'flex', alignItems: 'center', gap: 10, minWidth: 300
+        }}>
+          <i className={`bi ${toast.type === 'success' ? 'bi-check-circle-fill' : 'bi-exclamation-circle-fill'}`}></i>
           {toast.msg}
         </div>
       )}
 
-      {loading && (
-        <div style={{
-          position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-          backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex',
-          justifyContent: 'center', alignItems: 'center', zIndex: 9998
-        }}>
-          <div className="spinner-border text-danger" style={{ width: '3rem', height: '3rem' }}>
-            <span className="visually-hidden">Loading...</span>
-          </div>
-        </div>
-      )}
+      {/* Page header */}
+      <div style={{ marginBottom: 24 }}>
+        <h2 style={{ fontWeight: 800, fontSize: 22, color: '#1a2744', margin: 0, marginBottom: 4 }}>Registration Approvals</h2>
+        <p style={{ color: '#9ca3af', fontSize: 14, margin: 0 }}>Review and manage alumni self-registrations</p>
+      </div>
 
-      <div className="container-fluid my-5 px-4">
-        {/* Header */}
-        <div className="row mb-4">
-          <div className="col-12">
-            <button onClick={() => navigate('/admin')} className="btn btn-outline-danger mb-3">
-              <i className="bi bi-arrow-left me-2"></i>Back to Dashboard
-            </button>
-            <h1 className="display-5 fw-bold text-danger mb-1">
-              <i className="bi bi-person-check-fill me-3"></i>
-              Registration Approvals
-            </h1>
-            <p className="text-muted">Review and manage all alumni self-registrations.</p>
+      {/* Stats cards */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(140px,1fr))', gap: 16, marginBottom: 24 }}>
+        {[
+          { label: 'Total',    value: counts.all,      color: '#1a2744', icon: 'bi-people-fill'     },
+          { label: 'Pending',  value: counts.pending,  color: '#d97706', icon: 'bi-hourglass-split' },
+          { label: 'Approved', value: counts.approved, color: '#16a34a', icon: 'bi-check-circle-fill'},
+          { label: 'Rejected', value: counts.rejected, color: '#dc2626', icon: 'bi-x-circle-fill'  },
+        ].map((s, i) => (
+          <div key={i} onClick={() => setActiveTab(i === 0 ? 'all' : s.label.toLowerCase())}
+            style={{ background: '#fff', borderRadius: 14, padding: '18px 20px', boxShadow: '0 1px 4px rgba(0,0,0,0.07)', cursor: 'pointer', borderLeft: `4px solid ${s.color}`, transition: 'box-shadow 0.15s' }}
+            onMouseEnter={e => e.currentTarget.style.boxShadow = `0 4px 16px ${s.color}22`}
+            onMouseLeave={e => e.currentTarget.style.boxShadow = '0 1px 4px rgba(0,0,0,0.07)'}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
+              <i className={`bi ${s.icon}`} style={{ color: s.color, fontSize: 18 }}></i>
+              <span style={{ fontSize: 12, color: '#6b7280', fontWeight: 500 }}>{s.label}</span>
+            </div>
+            <div style={{ fontWeight: 800, fontSize: 28, color: s.color }}>{s.value}</div>
           </div>
-        </div>
+        ))}
+      </div>
 
-        {/* Summary Cards */}
-        <div className="row g-3 mb-4">
-          <div className="col-6 col-md-3">
-            <div className="card border-0 shadow-sm text-center py-3">
-              <div className="fs-2 fw-bold text-dark">{counts.all}</div>
-              <div className="text-muted small">Total</div>
-            </div>
-          </div>
-          <div className="col-6 col-md-3">
-            <div className="card border-0 shadow-sm text-center py-3" style={{ borderLeft: '4px solid #ffc107' }}>
-              <div className="fs-2 fw-bold text-warning">{counts.pending}</div>
-              <div className="text-muted small">Pending</div>
-            </div>
-          </div>
-          <div className="col-6 col-md-3">
-            <div className="card border-0 shadow-sm text-center py-3" style={{ borderLeft: '4px solid #198754' }}>
-              <div className="fs-2 fw-bold text-success">{counts.approved}</div>
-              <div className="text-muted small">Approved</div>
-            </div>
-          </div>
-          <div className="col-6 col-md-3">
-            <div className="card border-0 shadow-sm text-center py-3" style={{ borderLeft: '4px solid #dc3545' }}>
-              <div className="fs-2 fw-bold text-danger">{counts.rejected}</div>
-              <div className="text-muted small">Rejected</div>
-            </div>
-          </div>
-        </div>
-
-        {/* Filters */}
-        <div className="card shadow-sm mb-3 border-0">
-          <div className="card-body py-3">
-            <div className="row g-2 align-items-end">
-              <div className="col-md-4">
-                <label className="form-label fw-semibold small mb-1">
-                  <i className="bi bi-search me-1"></i>Search
-                </label>
-                <input
-                  type="text"
-                  className="form-control"
-                  placeholder="Name, email, designation..."
-                  value={filters.search}
+      {/* Filters + Tabs combined card */}
+      <div style={{ background: '#fff', borderRadius: 14, boxShadow: '0 1px 4px rgba(0,0,0,0.07)', marginBottom: 20, overflow: 'hidden' }}>
+        {/* Filter row */}
+        <div style={{ padding: '16px 20px', borderBottom: '1px solid #f3f4f6' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr auto', gap: 12, alignItems: 'end' }}>
+            <div>
+              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#374151', marginBottom: 5 }}>Search</label>
+              <div style={{ position: 'relative' }}>
+                <i className="bi bi-search" style={{ position: 'absolute', left: 11, top: '50%', transform: 'translateY(-50%)', color: '#9ca3af', fontSize: 13 }}></i>
+                <input type="text" placeholder="Name, email, designation…" value={filters.search}
                   onChange={e => setFilters(f => ({ ...f, search: e.target.value }))}
+                  style={{ ...inp, paddingLeft: 32 }}
+                  onFocus={e => e.target.style.borderColor = '#1a2744'}
+                  onBlur={e => e.target.style.borderColor = '#e5e7eb'}
                 />
               </div>
-              <div className="col-md-3">
-                <label className="form-label fw-semibold small mb-1">
-                  <i className="bi bi-calendar me-1"></i>Batch
-                </label>
-                <select
-                  className="form-select"
-                  value={filters.batch}
-                  onChange={e => setFilters(f => ({ ...f, batch: e.target.value }))}
-                >
-                  <option value="">All Batches</option>
-                  {years.map(y => <option key={y} value={y}>{y}</option>)}
-                </select>
-              </div>
-              <div className="col-md-3">
-                <label className="form-label fw-semibold small mb-1">
-                  <i className="bi bi-book me-1"></i>Department
-                </label>
-                <select
-                  className="form-select"
-                  value={filters.department}
-                  onChange={e => setFilters(f => ({ ...f, department: e.target.value }))}
-                >
-                  <option value="">All Departments</option>
-                  {departments.map(d => <option key={d} value={d}>{d}</option>)}
-                </select>
-              </div>
-              <div className="col-md-2">
-                <button
-                  className="btn btn-outline-danger w-100"
-                  onClick={() => setFilters({ search: '', batch: '', department: '' })}
-                >
-                  <i className="bi bi-arrow-clockwise me-1"></i>Reset
-                </button>
-              </div>
             </div>
-            {(filters.search || filters.batch || filters.department) && (
-              <div className="mt-2">
-                <small className="text-muted">
-                  Showing <strong>{filtered.length}</strong> result{filtered.length !== 1 ? 's' : ''}
-                </small>
-              </div>
-            )}
+            <div>
+              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#374151', marginBottom: 5 }}>Batch</label>
+              <select value={filters.batch} onChange={e => setFilters(f => ({ ...f, batch: e.target.value }))} style={inp}>
+                <option value="">All Batches</option>
+                {years.map(y => <option key={y} value={y}>{y}</option>)}
+              </select>
+            </div>
+            <div>
+              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#374151', marginBottom: 5 }}>Department</label>
+              <select value={filters.department} onChange={e => setFilters(f => ({ ...f, department: e.target.value }))} style={inp}>
+                <option value="">All Departments</option>
+                {departments.map(d => <option key={d} value={d}>{d}</option>)}
+              </select>
+            </div>
+            <div>
+              <button onClick={() => setFilters({ search: '', batch: '', department: '' })}
+                style={{ ...inp, cursor: 'pointer', fontWeight: 600, color: '#6b7280', display: 'flex', alignItems: 'center', gap: 6, width: 'auto', padding: '10px 16px' }}>
+                <i className="bi bi-arrow-clockwise"></i>Reset
+              </button>
+            </div>
           </div>
         </div>
 
-        {/* Tabs */}
-        <div className="card shadow-lg border-0">
-          <div className="card-header bg-white border-bottom p-0">
-            <div className="d-flex overflow-auto">
-              {[
-                { key: 'pending', label: 'Pending', count: counts.pending },
-                { key: 'approved', label: 'Approved', count: counts.approved },
-                { key: 'rejected', label: 'Rejected', count: counts.rejected },
-                { key: 'all', label: 'All', count: counts.all },
-              ].map(tab => (
-                <button key={tab.key} style={tabStyle(tab.key)} onClick={() => setActiveTab(tab.key)}>
-                  {tab.label}
-                  <span className={`ms-2 badge ${
-                    tab.key === 'pending' ? 'bg-warning text-dark' :
-                    tab.key === 'approved' ? 'bg-success' :
-                    tab.key === 'rejected' ? 'bg-danger' : 'bg-secondary'
-                  }`}>{tab.count}</span>
-                </button>
-              ))}
-            </div>
+        {/* Tab row */}
+        <div style={{ display: 'flex', padding: '0 20px', borderBottom: '1px solid #f3f4f6', overflowX: 'auto' }}>
+          {TABS.map(t => (
+            <button key={t.key} onClick={() => setActiveTab(t.key)} style={{
+              padding: '13px 18px', border: 'none', background: 'none', cursor: 'pointer',
+              fontWeight: activeTab === t.key ? 700 : 500, fontSize: 14,
+              color: activeTab === t.key ? t.color : '#6b7280',
+              borderBottom: activeTab === t.key ? `2.5px solid ${t.color}` : '2.5px solid transparent',
+              display: 'flex', alignItems: 'center', gap: 8, whiteSpace: 'nowrap', transition: 'all 0.15s'
+            }}>
+              {t.label}
+              <span style={{ background: activeTab === t.key ? t.bgOn : '#f3f4f6', color: activeTab === t.key ? t.color : '#9ca3af', borderRadius: 20, padding: '1px 9px', fontSize: 11, fontWeight: 700 }}>
+                {counts[t.key]}
+              </span>
+            </button>
+          ))}
+          <div style={{ marginLeft: 'auto', padding: '13px 0', fontSize: 12, color: '#9ca3af', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center' }}>
+            Showing {filtered.length} result{filtered.length !== 1 ? 's' : ''}
           </div>
+        </div>
 
-          <div className="card-body p-0">
-            {filtered.length === 0 ? (
-              <div className="text-center py-5">
-                <i className="bi bi-inbox display-1 text-muted"></i>
-                <p className="text-muted mt-3 fs-5">No {activeTab === 'all' ? '' : activeTab} registrations found.</p>
-              </div>
-            ) : (
-              <div className="table-responsive">
-                <table className="table table-hover align-middle mb-0">
-                  <thead className="table-light">
-                    <tr>
-                      <th className="ps-4">Photo</th>
-                      <th>Name & Email</th>
-                      <th>Batch</th>
-                      <th>Department</th>
-                      <th>Status</th>
-                      <th>Approval</th>
-                      <th>Registered On</th>
-                      <th className="text-center pe-4">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filtered.map((alumnus) => (
-                      <tr key={alumnus.id} className={
-                        alumnus.approval_status === 'rejected' ? 'table-danger bg-opacity-25' :
-                        alumnus.approval_status === 'approved' ? 'table-success bg-opacity-10' : ''
-                      }>
-                        <td className="ps-4">
-                          <img
-                            src={alumnus.photo ? `${API_BASE}${alumnus.photo}` : 'https://via.placeholder.com/50'}
-                            alt={alumnus.name}
-                            className="rounded-circle shadow-sm"
-                            style={{ width: '55px', height: '55px', objectFit: 'cover', cursor: 'pointer' }}
-                            onClick={() => setSelectedAlumni(alumnus)}
-                          />
-                        </td>
-                        <td>
-                          <strong
-                            className="d-block text-primary"
-                            style={{ cursor: 'pointer' }}
-                            onClick={() => setSelectedAlumni(alumnus)}
-                          >
-                            {alumnus.name}
-                          </strong>
-                          <small className="text-muted">
-                            <i className="bi bi-envelope me-1"></i>{alumnus.email}
-                          </small>
-                        </td>
-                        <td>
-                          <span className="badge bg-primary">{alumnus.batch || 'N/A'}</span>
-                        </td>
-                        <td><small>{alumnus.department || 'N/A'}</small></td>
-                        <td>
-                          <span className={`badge ${
-                            alumnus.current_status === 'Employed' ? 'bg-success' :
-                            alumnus.current_status === 'Self-Employed' ? 'bg-info' : 'bg-secondary'
-                          }`}>
-                            {alumnus.current_status || 'N/A'}
-                          </span>
-                        </td>
-                        <td>{statusBadge(alumnus.approval_status)}</td>
-                        <td>
-                          <small className="text-muted">
-                            {new Date(alumnus.created_at).toLocaleDateString('en-IN', {
-                              day: '2-digit', month: 'short', year: 'numeric'
-                            })}
-                          </small>
-                        </td>
-                        <td className="text-center pe-4">
-                          <div className="d-flex gap-1 justify-content-center flex-wrap">
-                            <button
-                              className="btn btn-sm btn-outline-primary"
-                              title="View Details"
-                              onClick={() => setSelectedAlumni(alumnus)}
-                            >
-                              <i className="bi bi-eye-fill"></i>
-                            </button>
-                            {alumnus.approval_status !== 'approved' && (
-                              <button
-                                className="btn btn-sm btn-success"
-                                title="Approve"
-                                disabled={actionLoading === alumnus.id}
-                                onClick={() => handleApprove(alumnus.id)}
-                              >
-                                {actionLoading === alumnus.id ? (
-                                  <span className="spinner-border spinner-border-sm"></span>
-                                ) : (
-                                  <><i className="bi bi-check-lg me-1"></i>Approve</>
-                                )}
-                              </button>
-                            )}
-                            {alumnus.approval_status !== 'rejected' && (
-                              <button
-                                className="btn btn-sm btn-danger"
-                                title="Reject"
-                                disabled={actionLoading === alumnus.id}
-                                onClick={() => handleReject(alumnus.id)}
-                              >
-                                <i className="bi bi-x-lg me-1"></i>Reject
-                              </button>
-                            )}
+        {/* Table */}
+        {loading ? (
+          <div style={{ textAlign: 'center', padding: 60 }}>
+            <div className="spinner-border text-danger" style={{ width: '2.5rem', height: '2.5rem' }}></div>
+          </div>
+        ) : filtered.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: 60, color: '#9ca3af' }}>
+            <i className="bi bi-inbox" style={{ fontSize: 44 }}></i>
+            <p style={{ marginTop: 12, fontSize: 15 }}>No {activeTab === 'all' ? '' : activeTab} registrations found.</p>
+          </div>
+        ) : (
+          <div style={{ overflowX: 'auto' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 14 }}>
+              <thead>
+                <tr style={{ background: '#f9fafb' }}>
+                  {['Applicant','Batch','Department','Career Status','Approval','Registered','Actions'].map(h => (
+                    <th key={h} style={{ padding: '12px 16px', textAlign: 'left', fontWeight: 600, color: '#6b7280', fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.05em', whiteSpace: 'nowrap' }}>{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {filtered.map(a => {
+                  const as_ = approvalStyle(a.approval_status);
+                  const ss  = statusStyle(a.current_status);
+                  return (
+                    <tr key={a.id} style={{ borderTop: '1px solid #f3f4f6' }}
+                      onMouseEnter={e => e.currentTarget.style.background = '#f9fafb'}
+                      onMouseLeave={e => e.currentTarget.style.background = ''}
+                    >
+                      {/* Applicant */}
+                      <td style={{ padding: '13px 16px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 11 }}>
+                          {a.photo
+                            ? <img src={`${API_BASE}${a.photo}`} alt={a.name} onClick={() => setSelectedAlumni(a)} style={{ width: 42, height: 42, borderRadius: '50%', objectFit: 'cover', border: '2px solid #e5e7eb', cursor: 'pointer', flexShrink: 0 }} />
+                            : <div onClick={() => setSelectedAlumni(a)} style={{ width: 42, height: 42, borderRadius: '50%', background: 'linear-gradient(135deg,#dc3545,#8b0000)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700, fontSize: 14, flexShrink: 0, cursor: 'pointer' }}>
+                                {a.name?.split(' ').map(n => n[0]).join('').slice(0,2).toUpperCase()}
+                              </div>
+                          }
+                          <div>
+                            <div onClick={() => setSelectedAlumni(a)} style={{ fontWeight: 600, color: '#1a2744', cursor: 'pointer', marginBottom: 2 }}>{a.name}</div>
+                            <div style={{ fontSize: 12, color: '#9ca3af' }}>{a.email}</div>
+                            {a.designation && <div style={{ fontSize: 11, color: '#6b7280', marginTop: 1 }}>{a.designation}{a.organization_name ? ` · ${a.organization_name}` : ''}</div>}
                           </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
+                        </div>
+                      </td>
+                      {/* Batch */}
+                      <td style={{ padding: '13px 16px' }}>
+                        {a.batch && <span style={{ background: '#eff6ff', color: '#2563eb', borderRadius: 20, padding: '3px 10px', fontSize: 11, fontWeight: 600 }}>{a.batch}</span>}
+                      </td>
+                      {/* Department */}
+                      <td style={{ padding: '13px 16px', color: '#6b7280', fontSize: 12, maxWidth: 160 }}>
+                        <span style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{a.department || '—'}</span>
+                      </td>
+                      {/* Status */}
+                      <td style={{ padding: '13px 16px' }}>
+                        {a.current_status && <span style={{ background: ss.bg, color: ss.text, borderRadius: 20, padding: '3px 10px', fontSize: 11, fontWeight: 600 }}>{a.current_status}</span>}
+                      </td>
+                      {/* Approval */}
+                      <td style={{ padding: '13px 16px' }}>
+                        <span style={{ background: as_.bg, color: as_.text, borderRadius: 20, padding: '3px 10px', fontSize: 11, fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: 4, textTransform: 'capitalize' }}>
+                          <i className={`bi ${as_.icon}`}></i>{a.approval_status}
+                        </span>
+                      </td>
+                      {/* Date */}
+                      <td style={{ padding: '13px 16px', color: '#9ca3af', fontSize: 12, whiteSpace: 'nowrap' }}>
+                        {a.created_at ? new Date(a.created_at).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : '—'}
+                      </td>
+                      {/* Actions */}
+                      <td style={{ padding: '13px 16px' }}>
+                        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                          <button onClick={() => setSelectedAlumni(a)} style={{ background: '#f3f4f6', color: '#374151', border: 'none', borderRadius: 8, padding: '6px 10px', cursor: 'pointer', fontSize: 13 }} title="View">
+                            <i className="bi bi-eye-fill"></i>
+                          </button>
+                          {a.approval_status !== 'approved' && (
+                            <button onClick={() => handleApprove(a.id)} disabled={actionLoading === a.id}
+                              style={{ background: '#dcfce7', color: '#16a34a', border: 'none', borderRadius: 8, padding: '6px 12px', cursor: 'pointer', fontWeight: 700, fontSize: 12, display: 'flex', alignItems: 'center', gap: 4, opacity: actionLoading === a.id ? 0.7 : 1 }}>
+                              {actionLoading === a.id ? <span className="spinner-border spinner-border-sm"></span> : <><i className="bi bi-check-lg"></i>Approve</>}
+                            </button>
+                          )}
+                          {a.approval_status !== 'rejected' && (
+                            <button onClick={() => handleReject(a.id)} disabled={actionLoading === a.id}
+                              style={{ background: '#fee2e2', color: '#dc2626', border: 'none', borderRadius: 8, padding: '6px 12px', cursor: 'pointer', fontWeight: 700, fontSize: 12, display: 'flex', alignItems: 'center', gap: 4 }}>
+                              <i className="bi bi-x-lg"></i>Reject
+                            </button>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
           </div>
-        </div>
+        )}
       </div>
 
       {/* Detail Modal */}
-      {selectedAlumni && (
-        <div className="modal show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}
-             onClick={() => setSelectedAlumni(null)}>
-          <div className="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable"
-               onClick={(e) => e.stopPropagation()}>
-            <div className="modal-content">
-              <div className={`modal-header ${
-                selectedAlumni.approval_status === 'approved' ? 'bg-success text-white' :
-                selectedAlumni.approval_status === 'rejected' ? 'bg-danger text-white' :
-                'bg-warning text-dark'
-              }`}>
-                <h5 className="modal-title">
-                  <i className="bi bi-person-circle me-2"></i>
-                  Registration Details
-                </h5>
-                <button type="button"
-                  className={`btn-close ${selectedAlumni.approval_status !== 'pending' ? 'btn-close-white' : ''}`}
-                  onClick={() => setSelectedAlumni(null)}></button>
+      {selectedAlumni && (() => {
+        const as_ = approvalStyle(selectedAlumni.approval_status);
+        return (
+          <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}
+            onClick={() => setSelectedAlumni(null)}>
+            <div style={{ background: '#fff', borderRadius: 18, width: '100%', maxWidth: 680, maxHeight: '90vh', overflow: 'auto', boxShadow: '0 20px 60px rgba(0,0,0,0.25)' }}
+              onClick={e => e.stopPropagation()}>
+              {/* Header strip */}
+              <div style={{ height: 80, background: 'linear-gradient(135deg,#1a2744,#2d4a8a)', borderRadius: '18px 18px 0 0', position: 'relative', display: 'flex', alignItems: 'flex-end', padding: '0 28px 16px' }}>
+                <span style={{ fontWeight: 700, fontSize: 16, color: '#fff' }}>Registration Details</span>
+                <button onClick={() => setSelectedAlumni(null)} style={{ position: 'absolute', top: 14, right: 14, background: 'rgba(255,255,255,0.15)', border: 'none', borderRadius: '50%', width: 34, height: 34, color: '#fff', fontSize: 18, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <i className="bi bi-x"></i>
+                </button>
               </div>
-              <div className="modal-body">
-                <div className="row">
-                  <div className="col-md-4 text-center mb-3">
-                    <img
-                      src={selectedAlumni.photo ? `${API_BASE}${selectedAlumni.photo}` : 'https://via.placeholder.com/150'}
-                      alt={selectedAlumni.name}
-                      className={`rounded-circle border border-3 ${
-                        selectedAlumni.approval_status === 'approved' ? 'border-success' :
-                        selectedAlumni.approval_status === 'rejected' ? 'border-danger' : 'border-warning'
-                      }`}
-                      style={{ width: '160px', height: '160px', objectFit: 'cover' }}
-                    />
-                    <h5 className="mt-3 fw-bold">{selectedAlumni.name}</h5>
-                    {statusBadge(selectedAlumni.approval_status)}
-                  </div>
-                  <div className="col-md-8">
-                    <div className="row g-3">
-                      <div className="col-6"><strong>Email:</strong><br /><span className="text-muted">{selectedAlumni.email || '—'}</span></div>
-                      <div className="col-6"><strong>Phone:</strong><br /><span className="text-muted">{selectedAlumni.phone || '—'}</span></div>
-                      <div className="col-6"><strong>Batch:</strong><br /><span className="text-muted">{selectedAlumni.batch || '—'}</span></div>
-                      <div className="col-6"><strong>Department:</strong><br /><span className="text-muted">{selectedAlumni.department || '—'}</span></div>
-                      <div className="col-6"><strong>Gender:</strong><br /><span className="text-muted">{selectedAlumni.gender || '—'}</span></div>
-                      <div className="col-6"><strong>Date of Birth:</strong><br /><span className="text-muted">{selectedAlumni.dob ? new Date(selectedAlumni.dob).toLocaleDateString() : '—'}</span></div>
-                      <div className="col-6"><strong>Current Status:</strong><br /><span className="text-muted">{selectedAlumni.current_status || '—'}</span></div>
-                      <div className="col-6"><strong>Organisation:</strong><br /><span className="text-muted">{selectedAlumni.organization_name || '—'}</span></div>
-                      <div className="col-6"><strong>Designation:</strong><br /><span className="text-muted">{selectedAlumni.designation || '—'}</span></div>
-                      <div className="col-6"><strong>Work Location:</strong><br /><span className="text-muted">{selectedAlumni.work_location || '—'}</span></div>
-                      <div className="col-6"><strong>Industry:</strong><br /><span className="text-muted">{selectedAlumni.industry || '—'}</span></div>
-                      <div className="col-6"><strong>Experience:</strong><br /><span className="text-muted">{selectedAlumni.experience_years ? `${selectedAlumni.experience_years} yrs` : '—'}</span></div>
-                      {selectedAlumni.skills && (
-                        <div className="col-12"><strong>Skills:</strong><br /><span className="text-muted">{selectedAlumni.skills}</span></div>
-                      )}
-                      {selectedAlumni.bio && (
-                        <div className="col-12"><strong>Bio:</strong><br /><span className="text-muted">{selectedAlumni.bio}</span></div>
-                      )}
-                      {selectedAlumni.linkedin && (
-                        <div className="col-12">
-                          <strong>LinkedIn:</strong><br />
-                          <a href={selectedAlumni.linkedin} target="_blank" rel="noopener noreferrer">
-                            <i className="bi bi-linkedin me-1"></i>View Profile
-                          </a>
-                        </div>
-                      )}
-                    </div>
+              <div style={{ padding: '0 28px 28px' }}>
+                {/* Photo + name */}
+                <div style={{ display: 'flex', alignItems: 'flex-end', gap: 18, marginTop: -28, marginBottom: 20 }}>
+                  {selectedAlumni.photo
+                    ? <img src={`${API_BASE}${selectedAlumni.photo}`} alt={selectedAlumni.name} style={{ width: 80, height: 80, borderRadius: '50%', objectFit: 'cover', border: '4px solid #fff', boxShadow: '0 2px 10px rgba(0,0,0,0.15)' }} />
+                    : <div style={{ width: 80, height: 80, borderRadius: '50%', border: '4px solid #fff', background: 'linear-gradient(135deg,#dc3545,#8b0000)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 800, fontSize: 24, boxShadow: '0 2px 10px rgba(0,0,0,0.15)' }}>
+                        {selectedAlumni.name?.split(' ').map(n => n[0]).join('').slice(0,2).toUpperCase()}
+                      </div>
+                  }
+                  <div style={{ paddingBottom: 4 }}>
+                    <div style={{ fontWeight: 800, fontSize: 20, color: '#1a2744' }}>{selectedAlumni.name}</div>
+                    <span style={{ background: as_.bg, color: as_.text, borderRadius: 20, padding: '3px 12px', fontSize: 12, fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: 4, textTransform: 'capitalize', marginTop: 4 }}>
+                      <i className={`bi ${as_.icon}`}></i>{selectedAlumni.approval_status}
+                    </span>
                   </div>
                 </div>
-              </div>
-              <div className="modal-footer">
-                <button className="btn btn-secondary" onClick={() => setSelectedAlumni(null)}>Close</button>
-                {selectedAlumni.approval_status !== 'rejected' && (
-                  <button
-                    className="btn btn-danger"
-                    disabled={actionLoading === selectedAlumni.id}
-                    onClick={() => handleReject(selectedAlumni.id)}
-                  >
-                    <i className="bi bi-x-lg me-1"></i>Reject
+
+                {/* Info grid */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                  {[
+                    { label: 'Email',       value: selectedAlumni.email },
+                    { label: 'Phone',       value: selectedAlumni.phone },
+                    { label: 'Batch',       value: selectedAlumni.batch },
+                    { label: 'Department',  value: selectedAlumni.department, full: true },
+                    { label: 'Gender',      value: selectedAlumni.gender },
+                    { label: 'Date of Birth', value: selectedAlumni.dob ? new Date(selectedAlumni.dob).toLocaleDateString() : null },
+                    { label: 'Current Status', value: selectedAlumni.current_status },
+                    { label: 'Organisation', value: selectedAlumni.organization_name },
+                    { label: 'Designation', value: selectedAlumni.designation },
+                    { label: 'Industry',    value: selectedAlumni.industry },
+                    { label: 'Work Location', value: selectedAlumni.work_location },
+                    { label: 'Experience',  value: selectedAlumni.experience_years ? `${selectedAlumni.experience_years} yrs` : null },
+                    { label: 'Skills',      value: selectedAlumni.skills, full: true },
+                    { label: 'Bio',         value: selectedAlumni.bio, full: true },
+                  ].filter(r => r.value).map((r, i) => (
+                    <div key={i} style={{ gridColumn: r.full ? '1/-1' : 'auto', background: '#f9fafb', borderRadius: 10, padding: '11px 14px' }}>
+                      <div style={{ fontSize: 11, fontWeight: 700, color: '#9ca3af', marginBottom: 3, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{r.label}</div>
+                      <div style={{ fontSize: 14, color: '#374151', fontWeight: 500 }}>{r.value}</div>
+                    </div>
+                  ))}
+                  {selectedAlumni.linkedin && (
+                    <div style={{ gridColumn: '1/-1', background: '#f9fafb', borderRadius: 10, padding: '11px 14px' }}>
+                      <div style={{ fontSize: 11, fontWeight: 700, color: '#9ca3af', marginBottom: 3, textTransform: 'uppercase', letterSpacing: '0.06em' }}>LinkedIn</div>
+                      <a href={selectedAlumni.linkedin} target="_blank" rel="noopener noreferrer" style={{ fontSize: 14, color: '#0a66c2', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                        <i className="bi bi-linkedin"></i>View Profile
+                      </a>
+                    </div>
+                  )}
+                </div>
+
+                {/* Modal footer actions */}
+                <div style={{ display: 'flex', gap: 10, marginTop: 20, justifyContent: 'flex-end' }}>
+                  <button onClick={() => setSelectedAlumni(null)} style={{ background: '#f3f4f6', color: '#374151', border: 'none', borderRadius: 10, padding: '10px 20px', fontWeight: 600, fontSize: 14, cursor: 'pointer' }}>
+                    Close
                   </button>
-                )}
-                {selectedAlumni.approval_status !== 'approved' && (
-                  <button
-                    className="btn btn-success"
-                    disabled={actionLoading === selectedAlumni.id}
-                    onClick={() => handleApprove(selectedAlumni.id)}
-                  >
-                    {actionLoading === selectedAlumni.id
-                      ? <span className="spinner-border spinner-border-sm me-2"></span>
-                      : <i className="bi bi-check-lg me-1"></i>
-                    }
-                    Approve
-                  </button>
-                )}
+                  {selectedAlumni.approval_status !== 'rejected' && (
+                    <button onClick={() => handleReject(selectedAlumni.id)} disabled={actionLoading === selectedAlumni.id}
+                      style={{ background: '#fee2e2', color: '#dc2626', border: 'none', borderRadius: 10, padding: '10px 20px', fontWeight: 700, fontSize: 14, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <i className="bi bi-x-lg"></i>Reject
+                    </button>
+                  )}
+                  {selectedAlumni.approval_status !== 'approved' && (
+                    <button onClick={() => handleApprove(selectedAlumni.id)} disabled={actionLoading === selectedAlumni.id}
+                      style={{ background: '#16a34a', color: '#fff', border: 'none', borderRadius: 10, padding: '10px 22px', fontWeight: 700, fontSize: 14, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}>
+                      {actionLoading === selectedAlumni.id ? <span className="spinner-border spinner-border-sm"></span> : <i className="bi bi-check-lg"></i>}
+                      Approve
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      )}
-    </div>
+        );
+      })()}
+    </AdminLayout>
   );
 }
 

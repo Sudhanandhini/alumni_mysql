@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import AdminLayout from './AdminLayout';
 
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const API_URL  = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 const API_BASE = API_URL.replace(/\/api\/?$/, '');
 
 function AdminDashboard() {
-  const navigate = useNavigate();
-  const [alumni, setAlumni] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const navigate  = useNavigate();
+  const [alumni, setAlumni]             = useState([]);
+  const [loading, setLoading]           = useState(false);
   const [pendingCount, setPendingCount] = useState(0);
 
   useEffect(() => {
@@ -20,270 +20,171 @@ function AdminDashboard() {
   const fetchAlumni = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`${API_URL}/alumni?all=true`);
-      setAlumni(response.data);
-    } catch (error) {
-      console.error('Error fetching alumni:', error);
-    } finally {
-      setLoading(false);
-    }
+      const res = await axios.get(`${API_URL}/alumni?all=true`);
+      setAlumni(res.data);
+    } catch (e) { console.error(e); }
+    finally { setLoading(false); }
   };
 
   const fetchPendingCount = async () => {
     try {
       const res = await axios.get(`${API_URL}/admin/alumni/pending-count`);
       setPendingCount(res.data.count);
-    } catch (error) {
-      console.error('Error fetching pending count:', error);
-    }
+    } catch (e) { console.error(e); }
+  };
+
+  const stats = [
+    { icon: 'bi-people-fill',     color: '#2563eb', label: 'Total Alumni',  value: alumni.length },
+    { icon: 'bi-briefcase-fill',  color: '#16a34a', label: 'Employed',      value: alumni.filter(a => a.current_status === 'Employed').length },
+    { icon: 'bi-laptop-fill',     color: '#7c3aed', label: 'Self-Employed', value: alumni.filter(a => a.current_status === 'Self-Employed').length },
+    { icon: 'bi-book-fill',       color: '#0891b2', label: 'Studying',      value: alumni.filter(a => a.current_status === 'Studying').length },
+    { icon: 'bi-hourglass-split', color: '#d97706', label: 'Pending',       value: pendingCount },
+  ];
+
+  const statusColor = s => {
+    if (s === 'Employed')      return { bg: '#dcfce7', text: '#16a34a' };
+    if (s === 'Self-Employed') return { bg: '#ede9fe', text: '#7c3aed' };
+    if (s === 'Studying')      return { bg: '#e0f2fe', text: '#0891b2' };
+    return { bg: '#f3f4f6', text: '#6b7280' };
+  };
+
+  const approvalColor = s => {
+    if (s === 'approved') return { bg: '#dcfce7', text: '#16a34a' };
+    if (s === 'rejected') return { bg: '#fee2e2', text: '#dc2626' };
+    return { bg: '#fef9c3', text: '#854d0e' };
   };
 
   return (
-    <div className="admin-dashboard">
-   
-
-      <div className="container my-5">
-        {/* Dashboard Header */}
-        <div className="row mb-5">
-          <div className="col-12 text-center">
-            <h1 className="display-4 fw-bold text-danger mb-3">
-              <i className="bi bi-speedometer2 me-3"></i>
-              Admin Dashboard
-            </h1>
-            <p className="lead text-muted">Manage your alumni database efficiently</p>
-          </div>
+    <AdminLayout title="Dashboard">
+      {/* Welcome banner */}
+      <div style={{ background: 'linear-gradient(135deg,#1a2744 0%,#2d4a8a 100%)', borderRadius: 16, padding: '24px 32px', marginBottom: 28, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16 }}>
+        <div>
+          <div style={{ fontWeight: 800, fontSize: 20, color: '#fff', marginBottom: 4 }}>Welcome back, Admin!</div>
+          <div style={{ fontSize: 14, color: 'rgba(255,255,255,0.6)' }}>Manage alumni records, approve registrations, and monitor the network.</div>
         </div>
-
-        {/* Quick Action Cards */}
-        <div className="row g-4 mb-5">
-          <div className="col-md-6 col-lg-4 mb-4">
-            <div
-              className="card action-card bg-danger text-white shadow-lg h-100 cursor-pointer"
-              onClick={() => navigate('/admin/add')}
-            >
-              <div className="card-body d-flex align-items-center p-5">
-                <div className="flex-shrink-0 me-4">
-                  <i className="bi bi-person-plus-fill display-1"></i>
-                </div>
-                <div>
-                  <h3 className="card-title mb-2">Add New Alumni</h3>
-                  <p className="card-text mb-0">Create a new alumni profile with complete details</p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-                 
-          <div className="col-md-6 col-lg-4 mb-4">
-            <div
-              className="card action-card bg-primary text-white shadow-lg h-100 cursor-pointer"
-              onClick={() => navigate('/admin/manage')}
-            >
-              <div className="card-body d-flex align-items-center p-5">
-                <div className="flex-shrink-0 me-4">
-                  <i className="bi bi-people-fill display-1"></i>
-                </div>
-                <div>
-                  <h3 className="card-title mb-2">Manage Alumni</h3>
-                  <p className="card-text mb-0">View, filter, edit, and delete alumni profiles</p>
-                </div>
-              </div>
-            </div>
-          </div> 
-          
-     
-{/* 
-        <div className="col-md-6 col-lg-4 mb-4">
-          <div className="card  bg-success  action-card text-white shadow-lg h-100 cursor-pointer"
-            onClick={() => navigate('/admin/manage-users')}>
-            <div className="card-body d-flex align-items-center p-5">
-              <div className="flex-shrink-0 me-4">
-                <i className="bi bi-person-badge-fill display-4"></i>
-              </div>
-              <div>
-              <h4 className="card-title mb-2">Manage Users</h4>
-              <p className="card-text mb-0">Add, edit, and manage user accounts</p>
-              </div>
-            </div>
-          </div>
-        </div> */}
-
-          <div className="col-md-6 col-lg-4 mb-4">
-            <div
-              className="card action-card text-white shadow-lg h-100 cursor-pointer"
-              style={{ backgroundColor: '#e67e22', cursor: 'pointer' }}
-              onClick={() => navigate('/admin/pending')}
-            >
-              <div className="card-body d-flex align-items-center p-5 position-relative">
-                {pendingCount > 0 && (
-                  <span className="position-absolute top-0 end-0 m-3 badge bg-white text-danger fs-6">
-                    {pendingCount} new
-                  </span>
-                )}
-                <div className="flex-shrink-0 me-4">
-                  <i className="bi bi-hourglass-split display-1"></i>
-                </div>
-                <div>
-                  <h3 className="card-title mb-2">Pending Approvals</h3>
-                  <p className="card-text mb-0">Review and approve alumni self-registrations</p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-           </div>
-
-        {/* Stats Section */}
-        <div className="row mb-4">
-          <div className="col-12">
-            <h3 className="fw-bold mb-4">
-              <i className="bi bi-bar-chart-fill me-2 text-danger"></i>
-              Statistics Overview
-            </h3>
-          </div>
-        </div>
-
-        <div className="row g-4 mb-5">
-          <div className="col-12 col-sm-6 col-lg-3">
-            <div className="card stat-card border-0 shadow-sm h-100">
-              <div className="card-body text-center p-4">
-                <i className="bi bi-people-fill text-danger display-3 mb-3"></i>
-                <h2 className="fw-bold mb-2">{alumni.length}</h2>
-                <p className="text-muted mb-0">Total Alumni</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="col-12 col-sm-6 col-lg-3">
-            <div className="card stat-card border-0 shadow-sm h-100">
-              <div className="card-body text-center p-4">
-                <i className="bi bi-briefcase-fill text-success display-3 mb-3"></i>
-                <h2 className="fw-bold mb-2">
-                  {alumni.filter(a => a.current_status === 'Employed').length}
-                </h2>
-                <p className="text-muted mb-0">Employed</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="col-12 col-sm-6 col-lg-3">
-            <div className="card stat-card border-0 shadow-sm h-100">
-              <div className="card-body text-center p-4">
-                <i className="bi bi-laptop-fill text-primary display-3 mb-3"></i>
-                <h2 className="fw-bold mb-2">
-                  {alumni.filter(a => a.current_status === 'Self-Employed').length}
-                </h2>
-                <p className="text-muted mb-0">Self-Employed</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="col-12 col-sm-6 col-lg-3">
-            <div className="card stat-card border-0 shadow-sm h-100">
-              <div className="card-body text-center p-4">
-                <i className="bi bi-book-fill text-info display-3 mb-3"></i>
-                <h2 className="fw-bold mb-2">
-                  {alumni.filter(a => a.current_status === 'Studying').length}
-                </h2>
-                <p className="text-muted mb-0">Studying</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Recent Alumni */}
-        <div className="row">
-          <div className="col-12">
-            <div className="card shadow-sm">
-              <div className="card-header bg-light">
-                <h5 className="mb-0">
-                  <i className="bi bi-clock-history me-2 text-danger"></i>
-                  Recent Alumni
-                </h5>
-              </div>
-              <div className="card-body">
-                {alumni.length === 0 ? (
-                  <div className="text-center py-5">
-                    <i className="bi bi-inbox display-1 text-muted"></i>
-                    <p className="text-muted mt-3">No alumni added yet.</p>
-                  </div>
-                ) : (
-                  <div className="table-responsive">
-                    <table className="table table-hover">
-                      <thead>
-                        <tr>
-                          <th>Photo</th>
-                          <th>Name</th>
-                          <th>Designation</th>
-                          <th>Batch</th>
-                          <th>Status</th>
-                          <th>Approval</th>
-                          <th>Actions</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {alumni.slice(0, 5).map((alumnus) => (
-                          <tr key={alumnus.id}>
-                            <td>
-                              <img
-                                src={alumnus.photo ? `${API_BASE}${alumnus.photo}` : 'https://via.placeholder.com/50'}
-                                alt={alumnus.name}
-                                className="rounded-circle"
-                                style={{ width: '50px', height: '50px', objectFit: 'cover' }}
-                              />
-                            </td>
-                            <td>
-                              <strong>{alumnus.name}</strong>
-                              <br />
-                              <small className="text-muted">{alumnus.email}</small>
-                            </td>
-                            <td>{alumnus.designation || 'N/A'}</td>
-                            <td><span className="badge bg-primary">{alumnus.batch}</span></td>
-                            <td>
-                              <span className={`badge ${alumnus.current_status === 'Employed' ? 'bg-success' :
-                                  alumnus.current_status === 'Self-Employed' ? 'bg-primary' : 'bg-info'
-                                }`}>
-                                {alumnus.current_status}
-                              </span>
-                            </td>
-                            <td>
-                              <span className={`badge ${
-                                alumnus.approval_status === 'approved' ? 'bg-success' :
-                                alumnus.approval_status === 'rejected' ? 'bg-danger' : 'bg-warning text-dark'
-                              }`}>
-                                {alumnus.approval_status || 'approved'}
-                              </span>
-                            </td>
-                            <td>
-                              <button
-                                onClick={() => navigate(`/admin/edit/${alumnus.id}`)}
-                                className="btn btn-sm btn-outline-primary me-2"
-                              >
-                                <i className="bi bi-pencil"></i>
-                              </button>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                )}
-                {alumni.length > 5 && (
-                  <div className="text-center mt-3">
-                    <button
-                      onClick={() => navigate('/admin/manage')}
-                      className="btn btn-outline-danger"
-                    >
-                      View All Alumni
-                    </button>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
+        <div style={{ display: 'flex', gap: 10 }}>
+          <button onClick={() => navigate('/admin/add')} style={{ background: '#dc3545', color: '#fff', border: 'none', borderRadius: 10, padding: '10px 20px', fontWeight: 700, fontSize: 13, cursor: 'pointer' }}>
+            <i className="bi bi-person-plus-fill me-2"></i>Add Alumni
+          </button>
+          <button onClick={() => navigate('/admin/pending')} style={{ background: 'rgba(255,255,255,0.12)', color: '#fff', border: '1px solid rgba(255,255,255,0.25)', borderRadius: 10, padding: '10px 20px', fontWeight: 600, fontSize: 13, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8 }}>
+            <i className="bi bi-hourglass-split"></i>Approvals
+            {pendingCount > 0 && <span style={{ background: '#dc3545', color: '#fff', borderRadius: 20, padding: '1px 8px', fontSize: 11, fontWeight: 700 }}>{pendingCount}</span>}
+          </button>
         </div>
       </div>
-    </div>
+
+      {/* Stats */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(150px,1fr))', gap: 16, marginBottom: 28 }}>
+        {stats.map((s, i) => (
+          <div key={i} style={{ background: '#fff', borderRadius: 14, padding: '20px 22px', boxShadow: '0 1px 4px rgba(0,0,0,0.07)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 10 }}>
+              <div style={{ width: 40, height: 40, borderRadius: 10, background: s.color + '18', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <i className={`bi ${s.icon}`} style={{ color: s.color, fontSize: 18 }}></i>
+              </div>
+              <span style={{ fontSize: 13, color: '#6b7280', fontWeight: 500 }}>{s.label}</span>
+            </div>
+            <div style={{ fontWeight: 800, fontSize: 28, color: '#1a2744' }}>{s.value}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* Quick actions */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(200px,1fr))', gap: 16, marginBottom: 28 }}>
+        {[
+          { label: 'Add New Alumni',    desc: 'Create a new alumni profile',  icon: 'bi-person-plus-fill', color: '#dc3545', path: '/admin/add' },
+          { label: 'Manage Alumni',     desc: 'View, edit and delete records', icon: 'bi-people-fill',      color: '#2563eb', path: '/admin/manage' },
+          { label: 'Pending Approvals', desc: 'Review self-registrations',     icon: 'bi-hourglass-split',  color: '#d97706', path: '/admin/pending', badge: pendingCount },
+        ].map((c, i) => (
+          <div key={i} onClick={() => navigate(c.path)} style={{ background: '#fff', borderRadius: 14, padding: '22px 24px', boxShadow: '0 1px 4px rgba(0,0,0,0.07)', cursor: 'pointer', border: '1.5px solid transparent', transition: 'all 0.15s', display: 'flex', alignItems: 'center', gap: 18, position: 'relative' }}
+            onMouseEnter={e => { e.currentTarget.style.borderColor = c.color; e.currentTarget.style.boxShadow = `0 4px 16px ${c.color}22`; }}
+            onMouseLeave={e => { e.currentTarget.style.borderColor = 'transparent'; e.currentTarget.style.boxShadow = '0 1px 4px rgba(0,0,0,0.07)'; }}
+          >
+            {c.badge > 0 && <span style={{ position: 'absolute', top: 12, right: 14, background: '#dc3545', color: '#fff', borderRadius: 20, padding: '2px 9px', fontSize: 11, fontWeight: 700 }}>{c.badge} new</span>}
+            <div style={{ width: 48, height: 48, borderRadius: 12, background: c.color + '18', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+              <i className={`bi ${c.icon}`} style={{ color: c.color, fontSize: 22 }}></i>
+            </div>
+            <div>
+              <div style={{ fontWeight: 700, fontSize: 15, color: '#1a2744', marginBottom: 3 }}>{c.label}</div>
+              <div style={{ fontSize: 13, color: '#9ca3af' }}>{c.desc}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Recent Alumni table */}
+      <div style={{ background: '#fff', borderRadius: 14, boxShadow: '0 1px 4px rgba(0,0,0,0.07)', overflow: 'hidden' }}>
+        <div style={{ padding: '18px 24px', borderBottom: '1px solid #f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div style={{ fontWeight: 700, fontSize: 15, color: '#1a2744', display: 'flex', alignItems: 'center', gap: 8 }}>
+            <i className="bi bi-clock-history" style={{ color: '#dc3545' }}></i> Recent Alumni
+          </div>
+          {alumni.length > 8 && (
+            <button onClick={() => navigate('/admin/manage')} style={{ background: 'none', border: '1.5px solid #1a2744', color: '#1a2744', borderRadius: 8, padding: '6px 16px', fontWeight: 600, fontSize: 13, cursor: 'pointer' }}>View All</button>
+          )}
+        </div>
+        {loading ? (
+          <div style={{ textAlign: 'center', padding: 48 }}><div className="spinner-border text-danger" style={{ width: '2rem', height: '2rem' }}></div></div>
+        ) : alumni.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: 48, color: '#9ca3af' }}>
+            <i className="bi bi-inbox" style={{ fontSize: 40 }}></i>
+            <p style={{ marginTop: 10 }}>No alumni records yet.</p>
+          </div>
+        ) : (
+          <div style={{ overflowX: 'auto' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 14 }}>
+              <thead>
+                <tr style={{ background: '#f9fafb' }}>
+                  {['Alumni','Designation','Batch','Status','Approval','Actions'].map(h => (
+                    <th key={h} style={{ padding: '12px 18px', textAlign: 'left', fontWeight: 600, color: '#6b7280', fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.05em', whiteSpace: 'nowrap' }}>{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {alumni.slice(0, 8).map(a => {
+                  const sc = statusColor(a.current_status);
+                  const ac = approvalColor(a.approval_status);
+                  return (
+                    <tr key={a.id} style={{ borderTop: '1px solid #f3f4f6' }}
+                      onMouseEnter={e => e.currentTarget.style.background = '#f9fafb'}
+                      onMouseLeave={e => e.currentTarget.style.background = ''}
+                    >
+                      <td style={{ padding: '14px 18px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                          {a.photo
+                            ? <img src={`${API_BASE}${a.photo}`} alt={a.name} style={{ width: 38, height: 38, borderRadius: '50%', objectFit: 'cover', border: '2px solid #e5e7eb' }} />
+                            : <div style={{ width: 38, height: 38, borderRadius: '50%', background: 'linear-gradient(135deg,#dc3545,#8b0000)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700, fontSize: 13, flexShrink: 0 }}>
+                                {a.name?.split(' ').map(n => n[0]).join('').slice(0,2).toUpperCase()}
+                              </div>
+                          }
+                          <div>
+                            <div style={{ fontWeight: 600, color: '#1a2744' }}>{a.name}</div>
+                            <div style={{ fontSize: 12, color: '#9ca3af' }}>{a.email}</div>
+                          </div>
+                        </div>
+                      </td>
+                      <td style={{ padding: '14px 18px', color: '#374151' }}>{a.designation || '—'}</td>
+                      <td style={{ padding: '14px 18px' }}>
+                        {a.batch && <span style={{ background: '#eff6ff', color: '#2563eb', borderRadius: 20, padding: '3px 10px', fontSize: 12, fontWeight: 600 }}>{a.batch}</span>}
+                      </td>
+                      <td style={{ padding: '14px 18px' }}>
+                        {a.current_status && <span style={{ background: sc.bg, color: sc.text, borderRadius: 20, padding: '3px 10px', fontSize: 12, fontWeight: 600 }}>{a.current_status}</span>}
+                      </td>
+                      <td style={{ padding: '14px 18px' }}>
+                        <span style={{ background: ac.bg, color: ac.text, borderRadius: 20, padding: '3px 10px', fontSize: 12, fontWeight: 600, textTransform: 'capitalize' }}>{a.approval_status || 'approved'}</span>
+                      </td>
+                      <td style={{ padding: '14px 18px' }}>
+                        <button onClick={() => navigate(`/admin/edit/${a.id}`)} style={{ background: '#f3f4f6', border: 'none', borderRadius: 8, padding: '6px 12px', cursor: 'pointer', color: '#374151', fontSize: 13, fontWeight: 600 }}>
+                          <i className="bi bi-pencil me-1"></i>Edit
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+    </AdminLayout>
   );
 }
 

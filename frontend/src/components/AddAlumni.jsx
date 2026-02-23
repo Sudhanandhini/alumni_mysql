@@ -500,7 +500,7 @@ function AddAlumni() {
       {/* ── Right: Info Panel ── */}
       <div className="d-none d-lg-flex" style={{
         width: 340, flexShrink: 0,
-        background: 'linear-gradient(160deg, #c62828 0%, #7b1717 55%, #4a0e0e 100%)',
+        background: '#1a2744',
         position: 'sticky', top: 0, height: '100vh', overflow: 'hidden',
         flexDirection: 'column', justifyContent: 'space-between', padding: '56px 32px'
       }}>
@@ -527,8 +527,8 @@ function AddAlumni() {
                     display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.3s'
                   }}>
                     {isDone
-                      ? <i className="bi bi-check2" style={{ color: '#c62828', fontSize: 13 }}></i>
-                      : <span style={{ fontSize: 11, fontWeight: 700, color: isActive ? '#c62828' : 'rgba(255,255,255,0.5)' }}>{n}</span>
+                      ? <i className="bi bi-check2" style={{ color: '#1a2744', fontSize: 13 }}></i>
+                      : <span style={{ fontSize: 11, fontWeight: 700, color: isActive ? '#1a2744' : 'rgba(255,255,255,0.5)' }}>{n}</span>
                     }
                   </div>
                   <span style={{ fontSize: 13, fontWeight: isActive ? 700 : 400, color: isDone || isActive ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.4)', transition: 'all 0.3s' }}>
