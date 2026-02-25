@@ -111,7 +111,7 @@ function ViewAlumni() {
       }}>
         {/* Logo row */}
         <div style={{ padding: '22px 16px 20px', display: 'flex', alignItems: 'center', gap: 10, borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
-          <div style={{ width: 36, height: 36, flexShrink: 0, borderRadius: 10, background: 'linear-gradient(135deg,#dc3545,#8b0000)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ width: 36, height: 36, flexShrink: 0, borderRadius: 10, background: 'linear-gradient(135deg,#197fe6,#1368c4)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <i className="bi bi-mortarboard-fill" style={{ color: '#fff', fontSize: 17 }}></i>
           </div>
           {sidebarOpen && (
@@ -130,8 +130,8 @@ function ViewAlumni() {
               <button key={n.key} onClick={() => setActiveTab(n.key)} style={{
                 width: '100%', display: 'flex', alignItems: 'center', gap: 12,
                 padding: '11px 12px', borderRadius: 10, border: 'none', cursor: 'pointer',
-                marginBottom: 4, background: active ? 'rgba(220,53,69,0.18)' : 'transparent',
-                color: active ? '#ff6b7a' : 'rgba(255,255,255,0.65)',
+                marginBottom: 4, background: active ? 'rgba(25,127,230,0.18)' : 'transparent',
+                color: active ? '#93c5fd' : 'rgba(255,255,255,0.65)',
                 fontWeight: active ? 700 : 500, fontSize: 14,
                 transition: 'all 0.15s', whiteSpace: 'nowrap', overflow: 'hidden'
               }}>
@@ -196,7 +196,7 @@ function ViewAlumni() {
             </div>
             <div style={{
               width: 38, height: 38, borderRadius: '50%',
-              background: 'linear-gradient(135deg,#dc3545,#8b0000)',
+              background: 'linear-gradient(135deg,#197fe6,#1368c4)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               color: '#fff', fontWeight: 800, fontSize: 14, flexShrink: 0
             }}>{userInitials}</div>
@@ -211,7 +211,7 @@ function ViewAlumni() {
             <div>
               {/* Welcome banner */}
               <div style={{
-                background: 'linear-gradient(135deg,#1a2744 0%,#2d4a8a 100%)',
+                background: 'linear-gradient(135deg,#197fe6 0%,#1368c4 100%)',
                 borderRadius: 16, padding: '28px 32px', marginBottom: 28,
                 display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                 flexWrap: 'wrap', gap: 20
@@ -228,7 +228,7 @@ function ViewAlumni() {
                 </div>
                 <div style={{ display: 'flex', gap: 12 }}>
                   <button onClick={() => setActiveTab('connect')} style={{
-                    background: '#dc3545', color: '#fff', border: 'none', borderRadius: 10,
+                    background: '#197fe6', color: '#fff', border: 'none', borderRadius: 10,
                     padding: '10px 22px', fontWeight: 700, fontSize: 14, cursor: 'pointer'
                   }}>
                     <i className="bi bi-people-fill me-2"></i>Browse Alumni
@@ -269,12 +269,12 @@ function ViewAlumni() {
               {isAlumniLoggedIn && ownAlumnus && (
                 <div style={{ background: '#fff', borderRadius: 16, padding: 24, boxShadow: '0 1px 4px rgba(0,0,0,0.07)', marginBottom: 28 }}>
                   <div style={{ fontWeight: 700, fontSize: 15, color: '#1a2744', marginBottom: 18, display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <i className="bi bi-person-badge-fill" style={{ color: '#dc3545' }}></i> Your Profile
+                    <i className="bi bi-person-badge-fill" style={{ color: '#197fe6' }}></i> Your Profile
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 20, flexWrap: 'wrap' }}>
                     {ownAlumnus.photo
-                      ? <img src={`${API_BASE}${ownAlumnus.photo}`} alt={ownAlumnus.name} style={{ width: 72, height: 72, borderRadius: '50%', objectFit: 'cover', border: '3px solid #dc3545' }} />
-                      : <div style={{ width: 72, height: 72, borderRadius: '50%', background: 'linear-gradient(135deg,#dc3545,#8b0000)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 800, fontSize: 22 }}>
+                      ? <img src={`${API_BASE}${ownAlumnus.photo}`} alt={ownAlumnus.name} style={{ width: 72, height: 72, borderRadius: '50%', objectFit: 'cover', border: '3px solid #197fe6' }} />
+                      : <div style={{ width: 72, height: 72, borderRadius: '50%', background: 'linear-gradient(135deg,#197fe6,#1368c4)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 800, fontSize: 22 }}>
                           {ownAlumnus.name?.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
                         </div>
                     }
@@ -290,7 +290,7 @@ function ViewAlumni() {
                       </div>
                     </div>
                     <button onClick={() => navigate('/alumni/edit-profile')} style={{
-                      background: '#1a2744', color: '#fff', border: 'none',
+                      background: '#197fe6', color: '#fff', border: 'none',
                       borderRadius: 10, padding: '10px 20px', fontWeight: 700, fontSize: 13, cursor: 'pointer'
                     }}>
                       <i className="bi bi-pencil-square me-2"></i>Edit Profile
@@ -302,19 +302,19 @@ function ViewAlumni() {
               {/* CTA for user-only login */}
               {!isAlumniLoggedIn && (
                 <div style={{
-                  background: 'linear-gradient(135deg,#fff5f5,#fff)',
-                  border: '1.5px solid #fecaca', borderRadius: 14, padding: '20px 24px',
+                  background: 'linear-gradient(135deg,#eff6ff,#fff)',
+                  border: '1.5px solid #bfdbfe', borderRadius: 14, padding: '20px 24px',
                   display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 14
                 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-                    <i className="bi bi-person-badge-fill" style={{ color: '#dc3545', fontSize: 26 }}></i>
+                    <i className="bi bi-person-badge-fill" style={{ color: '#197fe6', fontSize: 26 }}></i>
                     <div>
                       <div style={{ fontWeight: 700, fontSize: 15, color: '#1a2744' }}>Are you an alumni?</div>
                       <div style={{ fontSize: 13, color: '#6b7280' }}>Log in with your alumni credentials to view and edit your profile.</div>
                     </div>
                   </div>
                   <button onClick={() => navigate('/user/login')} style={{
-                    background: '#dc3545', color: '#fff', border: 'none',
+                    background: '#197fe6', color: '#fff', border: 'none',
                     borderRadius: 10, padding: '10px 20px', fontWeight: 700, fontSize: 13, cursor: 'pointer'
                   }}>
                     <i className="bi bi-box-arrow-in-right me-2"></i>Alumni Sign In
@@ -337,9 +337,9 @@ function ViewAlumni() {
                 </div>
                 <button onClick={() => setShowFilters(p => !p)} style={{
                   display: 'flex', alignItems: 'center', gap: 8,
-                  background: showFilters ? '#1a2744' : '#fff',
-                  color: showFilters ? '#fff' : '#1a2744',
-                  border: '1.5px solid #1a2744', borderRadius: 10,
+                  background: showFilters ? '#197fe6' : '#fff',
+                  color: showFilters ? '#fff' : '#197fe6',
+                  border: '1.5px solid #197fe6', borderRadius: 10,
                   padding: '9px 18px', fontWeight: 700, fontSize: 13, cursor: 'pointer'
                 }}>
                   <i className="bi bi-funnel-fill"></i>
@@ -359,7 +359,7 @@ function ViewAlumni() {
                         <input type="text" name="searchTerm" value={filters.searchTerm} onChange={handleFilterChange}
                           placeholder="Name, email, designation, company…"
                           style={{ width: '100%', padding: '10px 12px 10px 36px', border: '1.5px solid #e5e7eb', borderRadius: 9, fontSize: 14, boxSizing: 'border-box', outline: 'none' }}
-                          onFocus={e => e.target.style.borderColor = '#1a2744'}
+                          onFocus={e => e.target.style.borderColor = '#197fe6'}
                           onBlur={e => e.target.style.borderColor = '#e5e7eb'}
                         />
                       </div>
@@ -419,7 +419,7 @@ function ViewAlumni() {
               {/* Loading */}
               {loading && (
                 <div style={{ textAlign: 'center', padding: 60 }}>
-                  <div className="spinner-border text-danger" style={{ width: '2.5rem', height: '2.5rem' }}></div>
+                  <div className="spinner-border text-primary" style={{ width: '2.5rem', height: '2.5rem' }}></div>
                 </div>
               )}
 
@@ -440,24 +440,24 @@ function ViewAlumni() {
                         <div key={a.id} onClick={() => setSelectedAlumni(a)}
                           style={{
                             background: '#fff', borderRadius: 14, overflow: 'hidden',
-                            boxShadow: isOwn ? '0 0 0 2px #dc3545, 0 4px 16px rgba(220,53,69,0.15)' : '0 1px 4px rgba(0,0,0,0.07)',
+                            boxShadow: isOwn ? '0 0 0 2px #197fe6, 0 4px 16px rgba(25,127,230,0.15)' : '0 1px 4px rgba(0,0,0,0.07)',
                             cursor: 'pointer', transition: 'box-shadow 0.15s'
                           }}
-                          onMouseEnter={e => e.currentTarget.style.boxShadow = isOwn ? '0 0 0 2px #dc3545,0 8px 24px rgba(220,53,69,0.2)' : '0 4px 16px rgba(0,0,0,0.13)'}
-                          onMouseLeave={e => e.currentTarget.style.boxShadow = isOwn ? '0 0 0 2px #dc3545,0 4px 16px rgba(220,53,69,0.15)' : '0 1px 4px rgba(0,0,0,0.07)'}
+                          onMouseEnter={e => e.currentTarget.style.boxShadow = isOwn ? '0 0 0 2px #197fe6,0 8px 24px rgba(25,127,230,0.2)' : '0 4px 16px rgba(0,0,0,0.13)'}
+                          onMouseLeave={e => e.currentTarget.style.boxShadow = isOwn ? '0 0 0 2px #197fe6,0 4px 16px rgba(25,127,230,0.15)' : '0 1px 4px rgba(0,0,0,0.07)'}
                         >
                           {isOwn && (
-                            <div style={{ background: '#dc3545', color: '#fff', textAlign: 'center', padding: '4px 0', fontSize: 12, fontWeight: 700 }}>
+                            <div style={{ background: '#197fe6', color: '#fff', textAlign: 'center', padding: '4px 0', fontSize: 12, fontWeight: 700 }}>
                               <i className="bi bi-person-check-fill me-1"></i>Your Profile
                             </div>
                           )}
                           {/* Cover strip */}
-                          <div style={{ height: 56, background: 'linear-gradient(135deg,#1a2744,#2d4a8a)' }}></div>
+                          <div style={{ height: 56, background: 'linear-gradient(135deg,#197fe6,#1368c4)' }}></div>
                           {/* Photo */}
                           <div style={{ display: 'flex', justifyContent: 'center', marginTop: -28 }}>
                             {a.photo
                               ? <img src={`${API_BASE}${a.photo}`} alt={a.name} style={{ width: 56, height: 56, borderRadius: '50%', objectFit: 'cover', border: '3px solid #fff', background: '#fff' }} />
-                              : <div style={{ width: 56, height: 56, borderRadius: '50%', border: '3px solid #fff', background: 'linear-gradient(135deg,#dc3545,#8b0000)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 800, fontSize: 18 }}>
+                              : <div style={{ width: 56, height: 56, borderRadius: '50%', border: '3px solid #fff', background: 'linear-gradient(135deg,#197fe6,#1368c4)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 800, fontSize: 18 }}>
                                   {a.name?.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
                                 </div>
                             }
@@ -476,7 +476,7 @@ function ViewAlumni() {
                             </div>
                             {isOwn && (
                               <button onClick={e => { e.stopPropagation(); navigate('/alumni/edit-profile'); }} style={{
-                                width: '100%', background: '#1a2744', color: '#fff', border: 'none',
+                                width: '100%', background: '#197fe6', color: '#fff', border: 'none',
                                 borderRadius: 8, padding: '7px 0', fontWeight: 700, fontSize: 12, cursor: 'pointer'
                               }}>
                                 <i className="bi bi-pencil-square me-1"></i>Edit My Profile
@@ -501,7 +501,7 @@ function ViewAlumni() {
           <div style={{ background: '#fff', borderRadius: 18, width: '100%', maxWidth: 640, maxHeight: '90vh', overflow: 'auto', boxShadow: '0 20px 60px rgba(0,0,0,0.25)' }}
             onClick={e => e.stopPropagation()}>
             {/* Header strip */}
-            <div style={{ height: 90, background: 'linear-gradient(135deg,#1a2744,#2d4a8a)', borderRadius: '18px 18px 0 0', position: 'relative' }}>
+            <div style={{ height: 90, background: 'linear-gradient(135deg,#197fe6,#1368c4)', borderRadius: '18px 18px 0 0', position: 'relative' }}>
               <button onClick={() => setSelectedAlumni(null)} style={{
                 position: 'absolute', top: 14, right: 14, background: 'rgba(255,255,255,0.15)',
                 border: 'none', borderRadius: '50%', width: 34, height: 34,
@@ -513,7 +513,7 @@ function ViewAlumni() {
               <div style={{ marginTop: 20, display: 'flex', justifyContent: 'center' }}>
                 {selectedAlumni.photo
                   ? <img src={`${API_BASE}${selectedAlumni.photo}`} alt={selectedAlumni.name} style={{ width: 88, height: 88, borderRadius: '50%', objectFit: 'cover', border: '4px solid #fff', boxShadow: '0 2px 10px rgba(0,0,0,0.15)' }} />
-                  : <div style={{ width: 88, height: 88, borderRadius: '50%', border: '4px solid #fff', background: 'linear-gradient(135deg,#dc3545,#8b0000)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 800, fontSize: 28, boxShadow: '0 2px 10px rgba(0,0,0,0.15)' }}>
+                  : <div style={{ width: 88, height: 88, borderRadius: '50%', border: '4px solid #fff', background: 'linear-gradient(135deg,#197fe6,#1368c4)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 800, fontSize: 28, boxShadow: '0 2px 10px rgba(0,0,0,0.15)' }}>
                       {selectedAlumni.name?.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
                     </div>
                 }

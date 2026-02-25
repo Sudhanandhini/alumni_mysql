@@ -79,7 +79,7 @@ function UserLogin() {
         className="d-none d-lg-flex"
         style={{
           width: 420, flexShrink: 0, flexDirection: 'column',
-          background: 'linear-gradient(160deg, #0d1b3a 0%, #1a2744 55%, #0d1b3a 100%)',
+          background: 'linear-gradient(160deg, #197fe6 0%, #1368c4 55%, #0d52a0 100%)',
           padding: '52px 44px', justifyContent: 'space-between',
           position: 'relative', overflow: 'hidden'
         }}

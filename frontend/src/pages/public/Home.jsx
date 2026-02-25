@@ -4,7 +4,7 @@ import axios from 'axios';
 import Slider from 'react-slick';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
-import './AlumniCards.css';
+import '../../components/AlumniCards.css';
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 

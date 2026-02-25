@@ -6,7 +6,7 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 const API_BASE = API_URL.replace(/\/api\/?$/, '');
 
 // Univariety-inspired color constants
-const NAV_COLOR = '#1a2744';
+const NAV_COLOR = '#197fe6';
 const NAV_TEXT = 'rgba(255,255,255,0.85)';
 
 const TABS = [
@@ -242,7 +242,7 @@ function AlumniEditProfile() {
         {/* ── Profile Header Card ── */}
         <div style={{ background: '#fff', borderRadius: 14, boxShadow: '0 1px 8px rgba(0,0,0,0.07)', marginBottom: 20, overflow: 'hidden' }}>
           {/* Cover strip */}
-          <div style={{ height: 90, background: `linear-gradient(135deg, ${NAV_COLOR} 0%, #2d4a8a 100%)` }}></div>
+          <div style={{ height: 90, background: `linear-gradient(135deg, ${NAV_COLOR} 0%, #1368c4 100%)` }}></div>
 
           <div style={{ padding: '0 32px 24px', display: 'flex', alignItems: 'flex-end', gap: 24, flexWrap: 'wrap' }}>
             {/* Photo */}
@@ -290,7 +290,7 @@ function AlumniEditProfile() {
                 )}
                 {formData.address && (
                   <span style={{ fontSize: 14, color: '#6b7280', display: 'flex', alignItems: 'center', gap: 5 }}>
-                    <i className="bi bi-geo-alt-fill" style={{ color: '#dc3545', fontSize: 12 }}></i>
+                    <i className="bi bi-geo-alt-fill" style={{ color: '#197fe6', fontSize: 12 }}></i>
                     {formData.address}
                   </span>
                 )}
@@ -316,7 +316,7 @@ function AlumniEditProfile() {
                   padding: '10px 24px', fontWeight: 700, fontSize: 14,
                   cursor: saving ? 'not-allowed' : 'pointer',
                   display: 'flex', alignItems: 'center', gap: 8,
-                  boxShadow: '0 2px 8px rgba(26,39,68,0.3)'
+                  boxShadow: '0 2px 8px rgba(25,127,230,0.3)'
                 }}
               >
                 {saving
@@ -611,7 +611,7 @@ function AlumniEditProfile() {
 function SectionTitle({ icon, title }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4 }}>
-      <div style={{ width: 34, height: 34, borderRadius: 8, background: '#1a2744', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+      <div style={{ width: 34, height: 34, borderRadius: 8, background: '#197fe6', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
         <i className={`bi ${icon}`} style={{ color: '#fff', fontSize: 14 }}></i>
       </div>
       <h5 style={{ fontWeight: 700, fontSize: 16, color: '#111827', margin: 0 }}>{title}</h5>

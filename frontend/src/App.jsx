@@ -1,23 +1,23 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import Navbar from './components/Navbar';
-import Home from './components/Home';
-import Login from './components/Login';
-import AdminDashboard from './components/AdminDashboard';
-import AddAlumni from './components/AddAlumni';
-import ManageAlumni from './components/ManageAlumni';
-import UserRegistration from './components/UserRegistration';
-import UserLogin from './components/UserLogin';
-import ForgotPassword from './components/ForgotPassword';
-import ResetPassword from './components/ResetPassword';
-import ViewAlumni from './components/ViewAlumni';
-import ManageUsers from './components/ManageUsers';
-import PendingApprovals from './components/PendingApprovals';
-import AlumniEditProfile from './components/AlumniEditProfile';
+import Footer from './components/Footer';
+import Home from './pages/public/Home';
+import Login from './pages/public/Login';
+import UserRegistration from './pages/public/UserRegistration';
+import UserLogin from './pages/public/UserLogin';
+import ForgotPassword from './pages/public/ForgotPassword';
+import ResetPassword from './pages/public/ResetPassword';
+import AdminDashboard from './pages/admin/AdminDashboard';
+import AddAlumni from './pages/admin/AddAlumni';
+import ManageAlumni from './pages/admin/ManageAlumni';
+import ManageUsers from './pages/admin/ManageUsers';
+import PendingApprovals from './pages/admin/PendingApprovals';
+import ViewAlumni from './pages/user/ViewAlumni';
+import AlumniEditProfile from './pages/alumni/AlumniEditProfile';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import './App.css';
-import Footer from './components/Footer';
 
 // Protected Route Component for Admin
 const AdminProtectedRoute = ({ children }) => {
