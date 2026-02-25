@@ -206,7 +206,7 @@ function PendingApprovals() {
         {/* Table */}
         {loading ? (
           <div style={{ textAlign: 'center', padding: 60 }}>
-            <div className="spinner-border text-danger" style={{ width: '2.5rem', height: '2.5rem' }}></div>
+            <div className="spinner-border text-primary" style={{ width: '2.5rem', height: '2.5rem' }}></div>
           </div>
         ) : filtered.length === 0 ? (
           <div style={{ textAlign: 'center', padding: 60, color: '#9ca3af' }}>
@@ -237,7 +237,7 @@ function PendingApprovals() {
                         <div style={{ display: 'flex', alignItems: 'center', gap: 11 }}>
                           {a.photo
                             ? <img src={`${API_BASE}${a.photo}`} alt={a.name} onClick={() => setSelectedAlumni(a)} style={{ width: 42, height: 42, borderRadius: '50%', objectFit: 'cover', border: '2px solid #e5e7eb', cursor: 'pointer', flexShrink: 0 }} />
-                            : <div onClick={() => setSelectedAlumni(a)} style={{ width: 42, height: 42, borderRadius: '50%', background: 'linear-gradient(135deg,#dc3545,#8b0000)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700, fontSize: 14, flexShrink: 0, cursor: 'pointer' }}>
+                            : <div onClick={() => setSelectedAlumni(a)} style={{ width: 42, height: 42, borderRadius: '50%', background: 'linear-gradient(135deg,#197fe6,#1368c4)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700, fontSize: 14, flexShrink: 0, cursor: 'pointer' }}>
                                 {a.name?.split(' ').map(n => n[0]).join('').slice(0,2).toUpperCase()}
                               </div>
                           }
@@ -308,7 +308,7 @@ function PendingApprovals() {
             <div style={{ background: '#fff', borderRadius: 18, width: '100%', maxWidth: 680, maxHeight: '90vh', overflow: 'auto', boxShadow: '0 20px 60px rgba(0,0,0,0.25)' }}
               onClick={e => e.stopPropagation()}>
               {/* Header strip */}
-              <div style={{ height: 80, background: 'linear-gradient(135deg,#1a2744,#2d4a8a)', borderRadius: '18px 18px 0 0', position: 'relative', display: 'flex', alignItems: 'flex-end', padding: '0 28px 16px' }}>
+              <div style={{ height: 80, background: 'linear-gradient(135deg,#197fe6,#1368c4)', borderRadius: '18px 18px 0 0', position: 'relative', display: 'flex', alignItems: 'flex-end', padding: '0 28px 16px' }}>
                 <span style={{ fontWeight: 700, fontSize: 16, color: '#fff' }}>Registration Details</span>
                 <button onClick={() => setSelectedAlumni(null)} style={{ position: 'absolute', top: 14, right: 14, background: 'rgba(255,255,255,0.15)', border: 'none', borderRadius: '50%', width: 34, height: 34, color: '#fff', fontSize: 18, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <i className="bi bi-x"></i>
@@ -319,7 +319,7 @@ function PendingApprovals() {
                 <div style={{ display: 'flex', alignItems: 'flex-end', gap: 18, marginTop: -28, marginBottom: 20 }}>
                   {selectedAlumni.photo
                     ? <img src={`${API_BASE}${selectedAlumni.photo}`} alt={selectedAlumni.name} style={{ width: 80, height: 80, borderRadius: '50%', objectFit: 'cover', border: '4px solid #fff', boxShadow: '0 2px 10px rgba(0,0,0,0.15)' }} />
-                    : <div style={{ width: 80, height: 80, borderRadius: '50%', border: '4px solid #fff', background: 'linear-gradient(135deg,#dc3545,#8b0000)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 800, fontSize: 24, boxShadow: '0 2px 10px rgba(0,0,0,0.15)' }}>
+                    : <div style={{ width: 80, height: 80, borderRadius: '50%', border: '4px solid #fff', background: 'linear-gradient(135deg,#197fe6,#1368c4)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 800, fontSize: 24, boxShadow: '0 2px 10px rgba(0,0,0,0.15)' }}>
                         {selectedAlumni.name?.split(' ').map(n => n[0]).join('').slice(0,2).toUpperCase()}
                       </div>
                   }

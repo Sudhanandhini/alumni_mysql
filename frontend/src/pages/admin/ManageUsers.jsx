@@ -266,7 +266,7 @@ function ManageUsers() {
           alignItems: 'center',
           zIndex: 9999
         }}>
-          <div className="spinner-border" style={{ width: '3rem', height: '3rem', color: '#1a2744' }}>
+          <div className="spinner-border" style={{ width: '3rem', height: '3rem', color: '#197fe6' }}>
             <span className="visually-hidden">Loading...</span>
           </div>
         </div>

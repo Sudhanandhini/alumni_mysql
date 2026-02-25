@@ -16,8 +16,8 @@ function Navbar() {
   const navLinks = [
     { to: '/', label: 'Home' },
     { to: '/register', label: 'Directory' },
-    { to: '/user/login', label: 'Events' },
-    { to: '/mentorship', label: 'Mentorship' },
+    { to: '/user/login', label: 'User Login' },
+    // { to: '/mentorship', label: 'Mentorship' },
   ];
 
   return (

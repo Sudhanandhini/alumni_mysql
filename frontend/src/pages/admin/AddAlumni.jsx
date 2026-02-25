@@ -119,9 +119,9 @@ function StepIndicator({ step, total }) {
             <div style={{
               width: 34, height: 34, borderRadius: '50%', display: 'flex',
               alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: 13,
-              background: isActive ? '#dc3545' : isDone ? '#28a745' : '#e9ecef',
+              background: isActive ? '#197fe6' : isDone ? '#28a745' : '#e9ecef',
               color: isActive || isDone ? '#fff' : '#aaa', flexShrink: 0, transition: 'all 0.3s',
-              boxShadow: isActive ? '0 2px 8px rgba(220,53,69,0.4)' : 'none'
+              boxShadow: isActive ? '0 2px 8px rgba(25,127,230,0.4)' : 'none'
             }}>
               {isDone ? <i className="bi bi-check2" style={{ fontSize: 16 }}></i> : n}
             </div>
@@ -148,15 +148,15 @@ function CardRadio({ name, value, options, onChange }) {
     <div style={{ display: 'flex', gap: 14, marginTop: 4, flexWrap: 'wrap' }}>
       {options.map(opt => (
         <label key={opt.val} style={{
-          flex: '1 1 140px', border: `2px solid ${value === opt.val ? '#dc3545' : '#e9ecef'}`,
+          flex: '1 1 140px', border: `2px solid ${value === opt.val ? '#197fe6' : '#e9ecef'}`,
           borderRadius: 12, padding: '12px 16px', cursor: 'pointer',
-          background: value === opt.val ? '#fff5f5' : '#fff',
+          background: value === opt.val ? '#eff6ff' : '#fff',
           display: 'flex', alignItems: 'center', gap: 10, transition: 'all 0.2s', userSelect: 'none'
         }}>
           <input type="radio" name={name} value={opt.val} checked={value === opt.val}
-            onChange={onChange} style={{ accentColor: '#dc3545', width: 15, height: 15, flexShrink: 0 }} />
+            onChange={onChange} style={{ accentColor: '#197fe6', width: 15, height: 15, flexShrink: 0 }} />
           <div>
-            <div style={{ fontWeight: 600, fontSize: 14, color: value === opt.val ? '#dc3545' : '#333' }}>
+            <div style={{ fontWeight: 600, fontSize: 14, color: value === opt.val ? '#197fe6' : '#333' }}>
               {opt.icon && <i className={`bi ${opt.icon} me-2`}></i>}{opt.label}
             </div>
             {opt.desc && <div style={{ fontSize: 12, color: '#888', marginTop: 2 }}>{opt.desc}</div>}
@@ -409,7 +409,7 @@ function AddAlumni() {
       {/* Loading */}
       {loading && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9998 }}>
-          <div className="spinner-border text-danger" style={{ width: '3rem', height: '3rem' }}></div>
+          <div className="spinner-border text-primary" style={{ width: '3rem', height: '3rem' }}></div>
         </div>
       )}
 
@@ -428,7 +428,7 @@ function AddAlumni() {
             </button>
             <div style={{ flex: 1 }}>
               <div style={{ fontWeight: 800, fontSize: 20, color: '#1a1a2e' }}>
-                <i className="bi bi-person-plus-fill text-danger me-2"></i>
+                <i className="bi bi-person-plus-fill me-2" style={{ color: '#197fe6' }}></i>
                 {isEdit ? 'Edit Alumni' : 'Add New Alumni'}
               </div>
               <div style={{ fontSize: 12, color: '#aaa' }}>
@@ -472,20 +472,20 @@ function AddAlumni() {
             )}
             {step < TOTAL_STEPS ? (
               <button onClick={nextStep} style={{
-                background: 'linear-gradient(135deg, #dc3545, #8b0000)', color: '#fff',
+                background: 'linear-gradient(135deg, #197fe6, #1368c4)', color: '#fff',
                 border: 'none', borderRadius: 10, padding: '12px 30px', fontWeight: 700,
                 fontSize: 15, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8,
-                boxShadow: '0 4px 12px rgba(220,53,69,0.35)'
+                boxShadow: '0 4px 12px rgba(25,127,230,0.35)'
               }}>
                 Continue <i className="bi bi-arrow-right"></i>
               </button>
             ) : (
               <button onClick={handleSubmit} disabled={loading} style={{
-                background: 'linear-gradient(135deg, #dc3545, #8b0000)', color: '#fff',
+                background: 'linear-gradient(135deg, #197fe6, #1368c4)', color: '#fff',
                 border: 'none', borderRadius: 10, padding: '12px 30px', fontWeight: 700,
                 fontSize: 15, cursor: loading ? 'not-allowed' : 'pointer',
                 opacity: loading ? 0.7 : 1, minWidth: 180,
-                boxShadow: '0 4px 12px rgba(220,53,69,0.35)'
+                boxShadow: '0 4px 12px rgba(25,127,230,0.35)'
               }}>
                 {loading
                   ? <><span className="spinner-border spinner-border-sm me-2"></span>Saving...</>
@@ -500,7 +500,7 @@ function AddAlumni() {
       {/* ── Right: Info Panel ── */}
       <div className="d-none d-lg-flex" style={{
         width: 340, flexShrink: 0,
-        background: '#1a2744',
+        background: 'linear-gradient(160deg, #197fe6 0%, #1368c4 55%, #0d52a0 100%)',
         position: 'sticky', top: 0, height: '100vh', overflow: 'hidden',
         flexDirection: 'column', justifyContent: 'space-between', padding: '56px 32px'
       }}>
@@ -527,8 +527,8 @@ function AddAlumni() {
                     display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.3s'
                   }}>
                     {isDone
-                      ? <i className="bi bi-check2" style={{ color: '#1a2744', fontSize: 13 }}></i>
-                      : <span style={{ fontSize: 11, fontWeight: 700, color: isActive ? '#1a2744' : 'rgba(255,255,255,0.5)' }}>{n}</span>
+                      ? <i className="bi bi-check2" style={{ color: '#197fe6', fontSize: 13 }}></i>
+                      : <span style={{ fontSize: 11, fontWeight: 700, color: isActive ? '#197fe6' : 'rgba(255,255,255,0.5)' }}>{n}</span>
                     }
                   </div>
                   <span style={{ fontSize: 13, fontWeight: isActive ? 700 : 400, color: isDone || isActive ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.4)', transition: 'all 0.3s' }}>
@@ -561,8 +561,8 @@ function Step1({ formData, onChange, errors, isEdit }) {
       {!isEdit && (
         <>
           <div className="col-12">
-            <div style={{ background: '#fff5f5', borderRadius: 10, padding: '12px 16px', marginBottom: 4 }}>
-              <span style={{ fontSize: 13, fontWeight: 600, color: '#dc3545' }}>
+            <div style={{ background: '#eff6ff', borderRadius: 10, padding: '12px 16px', marginBottom: 4 }}>
+              <span style={{ fontSize: 13, fontWeight: 600, color: '#197fe6' }}>
                 <i className="bi bi-shield-lock-fill me-2"></i>Login Credentials
               </span>
             </div>
@@ -667,7 +667,7 @@ function Step2({ formData, onChange, errors }) {
           {['Male', 'Female', 'Other'].map(g => (
             <label key={g} style={{ display: 'flex', alignItems: 'center', gap: 7, cursor: 'pointer' }}>
               <input type="radio" name="gender" value={g} checked={formData.gender === g}
-                onChange={onChange} style={{ accentColor: '#dc3545', width: 15, height: 15 }} />
+                onChange={onChange} style={{ accentColor: '#197fe6', width: 15, height: 15 }} />
               <span style={{ fontSize: 14 }}>{g}</span>
             </label>
           ))}
@@ -685,7 +685,7 @@ function Step2({ formData, onChange, errors }) {
           {['Pursuing Studies', 'Completed'].map(s => (
             <label key={s} style={{ display: 'flex', alignItems: 'center', gap: 7, cursor: 'pointer' }}>
               <input type="radio" name="education_status" value={s} checked={formData.education_status === s}
-                onChange={onChange} style={{ accentColor: '#dc3545', width: 15, height: 15 }} />
+                onChange={onChange} style={{ accentColor: '#197fe6', width: 15, height: 15 }} />
               <span style={{ fontSize: 14 }}>{s}</span>
             </label>
           ))}
@@ -766,14 +766,14 @@ function Step4({ formData, onChange, imagePreview, onImageChange }) {
         <label className="form-label fw-semibold small">Profile Photo</label>
         <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
           {imagePreview ? (
-            <img src={imagePreview} alt="Preview" style={{ width: 84, height: 84, borderRadius: '50%', objectFit: 'cover', border: '3px solid #dc3545', flexShrink: 0 }} />
+            <img src={imagePreview} alt="Preview" style={{ width: 84, height: 84, borderRadius: '50%', objectFit: 'cover', border: '3px solid #197fe6', flexShrink: 0 }} />
           ) : (
             <div style={{ width: 84, height: 84, borderRadius: '50%', background: '#f0f0f0', border: '2px dashed #ccc', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
               <i className="bi bi-person-circle" style={{ fontSize: 40, color: '#bbb' }}></i>
             </div>
           )}
           <div>
-            <label htmlFor="photo-admin" className="btn btn-outline-danger btn-sm" style={{ borderRadius: 8 }}>
+            <label htmlFor="photo-admin" className="btn btn-outline-primary btn-sm" style={{ borderRadius: 8 }}>
               <i className="bi bi-camera-fill me-2"></i>{imagePreview ? 'Change Photo' : 'Upload Photo'}
             </label>
             <input type="file" id="photo-admin" accept="image/*" onChange={onImageChange} className="d-none" />
@@ -790,7 +790,7 @@ function Step4({ formData, onChange, imagePreview, onImageChange }) {
               {['Office', 'Remote', 'Hybrid'].map(mode => (
                 <label key={mode} style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
                   <input type="radio" name="work_mode" value={mode} checked={formData.work_mode === mode}
-                    onChange={onChange} style={{ accentColor: '#dc3545', width: 15, height: 15 }} />
+                    onChange={onChange} style={{ accentColor: '#197fe6', width: 15, height: 15 }} />
                   <span style={{ fontSize: 14 }}>{mode}</span>
                 </label>
               ))}

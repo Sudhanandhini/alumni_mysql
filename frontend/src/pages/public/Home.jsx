@@ -6,6 +6,10 @@ import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 import '../../components/AlumniCards.css';
 
+
+import hero from "../../assets/po.jpg"
+
+
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
 const API_BASE = (() => {
@@ -251,7 +255,7 @@ function Home() {
                 >
                   Join Alumni Network <i className="bi bi-arrow-right"></i>
                 </a>
-                <a href="/" style={{
+                <a href="/user/login" style={{
                   display: 'inline-flex', alignItems: 'center', gap: 9,
                   padding: '13px 28px', background: '#fff', color: '#111827',
                   borderRadius: 10, fontWeight: 700, fontSize: '0.95rem',
@@ -276,7 +280,7 @@ function Home() {
                   transform: 'rotate(2deg)'
                 }}>
                   <img
-                    src="https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=600&auto=format&fit=crop&q=80"
+                    src={hero}
                     alt="Graduation ceremony"
                     style={{ width: '100%', height: 370, objectFit: 'cover', display: 'block' }}
                   />

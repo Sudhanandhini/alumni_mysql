@@ -109,7 +109,7 @@ function ManageAlumni() {
           <h2 style={{ fontWeight: 800, fontSize: 22, color: '#1a2744', margin: 0, marginBottom: 4 }}>Manage Alumni</h2>
           <p style={{ color: '#9ca3af', fontSize: 14, margin: 0 }}>View, filter, edit and manage alumni profiles</p>
         </div>
-        <button onClick={() => navigate('/admin/add')} style={{ background: '#dc3545', color: '#fff', border: 'none', borderRadius: 10, padding: '11px 22px', fontWeight: 700, fontSize: 14, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8 }}>
+        <button onClick={() => navigate('/admin/add')} style={{ background: '#197fe6', color: '#fff', border: 'none', borderRadius: 10, padding: '11px 22px', fontWeight: 700, fontSize: 14, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8 }}>
           <i className="bi bi-plus-circle-fill"></i>Add New Alumni
         </button>
       </div>
@@ -144,7 +144,7 @@ function ManageAlumni() {
         <div style={{ padding: '14px 20px', borderBottom: showFilters ? '1px solid #f3f4f6' : 'none', display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }}
           onClick={() => setShowFilters(p => !p)}>
           <div style={{ fontWeight: 700, fontSize: 14, color: '#1a2744', display: 'flex', alignItems: 'center', gap: 8 }}>
-            <i className="bi bi-funnel-fill" style={{ color: '#dc3545' }}></i>
+            <i className="bi bi-funnel-fill" style={{ color: '#197fe6' }}></i>
             Filters
             <span style={{ background: '#f3f4f6', color: '#6b7280', borderRadius: 20, padding: '1px 10px', fontSize: 12, fontWeight: 600 }}>
               {filtered.length} / {alumni.length}
@@ -212,7 +212,7 @@ function ManageAlumni() {
       {/* Table card */}
       <div style={{ background: '#fff', borderRadius: 14, boxShadow: '0 1px 4px rgba(0,0,0,0.07)', overflow: 'hidden' }}>
         <div style={{ padding: '16px 22px', borderBottom: '1px solid #f3f4f6', display: 'flex', alignItems: 'center', gap: 10 }}>
-          <i className={`bi ${activeTab === 'deleted' ? 'bi-trash3-fill' : 'bi-list-ul'}`} style={{ color: activeTab === 'deleted' ? '#6b7280' : '#dc3545' }}></i>
+          <i className={`bi ${activeTab === 'deleted' ? 'bi-trash3-fill' : 'bi-list-ul'}`} style={{ color: activeTab === 'deleted' ? '#6b7280' : '#197fe6' }}></i>
           <span style={{ fontWeight: 700, fontSize: 15, color: '#1a2744' }}>
             {activeTab === 'deleted' ? 'Deleted Alumni' : 'Alumni List'}
           </span>
@@ -221,7 +221,7 @@ function ManageAlumni() {
 
         {loading ? (
           <div style={{ textAlign: 'center', padding: 60 }}>
-            <div className="spinner-border text-danger" style={{ width: '2.5rem', height: '2.5rem' }}></div>
+            <div className="spinner-border text-primary" style={{ width: '2.5rem', height: '2.5rem' }}></div>
           </div>
         ) : filtered.length === 0 ? (
           <div style={{ textAlign: 'center', padding: 60, color: '#9ca3af' }}>
@@ -256,7 +256,7 @@ function ManageAlumni() {
                         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                           {a.photo
                             ? <img src={`${API_BASE}${a.photo}`} alt={a.name} style={{ width: 40, height: 40, borderRadius: '50%', objectFit: 'cover', border: '2px solid #e5e7eb', filter: isDeleted ? 'grayscale(70%)' : 'none', flexShrink: 0 }} />
-                            : <div style={{ width: 40, height: 40, borderRadius: '50%', background: isDeleted ? '#9ca3af' : 'linear-gradient(135deg,#dc3545,#8b0000)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700, fontSize: 13, flexShrink: 0 }}>
+                            : <div style={{ width: 40, height: 40, borderRadius: '50%', background: isDeleted ? '#9ca3af' : 'linear-gradient(135deg,#197fe6,#1368c4)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700, fontSize: 13, flexShrink: 0 }}>
                                 {a.name?.split(' ').map(n => n[0]).join('').slice(0,2).toUpperCase()}
                               </div>
                           }

@@ -100,7 +100,7 @@ function AdminDashboard() {
                 padding: '11px 12px', borderRadius: 10, border: 'none', cursor: 'pointer',
                 marginBottom: 4,
                 background: active ? 'rgba(25,127,230,0.18)' : 'transparent',
-                color: active ? '#ff6b7a' : 'rgba(255,255,255,0.65)',
+                color: active ? '#93c5fd' : 'rgba(255,255,255,0.65)',
                 fontWeight: active ? 700 : 500, fontSize: 14,
                 transition: 'all 0.15s', whiteSpace: 'nowrap', overflow: 'hidden',
                 position: 'relative'
