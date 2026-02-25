@@ -1,5 +1,5 @@
 // src/pages/Home.jsx
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 import Slider from 'react-slick';
 import 'slick-carousel/slick/slick.css';
@@ -24,21 +24,17 @@ function AnimatedCounter({ end, duration = 2000, suffix = '' }) {
   useEffect(() => {
     let startTime;
     let animationFrame;
-
     const animate = (currentTime) => {
       if (!startTime) startTime = currentTime;
       const progress = Math.min((currentTime - startTime) / duration, 1);
-      
       const easeOutQuart = 1 - Math.pow(1 - progress, 4);
       setCount(Math.floor(easeOutQuart * end));
-
       if (progress < 1) {
         animationFrame = requestAnimationFrame(animate);
       } else {
         setCount(end);
       }
     };
-
     animationFrame = requestAnimationFrame(animate);
     return () => cancelAnimationFrame(animationFrame);
   }, [end, duration]);
@@ -46,11 +42,49 @@ function AnimatedCounter({ end, duration = 2000, suffix = '' }) {
   return <>{count}{suffix}</>;
 }
 
+// Custom Slider Arrows
+function PrevArrow({ onClick }) {
+  return (
+    <button onClick={onClick} style={{
+      position: 'absolute', left: -52, top: '50%', transform: 'translateY(-50%)',
+      width: 40, height: 40, borderRadius: '50%',
+      background: '#fff', border: '1.5px solid #e5e7eb',
+      boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      cursor: 'pointer', zIndex: 10, transition: 'all 0.2s',
+      padding: 0,
+    }}
+      onMouseEnter={e => { e.currentTarget.style.background = '#197fe6'; e.currentTarget.style.borderColor = '#197fe6'; e.currentTarget.querySelector('i').style.color = '#fff'; }}
+      onMouseLeave={e => { e.currentTarget.style.background = '#fff'; e.currentTarget.style.borderColor = '#e5e7eb'; e.currentTarget.querySelector('i').style.color = '#374151'; }}
+    >
+      <i className="bi bi-chevron-left" style={{ fontSize: 14, color: '#374151' }}></i>
+    </button>
+  );
+}
+
+function NextArrow({ onClick }) {
+  return (
+    <button onClick={onClick} style={{
+      position: 'absolute', right: -52, top: '50%', transform: 'translateY(-50%)',
+      width: 40, height: 40, borderRadius: '50%',
+      background: '#fff', border: '1.5px solid #e5e7eb',
+      boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      cursor: 'pointer', zIndex: 10, transition: 'all 0.2s',
+      padding: 0,
+    }}
+      onMouseEnter={e => { e.currentTarget.style.background = '#197fe6'; e.currentTarget.style.borderColor = '#197fe6'; e.currentTarget.querySelector('i').style.color = '#fff'; }}
+      onMouseLeave={e => { e.currentTarget.style.background = '#fff'; e.currentTarget.style.borderColor = '#e5e7eb'; e.currentTarget.querySelector('i').style.color = '#374151'; }}
+    >
+      <i className="bi bi-chevron-right" style={{ fontSize: 14, color: '#374151' }}></i>
+    </button>
+  );
+}
+
 function Home() {
   const [alumni, setAlumni] = useState([]);
   const [loading, setLoading] = useState(true);
-  
-  // Stats state
+
   const [stats, setStats] = useState({
     totalAlumni: 0,
     totalCareers: 0,
@@ -61,11 +95,9 @@ function Home() {
 
   useEffect(() => {
     let mounted = true;
-
     const fetchAlumni = async () => {
       setLoading(true);
       const url = `${API_URL.replace(/\/$/, '')}/alumni`;
-      console.log('[Home] Fetching alumni from:', url);
       try {
         const res = await axios.get(url);
         if (mounted) setAlumni(Array.isArray(res.data) ? res.data : []);
@@ -79,29 +111,21 @@ function Home() {
         if (mounted) setLoading(false);
       }
     };
-
     fetchAlumni();
-    return () => {
-      mounted = false;
-    };
+    return () => { mounted = false; };
   }, []);
 
-  // Fetch statistics from 4 separate API endpoints
   useEffect(() => {
     let mounted = true;
-
     const fetchStats = async () => {
       try {
         const baseUrl = API_URL.replace(/\/$/, '');
-        
-        // Make 4 parallel API calls
         const [alumniRes, careersRes, companiesRes, countriesRes] = await Promise.all([
           axios.get(`${baseUrl}/stats/total-alumni`),
           axios.get(`${baseUrl}/stats/careers`),
           axios.get(`${baseUrl}/stats/companies`),
           axios.get(`${baseUrl}/stats/countries`)
         ]);
-
         if (mounted) {
           setStats({
             totalAlumni: alumniRes.data.count || 0,
@@ -113,22 +137,15 @@ function Home() {
         }
       } catch (error) {
         console.error('[Home] Error fetching stats:', error);
-        if (mounted) {
-          setStats(prev => ({ ...prev, loading: false }));
-        }
+        if (mounted) setStats(prev => ({ ...prev, loading: false }));
       }
     };
-
     fetchStats();
-    return () => {
-      mounted = false;
-    };
+    return () => { mounted = false; };
   }, []);
 
-  const slidesToShow = Math.min(4, Math.max(1, alumni.length || 1));
-  const slidesToShowXL = Math.min(3, Math.max(1, alumni.length || 1));
+  const slidesToShow = Math.min(3, Math.max(1, alumni.length || 1));
   const slidesToShowMD = Math.min(2, Math.max(1, alumni.length || 1));
-  const slidesToShowSM = 1;
 
   const carouselSettings = {
     dots: true,
@@ -137,26 +154,15 @@ function Home() {
     slidesToShow,
     slidesToScroll: 1,
     autoplay: alumni.length > 1,
-    autoplaySpeed: 3000,
+    autoplaySpeed: 3500,
     pauseOnHover: true,
     arrows: true,
-    centerMode: false,
-    adaptiveHeight: true,
-    appendDots: (dots) => (
-      <div>
-        <ul style={{ margin: "0px" }}> {dots.slice(0, 5)} </ul>
-      </div>
+    prevArrow: <PrevArrow />,
+    nextArrow: <NextArrow />,
+    appendDots: dots => (
+      <div><ul style={{ margin: '0px' }}>{dots}</ul></div>
     ),
     responsive: [
-      {
-        breakpoint: 1200,
-        settings: {
-          slidesToShow: slidesToShowXL,
-          slidesToScroll: 1,
-          infinite: alumni.length > slidesToShowXL,
-          arrows: true,
-        },
-      },
       {
         breakpoint: 992,
         settings: {
@@ -172,20 +178,6 @@ function Home() {
           slidesToShow: 1,
           slidesToScroll: 1,
           infinite: alumni.length > 1,
-          centerMode: true,
-          centerPadding: '40px',
-          arrows: false,
-          dots: true,
-        },
-      },
-      {
-        breakpoint: 576,
-        settings: {
-          slidesToShow: slidesToShowSM,
-          slidesToScroll: 1,
-          infinite: alumni.length > slidesToShowSM,
-          centerMode: true,
-          centerPadding: '30px',
           arrows: false,
           dots: true,
         },
@@ -200,274 +192,292 @@ function Home() {
     return `${API_BASE}/${photoPath}`;
   };
 
+  const getStatusColor = (status) => {
+    if (status === 'Employed') return '#16a34a';
+    if (status === 'Self-Employed') return '#197fe6';
+    return '#0891b2';
+  };
+
   return (
-    <div className="home-page">
-      {/* Hero Section */}
-      <div className="hero-section text-white py-5" style={{ background: 'linear-gradient(135deg, #1a2744 0%, #2d4a8a 100%)' }}>
-        <div className="container text-center">
-          <h1 className="display-4 display-md-3 fw-bold mb-3 animate-fade-in">
-            <i className="bi bi-stars me-2 me-md-3"></i>
-            <span className="d-block d-md-inline">Our Distinguished Alumni</span>
-            <i className="bi bi-stars ms-2 ms-md-3"></i>
-          </h1>
-          <p className="lead fs-5 fs-md-4 mb-4 px-3">Meet our successful alumni who are making a difference in the world</p>
-          <div className="mt-4">
-            <span className="badge bg-white fs-6 fs-md-5 px-3 px-md-4 py-2 py-md-3" style={{ color: '#1a2744' }}>
-              <i className="bi bi-people-fill me-2"></i>
-              {alumni.length} Alumni Network
-            </span>
+    <div className="home-page" style={{ background: '#f3f4f6' }}>
+
+      {/* ── HERO SECTION ── */}
+      <div style={{ background: 'linear-gradient(135deg, #eef4ff 0%, #ddeaff 100%)', padding: '80px 0 110px' }}>
+        <div className="container">
+          <div className="row align-items-center g-5">
+
+            {/* Left */}
+            <div className="col-lg-6">
+              {/* Badge */}
+              <div style={{
+                display: 'inline-flex', alignItems: 'center', gap: 8,
+                background: 'rgba(25,127,230,0.08)', border: '1.5px solid rgba(25,127,230,0.2)',
+                borderRadius: 24, padding: '6px 16px', marginBottom: 28,
+                fontSize: 11.5, fontWeight: 700, color: '#197fe6', letterSpacing: '1.2px'
+              }}>
+                <i className="bi bi-shield-fill-check" style={{ fontSize: 13 }}></i>
+                OFFICIAL UNIVERSITY NETWORK
+              </div>
+
+              {/* Heading */}
+              <h1 style={{
+                fontSize: 'clamp(2.6rem, 5vw, 4rem)', fontWeight: 900,
+                lineHeight: 1.08, marginBottom: 20, color: '#111827'
+              }}>
+                Our<br />Distinguished<br />
+                <span style={{ color: '#197fe6' }}>Alumni</span>
+              </h1>
+
+              {/* Description */}
+              <p style={{
+                fontSize: '1.05rem', color: '#4b5563', marginBottom: 38,
+                lineHeight: 1.75, maxWidth: 460
+              }}>
+                Connecting excellence across generations. Join a global network of leaders,
+                innovators, and mentors shaping the future.
+              </p>
+
+              {/* CTA Buttons */}
+              <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap' }}>
+                <a href="/register" style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 9,
+                  padding: '13px 28px', background: '#197fe6', color: '#fff',
+                  borderRadius: 10, fontWeight: 700, fontSize: '0.95rem',
+                  textDecoration: 'none', boxShadow: '0 4px 16px rgba(25,127,230,0.32)',
+                  transition: 'all 0.2s'
+                }}
+                  onMouseEnter={e => { e.currentTarget.style.background = '#1368c4'; }}
+                  onMouseLeave={e => { e.currentTarget.style.background = '#197fe6'; }}
+                >
+                  Join Alumni Network <i className="bi bi-arrow-right"></i>
+                </a>
+                <a href="/" style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 9,
+                  padding: '13px 28px', background: '#fff', color: '#111827',
+                  borderRadius: 10, fontWeight: 700, fontSize: '0.95rem',
+                  textDecoration: 'none', border: '1.5px solid #d1d5db',
+                  boxShadow: '0 2px 6px rgba(0,0,0,0.06)', transition: 'all 0.2s'
+                }}
+                  onMouseEnter={e => { e.currentTarget.style.borderColor = '#197fe6'; e.currentTarget.style.color = '#197fe6'; }}
+                  onMouseLeave={e => { e.currentTarget.style.borderColor = '#d1d5db'; e.currentTarget.style.color = '#111827'; }}
+                >
+                  View Directory
+                </a>
+              </div>
+            </div>
+
+            {/* Right – Graduation Image */}
+            <div className="col-lg-6 d-flex justify-content-center">
+              <div style={{ position: 'relative', maxWidth: 500, width: '100%' }}>
+                <div style={{
+                  borderRadius: 22, overflow: 'hidden',
+                  border: '6px solid #fff',
+                  boxShadow: '0 20px 56px rgba(25,127,230,0.16)',
+                  transform: 'rotate(2deg)'
+                }}>
+                  <img
+                    src="https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=600&auto=format&fit=crop&q=80"
+                    alt="Graduation ceremony"
+                    style={{ width: '100%', height: 370, objectFit: 'cover', display: 'block' }}
+                  />
+                </div>
+                {/* Social Proof */}
+                <div style={{
+                  position: 'absolute', bottom: -22, left: -8,
+                  background: '#fff', borderRadius: 14,
+                  padding: '12px 18px',
+                  boxShadow: '0 8px 28px rgba(0,0,0,0.11)',
+                  display: 'flex', alignItems: 'center', gap: 12,
+                  minWidth: 220
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center' }}>
+                    {['#197fe6', '#1368c4', '#0d52a0'].map((bg, i) => (
+                      <div key={i} style={{
+                        width: 32, height: 32, borderRadius: '50%',
+                        background: bg, border: '2.5px solid #fff',
+                        marginLeft: i > 0 ? -9 : 0,
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        color: '#fff', fontSize: 11, fontWeight: 700, zIndex: 3 - i
+                      }}>
+                        {['A', 'B', 'C'][i]}
+                      </div>
+                    ))}
+                    <div style={{
+                      width: 32, height: 32, borderRadius: '50%',
+                      background: '#197fe6', border: '2.5px solid #fff',
+                      marginLeft: -9,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      color: '#fff', fontSize: 8.5, fontWeight: 800, zIndex: 0
+                    }}>
+                      +5k
+                    </div>
+                  </div>
+                  <div style={{ fontSize: 12.5, fontWeight: 700, color: '#111827', whiteSpace: 'nowrap' }}>
+                    {alumni.length > 0 ? `${alumni.length}+ Alumni joined` : '5,000+ Alumni joined this month'}
+                  </div>
+                </div>
+              </div>
+            </div>
+
           </div>
         </div>
       </div>
 
-      {/* Alumni Carousel */}
-      <div className="carousel-section py-4 py-md-5">
-        <div className="container-fluid px-2 px-md-3 px-lg-5">
+      {/* ── NETWORK AT A GLANCE ── */}
+      <div style={{ background: '#fff', padding: '60px 0' }}>
+        <div className="container">
+          <div style={{ marginBottom: 36 }}>
+            <h2 style={{ fontSize: '1.65rem', fontWeight: 800, color: '#111827', marginBottom: 6 }}>
+              Network at a Glance
+            </h2>
+            <p style={{ color: '#6b7280', fontSize: '0.95rem' }}>
+              Impacting the world through our collective reach.
+            </p>
+          </div>
+
+          {stats.loading ? (
+            <div className="text-center py-4">
+              <div className="spinner-border" style={{ width: '2.5rem', height: '2.5rem', color: '#197fe6' }}>
+                <span className="visually-hidden">Loading...</span>
+              </div>
+            </div>
+          ) : (
+            <div className="row g-3 g-md-4">
+              {[
+                { icon: 'bi-people-fill', value: stats.totalAlumni, label: 'Active Members' },
+                { icon: 'bi-graph-up-arrow', value: stats.totalCareers, label: 'Careers Launched' },
+                { icon: 'bi-building', value: stats.totalCompanies, label: 'Global Companies' },
+                { icon: 'bi-globe2', value: stats.totalCountries, label: 'Countries Represented' },
+              ].map((item, idx) => (
+                <div key={idx} className="col-6 col-lg-3">
+                  <div className="stat-card" style={{
+                    background: '#f3f4f6', borderRadius: 16,
+                    padding: '28px 24px', border: '1px solid #e5e7eb',
+                    transition: 'all 0.25s ease'
+                  }}>
+                    <div style={{
+                      width: 44, height: 44, borderRadius: 10,
+                      background: '#e8f2fd',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      marginBottom: 18
+                    }}>
+                      <i className={`bi ${item.icon}`} style={{ fontSize: 20, color: '#197fe6' }}></i>
+                    </div>
+                    <div style={{ fontSize: 'clamp(1.7rem, 4vw, 2.2rem)', fontWeight: 900, color: '#111827', lineHeight: 1, marginBottom: 6 }}>
+                      <AnimatedCounter end={item.value} duration={2000} />
+                    </div>
+                    <div style={{ fontSize: '0.875rem', color: '#6b7280', fontWeight: 500 }}>
+                      {item.label}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* ── FEATURED ALUMNI ── */}
+      <div style={{ background: '#f3f4f6', padding: '60px 0 70px' }}>
+        <div className="container">
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 32, flexWrap: 'wrap', gap: 12 }}>
+            <h2 style={{ fontSize: '1.65rem', fontWeight: 800, color: '#111827', margin: 0 }}>
+              Featured Alumni
+            </h2>
+          </div>
+
           {loading ? (
             <div className="text-center py-5">
-              <div className="spinner-border" style={{ width: '3rem', height: '3rem', color: '#1a2744' }}>
+              <div className="spinner-border" style={{ width: '2.5rem', height: '2.5rem', color: '#197fe6' }}>
                 <span className="visually-hidden">Loading...</span>
               </div>
             </div>
           ) : alumni.length === 0 ? (
             <div className="text-center py-5">
-              <i className="bi bi-inbox display-1 text-muted"></i>
-              <p className="text-muted mt-3 fs-5">No alumni profiles available yet.</p>
+              <i className="bi bi-inbox display-1" style={{ color: '#d1d5db' }}></i>
+              <p style={{ color: '#9ca3af', marginTop: 16, fontSize: '1rem' }}>No alumni profiles available yet.</p>
             </div>
           ) : (
-            <div className="alumni-carousel-container">
+            <div className="alumni-carousel-container" style={{ padding: '0 60px', position: 'relative' }}>
               <Slider {...carouselSettings}>
                 {alumni.map((alumnus) => (
-                  <div key={alumnus.id} className="carousel-item-wrapper px-1 px-md-2">
-                    <div 
-                      className="alumni-card-modern" 
-                      style={{ 
-                        position: 'relative', 
-                        margin: '0 5px',
-                        background: 'linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)',
-                        borderRadius: '20px',
+                  <div key={alumnus.id} style={{ padding: '0 10px' }}>
+                    <div
+                      className="alumni-card-modern"
+                      style={{
+                        background: '#fff',
+                        borderRadius: 18,
                         overflow: 'hidden',
-                        border: '1px solid #e9ecef',
-                        transition: 'all 0.3s ease',
-                        height: '100%',
-                        boxShadow: '0 4px 20px rgba(0,0,0,0.08)'
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.transform = 'translateY(-5px)';
-                        e.currentTarget.style.boxShadow = '0 8px 30px rgba(26,39,68,0.18)';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.transform = 'translateY(0)';
-                        e.currentTarget.style.boxShadow = '0 4px 20px rgba(0,0,0,0.08)';
+                        border: '1px solid #e5e7eb',
+                        boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
+                        transition: 'all 0.25s ease',
+                        margin: '8px 4px 16px',
                       }}
                     >
-                      <div style={{
-                        height: '5px',
-                        background: 'linear-gradient(90deg, #1a2744 0%, #2d4a8a 100%)',
-                        width: '100%'
-                      }} />
-
-                      <div className="card-body p-4">
+                      {/* Photo area */}
+                      <div style={{ position: 'relative', background: '#f3f4f6', padding: '24px 24px 0' }}>
                         {alumnus.current_status && (
-                          <span
-                            className={`status-badge ${
-                              alumnus.current_status === 'Employed'
-                                ? 'bg-success'
-                                : alumnus.current_status === 'Self-Employed'
-                                ? 'bg-primary'
-                                : 'bg-info'
-                            }`}
-                            style={{ 
-                              position: 'absolute', 
-                              right: 15, 
-                              top: 20, 
-                              padding: '6px 12px', 
-                              borderRadius: '20px', 
-                              color: '#fff',
-                              fontSize: '0.75rem',
-                              fontWeight: '600',
-                              boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
-                              zIndex: 1
-                            }}
-                          >
+                          <span style={{
+                            position: 'absolute', top: 14, right: 14,
+                            background: getStatusColor(alumnus.current_status),
+                            color: '#fff', fontSize: '0.68rem', fontWeight: 700,
+                            padding: '4px 10px', borderRadius: 20,
+                            letterSpacing: '0.6px', textTransform: 'uppercase',
+                            zIndex: 2
+                          }}>
                             {alumnus.current_status}
                           </span>
                         )}
+                        <img
+                          src={buildPhotoUrl(alumnus.photo)}
+                          alt={alumnus.name || 'Alumnus'}
+                          style={{
+                            width: '100%', height: 220,
+                            objectFit: 'cover',
+                            borderRadius: 12,
+                            display: 'block'
+                          }}
+                        />
+                      </div>
 
-                        <div className="alumni-photo-section d-flex justify-content-center mb-3" style={{ paddingTop: '10px' }}>
-                          <div style={{
-                            position: 'relative',
-                            padding: '4px',
-                            background: 'linear-gradient(135deg, #1a2744 0%, #2d4a8a 100%)',
-                            borderRadius: '50%',
-                            boxShadow: '0 4px 15px rgba(26,39,68,0.25)'
-                          }}>
-                            <img
-                              src={buildPhotoUrl(alumnus.photo)}
-                              alt={alumnus.name || 'Alumnus'}
-                              className="alumni-photo"
-                              style={{ 
-                                width: '120px', 
-                                height: '120px', 
-                                objectFit: 'cover',
-                                borderRadius: '50%',
-                                border: '4px solid white',
-                                display: 'block'
-                              }}
-                            />
-                          </div>
-                        </div>
-
-                        <div className="text-center mb-3" style={{ 
-                          borderBottom: '2px solid #f8f9fa',
-                          paddingBottom: '15px'
+                      {/* Info area */}
+                      <div style={{ padding: '20px 22px 24px' }}>
+                        <h5 style={{
+                          fontSize: '1.05rem', fontWeight: 800,
+                          color: '#111827', marginBottom: 4
                         }}>
-                          <h5 className="alumni-name mb-2" style={{
-                            fontSize: '1.25rem',
-                            fontWeight: '700',
-                            color: '#212529',
-                            marginBottom: '5px'
-                          }}>
-                            {alumnus.name || '—'}
-                          </h5>
-                          
-                          {alumnus.designation && (
-                            <p className="mb-0" style={{ color: '#1a2744',
-                              fontSize: '0.95rem',
-                              fontWeight: '600',
-                              letterSpacing: '0.3px'
-                            }}>
-                              {alumnus.designation}
-                            </p>
-                          )}
-                          
-                          {alumnus.organization_name && (
-                            <p className="text-muted mb-0" style={{
-                              fontSize: '0.85rem',
-                              marginTop: '3px'
-                            }}>
-                              {alumnus.organization_name}
-                            </p>
-                          )}
-                        </div>
+                          {alumnus.name || '—'}
+                        </h5>
 
-                        <div className="alumni-details mb-3" style={{
-                          background: '#f8f9fa',
-                          borderRadius: '12px',
-                          padding: '15px',
-                        }}>
+                        {(alumnus.designation || alumnus.organization_name) && (
+                          <p style={{
+                            fontSize: '0.875rem', color: '#197fe6',
+                            fontWeight: 600, marginBottom: 14
+                          }}>
+                            {alumnus.designation}
+                            {alumnus.designation && alumnus.organization_name && ' at '}
+                            {alumnus.organization_name}
+                          </p>
+                        )}
+
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                           {alumnus.institution && (
-                            <div className="detail-row d-flex align-items-start mb-2">
-                              <div style={{
-                                width: '32px',
-                                height: '32px',
-                                background: 'linear-gradient(135deg, #1a2744 0%, #2d4a8a 100%)',
-                                borderRadius: '8px',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                flexShrink: 0,
-                                marginRight: '10px'
-                              }}>
-                                <i className="bi bi-mortarboard-fill text-white" style={{ fontSize: '0.9rem' }} />
-                              </div>
-                              <div className="flex-grow-1">
-                                <div style={{ fontSize: '0.75rem', color: '#6c757d', marginBottom: '2px' }}>Education</div>
-                                <div style={{ fontSize: '0.85rem', color: '#495057', fontWeight: '500' }}>
-                                  {alumnus.institution}
-                                  {alumnus.batch && <span className="text-muted"> • {alumnus.batch}</span>}
-                                </div>
-                              </div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                              <i className="bi bi-mortarboard" style={{ color: '#9ca3af', fontSize: 14, flexShrink: 0 }}></i>
+                              <span style={{ fontSize: '0.84rem', color: '#6b7280' }}>
+                                {alumnus.institution}{alumnus.batch ? `, Class of ${alumnus.batch}` : ''}
+                              </span>
                             </div>
                           )}
-
-                          {alumnus.department && (
-                            <div className="detail-row d-flex align-items-start mb-2">
-                              <div style={{
-                                width: '32px',
-                                height: '32px',
-                                background: 'linear-gradient(135deg, #6c757d 0%, #5a6268 100%)',
-                                borderRadius: '8px',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                flexShrink: 0,
-                                marginRight: '10px'
-                              }}>
-                                <i className="bi bi-book-fill text-white" style={{ fontSize: '0.9rem' }} />
-                              </div>
-                              <div className="flex-grow-1">
-                                <div style={{ fontSize: '0.75rem', color: '#6c757d', marginBottom: '2px' }}>Department</div>
-                                <div style={{ fontSize: '0.85rem', color: '#495057', fontWeight: '500' }}>
-                                  {alumnus.department}
-                                </div>
-                              </div>
-                            </div>
-                          )}
-
                           {alumnus.work_location && (
-                            <div className="detail-row d-flex align-items-start mb-2">
-                              <div style={{
-                                width: '32px',
-                                height: '32px',
-                                background: 'linear-gradient(135deg, #28a745 0%, #218838 100%)',
-                                borderRadius: '8px',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                flexShrink: 0,
-                                marginRight: '10px'
-                              }}>
-                                <i className="bi bi-geo-alt-fill text-white" style={{ fontSize: '0.9rem' }} />
-                              </div>
-                              <div className="flex-grow-1">
-                                <div style={{ fontSize: '0.75rem', color: '#6c757d', marginBottom: '2px' }}>Location</div>
-                                <div style={{ fontSize: '0.85rem', color: '#495057', fontWeight: '500' }}>
-                                  {alumnus.work_location}
-                                </div>
-                              </div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                              <i className="bi bi-geo-alt" style={{ color: '#9ca3af', fontSize: 14, flexShrink: 0 }}></i>
+                              <span style={{ fontSize: '0.84rem', color: '#6b7280' }}>
+                                {alumnus.work_location}
+                              </span>
                             </div>
                           )}
                         </div>
-{/* 
-                        {alumnus.linkedin && (
-                          <div className="d-flex justify-content-center">
-                            <a 
-                              href={alumnus.linkedin} 
-                              target="_blank" 
-                              rel="noopener noreferrer" 
-                              className="linkedin-btn"
-                              style={{
-                                display: 'inline-flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                padding: '10px 24px',
-                                background: '#0077b5',
-                                color: 'white',
-                                borderRadius: '25px',
-                                textDecoration: 'none',
-                                fontSize: '0.9rem',
-                                fontWeight: '600',
-                                transition: 'all 0.3s ease',
-                                boxShadow: '0 3px 10px rgba(0, 119, 181, 0.3)',
-                                border: 'none'
-                              }}
-                              onMouseEnter={(e) => {
-                                e.currentTarget.style.background = '#005885';
-                                e.currentTarget.style.transform = 'translateY(-2px)';
-                                e.currentTarget.style.boxShadow = '0 5px 15px rgba(0, 119, 181, 0.4)';
-                              }}
-                              onMouseLeave={(e) => {
-                                e.currentTarget.style.background = '#0077b5';
-                                e.currentTarget.style.transform = 'translateY(0)';
-                                e.currentTarget.style.boxShadow = '0 3px 10px rgba(0, 119, 181, 0.3)';
-                              }}
-                            >
-                              <i className="bi bi-linkedin me-2" style={{ fontSize: '1.1rem' }} />
-                              Connect on LinkedIn
-                            </a>
-                          </div>
-                        )} */}
                       </div>
                     </div>
                   </div>
@@ -478,138 +488,71 @@ function Home() {
         </div>
       </div>
 
-      {/* Profile of Members Section - KALS Alumni Network Stats */}
-      <div className="py-5" style={{ background: 'linear-gradient(to bottom, #f8f5f5, #fff)' }}>
+      {/* ── CTA SECTION ── */}
+      <div style={{ background: '#f3f4f6', padding: '0 0 70px' }}>
         <div className="container">
-          <div className="text-center mb-5">
-            <h2 className="fw-bold mb-3" style={{ color: '#1a2744', fontSize: 'clamp(1.5rem, 5vw, 2rem)' }}>
-              Profile of Members in the Alumni Network
-            </h2>
-            <p className="text-secondary" style={{ fontSize: 'clamp(0.9rem, 2.5vw, 1.05rem)', maxWidth: '900px', margin: '0 auto', lineHeight: '1.6' }}>
-              Alumni are in dominating positions across the world in different Careers, Companies and Universities.<br />
-              Connect with them to grow Professionally & Personally.
-            </p>
+          <div style={{
+            background: '#197fe6',
+            borderRadius: 20,
+            padding: 'clamp(40px, 6vw, 64px)',
+            position: 'relative', overflow: 'hidden',
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            gap: 32, flexWrap: 'wrap'
+          }}>
+            {/* Background decoration */}
+            <div style={{
+              position: 'absolute', right: -20, top: '50%', transform: 'translateY(-50%)',
+              fontSize: 180, opacity: 0.08, color: '#fff', pointerEvents: 'none',
+              lineHeight: 1
+            }}>
+              <i className="bi bi-mortarboard-fill"></i>
+            </div>
+
+            <div style={{ position: 'relative', maxWidth: 560 }}>
+              <h2 style={{
+                fontSize: 'clamp(1.5rem, 3.5vw, 2.1rem)', fontWeight: 900,
+                color: '#fff', marginBottom: 14, lineHeight: 1.2
+              }}>
+                Ready to re-connect with<br />your community?
+              </h2>
+              <p style={{
+                color: 'rgba(255,255,255,0.82)', fontSize: '0.95rem',
+                marginBottom: 32, lineHeight: 1.65, maxWidth: 460
+              }}>
+                Don't miss out on exclusive alumni events, job opportunities, and a network of{' '}
+                {stats.totalAlumni > 0 ? `${stats.totalAlumni.toLocaleString()}+` : '12,000+'} graduates globally.
+              </p>
+              <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap' }}>
+                <a href="/register" style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 8,
+                  padding: '12px 26px', background: '#fff', color: '#197fe6',
+                  borderRadius: 10, fontWeight: 700, fontSize: '0.93rem',
+                  textDecoration: 'none', boxShadow: '0 4px 14px rgba(0,0,0,0.15)',
+                  transition: 'all 0.2s'
+                }}
+                  onMouseEnter={e => { e.currentTarget.style.background = '#f0f7ff'; }}
+                  onMouseLeave={e => { e.currentTarget.style.background = '#fff'; }}
+                >
+                  Create Account
+                </a>
+                <a href="/login" style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 8,
+                  padding: '12px 26px', background: 'transparent', color: '#fff',
+                  borderRadius: 10, fontWeight: 700, fontSize: '0.93rem',
+                  textDecoration: 'none', border: '1.5px solid rgba(255,255,255,0.5)',
+                  transition: 'all 0.2s'
+                }}
+                  onMouseEnter={e => { e.currentTarget.style.borderColor = '#fff'; e.currentTarget.style.background = 'rgba(255,255,255,0.1)'; }}
+                  onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.5)'; e.currentTarget.style.background = 'transparent'; }}
+                >
+                  Contact Office
+                </a>
+              </div>
+            </div>
           </div>
-
-          {stats.loading ? (
-            <div className="text-center py-5">
-              <div className="spinner-border" style={{ width: '3rem', height: '3rem', color: '#1a2744' }}>
-                <span className="visually-hidden">Loading statistics...</span>
-              </div>
-            </div>
-          ) : (
-            <div className="row g-3 g-md-4">
-              {/* Active Alumni Members */}
-              <div className="col-6 col-lg-3">
-                <div className="stat-card p-3 p-md-4 bg-white rounded-3 shadow-sm h-100 text-center transition-all" 
-                     style={{ 
-                       border: '1px solid #e8e8e8',
-                       transition: 'all 0.3s ease'
-                     }}
-                     onMouseEnter={(e) => {
-                       e.currentTarget.style.transform = 'translateY(-5px)';
-                       e.currentTarget.style.boxShadow = '0 10px 30px rgba(26,39,68,0.15)';
-                     }}
-                     onMouseLeave={(e) => {
-                       e.currentTarget.style.transform = 'translateY(0)';
-                       e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)';
-                     }}>
-                  <div className="mb-2 mb-md-3">
-                    <i className="bi bi-mortarboard-fill" style={{ fontSize: 'clamp(2.5rem, 8vw, 3.5rem)', color: '#1a2744' }}></i>
-                  </div>
-                  <h3 className="fw-bold mb-1 mb-md-2" style={{ color: '#1a2744', fontSize: 'clamp(2rem, 8vw, 3rem)' }}>
-                    <AnimatedCounter end={stats.totalAlumni} duration={2000} />
-                  </h3>
-                  <p className="text-secondary mb-0" style={{ fontSize: 'clamp(0.75rem, 2vw, 0.95rem)', lineHeight: '1.4' }}>
-                    Active<br />Alumni Members
-                  </p>
-                </div>
-              </div>
-
-              {/* Different Career Chosen */}
-              <div className="col-6 col-lg-3">
-                <div className="stat-card p-3 p-md-4 bg-white rounded-3 shadow-sm h-100 text-center transition-all" 
-                     style={{ 
-                       border: '1px solid #e8e8e8',
-                       transition: 'all 0.3s ease'
-                     }}
-                     onMouseEnter={(e) => {
-                       e.currentTarget.style.transform = 'translateY(-5px)';
-                       e.currentTarget.style.boxShadow = '0 10px 30px rgba(26,39,68,0.15)';
-                     }}
-                     onMouseLeave={(e) => {
-                       e.currentTarget.style.transform = 'translateY(0)';
-                       e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)';
-                     }}>
-                  <div className="mb-2 mb-md-3">
-                    <i className="bi bi-briefcase-fill" style={{ fontSize: 'clamp(2.5rem, 8vw, 3.5rem)', color: '#1a2744' }}></i>
-                  </div>
-                  <h3 className="fw-bold mb-1 mb-md-2" style={{ color: '#1a2744', fontSize: 'clamp(2rem, 8vw, 3rem)' }}>
-                    <AnimatedCounter end={stats.totalCareers} duration={2000} />
-                  </h3>
-                  <p className="text-secondary mb-0" style={{ fontSize: 'clamp(0.75rem, 2vw, 0.95rem)', lineHeight: '1.4' }}>
-                    Different<br />Career Chosen
-                  </p>
-                </div>
-              </div>
-
-              {/* Companies Represented */}
-              <div className="col-6 col-lg-3">
-                <div className="stat-card p-3 p-md-4 bg-white rounded-3 shadow-sm h-100 text-center transition-all" 
-                     style={{ 
-                       border: '1px solid #e8e8e8',
-                       transition: 'all 0.3s ease'
-                     }}
-                     onMouseEnter={(e) => {
-                       e.currentTarget.style.transform = 'translateY(-5px)';
-                       e.currentTarget.style.boxShadow = '0 10px 30px rgba(26,39,68,0.15)';
-                     }}
-                     onMouseLeave={(e) => {
-                       e.currentTarget.style.transform = 'translateY(0)';
-                       e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)';
-                     }}>
-                  <div className="mb-2 mb-md-3">
-                    <i className="bi bi-building" style={{ fontSize: 'clamp(2.5rem, 8vw, 3.5rem)', color: '#1a2744' }}></i>
-                  </div>
-                  <h3 className="fw-bold mb-1 mb-md-2" style={{ color: '#1a2744', fontSize: 'clamp(2rem, 8vw, 3rem)' }}>
-                    <AnimatedCounter end={stats.totalCompanies} duration={2000}  />
-                  </h3>
-                  <p className="text-secondary mb-0" style={{ fontSize: 'clamp(0.75rem, 2vw, 0.95rem)', lineHeight: '1.4' }}>
-                    Companies<br />Represented
-                  </p>
-                </div>
-              </div>
-
-              {/* Countries Represented */}
-              <div className="col-6 col-lg-3">
-                <div className="stat-card p-3 p-md-4 bg-white rounded-3 shadow-sm h-100 text-center transition-all" 
-                     style={{ 
-                       border: '1px solid #e8e8e8',
-                       transition: 'all 0.3s ease'
-                     }}
-                     onMouseEnter={(e) => {
-                       e.currentTarget.style.transform = 'translateY(-5px)';
-                       e.currentTarget.style.boxShadow = '0 10px 30px rgba(26,39,68,0.15)';
-                     }}
-                     onMouseLeave={(e) => {
-                       e.currentTarget.style.transform = 'translateY(0)';
-                       e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)';
-                     }}>
-                  <div className="mb-2 mb-md-3">
-                    <i className="bi bi-globe" style={{ fontSize: 'clamp(2.5rem, 8vw, 3.5rem)', color: '#1a2744' }}></i>
-                  </div>
-                  <h3 className="fw-bold mb-1 mb-md-2" style={{ color: '#1a2744', fontSize: 'clamp(2rem, 8vw, 3rem)' }}>
-                    <AnimatedCounter end={stats.totalCountries} duration={2000} />
-                  </h3>
-                  <p className="text-secondary mb-0" style={{ fontSize: 'clamp(0.75rem, 2vw, 0.95rem)', lineHeight: '1.4' }}>
-                    Countries<br />Represented
-                  </p>
-                </div>
-              </div>
-            </div>
-          )}
         </div>
       </div>
+
     </div>
   );
 }

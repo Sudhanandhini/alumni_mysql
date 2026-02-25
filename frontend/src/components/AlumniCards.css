@@ -1,13 +1,14 @@
-/* Enhanced Alumni Card Styles */
+/* Alumni Card Styles – primary #197fe6 */
 
 .alumni-card-modern {
-  cursor: pointer;
+  cursor: default;
   will-change: transform;
+  transition: all 0.25s ease;
 }
 
 .alumni-card-modern:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 30px rgba(220, 53, 69, 0.2) !important;
+  transform: translateY(-6px);
+  box-shadow: 0 12px 32px rgba(25,127,230,0.15) !important;
 }
 
 .alumni-photo {
@@ -15,111 +16,81 @@
 }
 
 .alumni-card-modern:hover .alumni-photo {
-  transform: scale(1.05);
+  transform: scale(1.04);
 }
 
 .detail-row {
   transition: all 0.2s ease;
 }
 
-.detail-row:hover {
-  transform: translateX(3px);
-}
-
-.linkedin-btn {
-  position: relative;
-  overflow: hidden;
-}
-
-.linkedin-btn::before {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 0;
-  height: 0;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.1);
-  transform: translate(-50%, -50%);
-  transition: width 0.6s, height 0.6s;
-}
-
-.linkedin-btn:hover::before {
-  width: 300px;
-  height: 300px;
-}
-
 /* Status Badge Animation */
 .status-badge {
-  animation: pulse-badge 2s ease-in-out infinite;
+  animation: pulse-badge 2.5s ease-in-out infinite;
 }
 
 @keyframes pulse-badge {
-  0%, 100% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.05);
-  }
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.04); }
 }
 
-/* Carousel Navigation Styling */
+/* Slick nav overrides (backup) */
 .slick-prev, .slick-next {
-  width: 45px !important;
-  height: 45px !important;
+  width: 40px !important;
+  height: 40px !important;
   border-radius: 50% !important;
-  background: linear-gradient(135deg, #dc3545 0%, #c82333 100%) !important;
-  box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3) !important;
+  background: #fff !important;
+  border: 1.5px solid #e5e7eb !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08) !important;
   z-index: 1;
-  transition: all 0.3s ease !important;
+  transition: all 0.2s ease !important;
 }
 
 .slick-prev:hover, .slick-next:hover {
-  background: linear-gradient(135deg, #c82333 0%, #bd2130 100%) !important;
-  transform: scale(1.1) !important;
-  box-shadow: 0 6px 20px rgba(220, 53, 69, 0.4) !important;
+  background: #197fe6 !important;
+  border-color: #197fe6 !important;
+  box-shadow: 0 4px 14px rgba(25,127,230,0.35) !important;
 }
 
 .slick-prev:before, .slick-next:before {
-  font-size: 20px !important;
+  font-size: 16px !important;
   opacity: 1 !important;
+  color: #374151;
+}
+
+.slick-prev:hover:before, .slick-next:hover:before {
+  color: #fff;
 }
 
 .slick-prev {
-  left: -50px !important;
+  left: -48px !important;
 }
 
 .slick-next {
-  right: -50px !important;
+  right: -48px !important;
 }
 
 @media (max-width: 768px) {
-  .slick-prev {
-    left: 10px !important;
-  }
-  
-  .slick-next {
-    right: 10px !important;
-  }
+  .slick-prev { left: 5px !important; }
+  .slick-next { right: 5px !important; }
 }
 
 /* Carousel Dots */
 .slick-dots li button:before {
-  font-size: 12px !important;
-  color: #dc3545 !important;
+  font-size: 10px !important;
+  color: #197fe6 !important;
   opacity: 0.3 !important;
 }
 
 .slick-dots li.slick-active button:before {
   opacity: 1 !important;
-  color: #dc3545 !important;
+  color: #197fe6 !important;
 }
 
 .slick-dots li {
   margin: 0 3px !important;
 }
 
-/* Smooth Scroll Behavior */
+/* Smooth Scroll */
 .slick-track {
   display: flex !important;
   align-items: stretch !important;
@@ -133,45 +104,35 @@
   height: 100%;
 }
 
-/* Loading Animation */
+/* Spinner */
 .spinner-border {
   animation: spinner-rotate 0.75s linear infinite;
 }
 
 @keyframes spinner-rotate {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
-/* Hero Section Animation */
+/* Hero Animation */
 .animate-fade-in {
   animation: fadeInUp 0.8s ease-out;
 }
 
 @keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-/* Stat Cards Hover Effect */
+/* Stat Cards */
 .stat-card {
-  transition: all 0.3s ease;
-  cursor: pointer;
+  transition: all 0.25s ease;
+  cursor: default;
 }
 
 .stat-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15) !important;
+  transform: translateY(-4px);
+  box-shadow: 0 12px 28px rgba(25,127,230,0.12) !important;
 }
 
 .stat-card i {
@@ -179,97 +140,23 @@
 }
 
 .stat-card:hover i {
-  transform: scale(1.1) rotate(5deg);
+  transform: scale(1.1);
 }
 
-/* Gradient Background */
-.bg-gradient-danger {
-  background: linear-gradient(135deg, #dc3545 0%, #c82333 50%, #bd2130 100%);
-  position: relative;
-  overflow: hidden;
+/* Focus States */
+.alumni-card-modern:focus {
+  outline: 2px solid #197fe6;
+  outline-offset: 2px;
 }
 
-.bg-gradient-danger::before {
-  content: '';
-  position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-  animation: gradient-rotate 20s linear infinite;
-}
-
-@keyframes gradient-rotate {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
-/* Badge Styling */
-.badge {
-  font-weight: 600;
-  letter-spacing: 0.5px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-}
-
-/* Responsive Card Adjustments */
+/* Responsive Card */
 @media (max-width: 768px) {
   .alumni-card-modern {
     margin: 0 auto !important;
   }
-  
-  .alumni-photo-section img {
-    width: 100px !important;
-    height: 100px !important;
-  }
-  
-  .alumni-name {
-    font-size: 1.1rem !important;
-  }
-  
-  .detail-row {
-    font-size: 0.8rem;
-  }
-  
-  .linkedin-btn {
-    font-size: 0.85rem !important;
-    padding: 8px 20px !important;
-  }
 }
 
-@media (max-width: 576px) {
-  .alumni-details {
-    padding: 12px !important;
-  }
-  
-  .detail-row > div:first-child {
-    width: 28px !important;
-    height: 28px !important;
-  }
-  
-  .detail-row > div:first-child i {
-    font-size: 0.8rem !important;
-  }
-}
-
-/* Smooth Transitions */
-* {
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-/* Focus States for Accessibility */
-.linkedin-btn:focus,
-.alumni-card-modern:focus {
-  outline: 2px solid #dc3545;
-  outline-offset: 2px;
-}
-
-/* Print Styles */
+/* Print */
 @media print {
   .alumni-card-modern {
     page-break-inside: avoid;

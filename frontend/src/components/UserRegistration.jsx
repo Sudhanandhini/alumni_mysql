@@ -4,7 +4,7 @@ import axios from 'axios';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
-// ─── Data ────────────────────────────────────────────────────────────────────
+// â”€â”€â”€ Data â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const COUNTRIES = [
   'India', 'United States', 'United Kingdom', 'Canada', 'Australia',
   'Germany', 'France', 'Singapore', 'UAE', 'Saudi Arabia',
@@ -49,7 +49,7 @@ const EDUCATION_LEVELS = [
   'Postgraduate (MBA/M.Tech/M.Sc)', 'Doctoral (PhD)'
 ];
 
-// ─── ComboBox ────────────────────────────────────────────────────────────────
+// â”€â”€â”€ ComboBox â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function ComboBox({ name, value, onChange, options, placeholder, required = false }) {
   const [open, setOpen] = useState(false);
   const [inputVal, setInputVal] = useState(value || '');
@@ -131,7 +131,7 @@ function ComboBox({ name, value, onChange, options, placeholder, required = fals
   );
 }
 
-// ─── Step Indicator ──────────────────────────────────────────────────────────
+// â”€â”€â”€ Step Indicator â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function StepIndicator({ step, total }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', marginBottom: 28 }}>
@@ -144,10 +144,10 @@ function StepIndicator({ step, total }) {
             <div style={{
               width: 34, height: 34, borderRadius: '50%', display: 'flex',
               alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: 13,
-              background: isActive ? '#dc3545' : isDone ? '#28a745' : '#e9ecef',
+              background: isActive ? '#197fe6' : isDone ? '#28a745' : '#e9ecef',
               color: isActive || isDone ? '#fff' : '#aaa',
               flexShrink: 0, transition: 'all 0.3s',
-              boxShadow: isActive ? '0 2px 8px rgba(220,53,69,0.4)' : 'none'
+              boxShadow: isActive ? '0 2px 8px rgba(25,127,230,0.4)' : 'none'
             }}>
               {isDone ? <i className="bi bi-check2" style={{ fontSize: 16 }}></i> : n}
             </div>
@@ -164,33 +164,33 @@ function StepIndicator({ step, total }) {
   );
 }
 
-// ─── Field Error ─────────────────────────────────────────────────────────────
+// â”€â”€â”€ Field Error â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function FieldError({ msg }) {
   if (!msg) return null;
   return (
-    <div style={{ color: '#dc3545', fontSize: 12, marginTop: 4 }}>
+    <div style={{ color: '#197fe6', fontSize: 12, marginTop: 4 }}>
       <i className="bi bi-exclamation-circle me-1"></i>{msg}
     </div>
   );
 }
 
-// ─── Card Radio ──────────────────────────────────────────────────────────────
+// â”€â”€â”€ Card Radio â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function CardRadio({ name, value, options, onChange, errors }) {
   return (
     <>
       <div style={{ display: 'flex', gap: 14, marginTop: 4, flexWrap: 'wrap' }}>
         {options.map(opt => (
           <label key={opt.val} style={{
-            flex: '1 1 140px', border: `2px solid ${value === opt.val ? '#dc3545' : '#e9ecef'}`,
+            flex: '1 1 140px', border: `2px solid ${value === opt.val ? '#197fe6' : '#e9ecef'}`,
             borderRadius: 12, padding: '14px 16px', cursor: 'pointer',
-            background: value === opt.val ? '#fff5f5' : '#fff',
+            background: value === opt.val ? '#e8f2fd' : '#fff',
             display: 'flex', alignItems: 'center', gap: 10, transition: 'all 0.2s',
             userSelect: 'none'
           }}>
             <input type="radio" name={name} value={opt.val} checked={value === opt.val}
-              onChange={onChange} style={{ accentColor: '#dc3545', width: 16, height: 16, flexShrink: 0 }} />
+              onChange={onChange} style={{ accentColor: '#197fe6', width: 16, height: 16, flexShrink: 0 }} />
             <div>
-              <div style={{ fontWeight: 600, fontSize: 14, color: value === opt.val ? '#dc3545' : '#333' }}>
+              <div style={{ fontWeight: 600, fontSize: 14, color: value === opt.val ? '#197fe6' : '#333' }}>
                 {opt.icon && <i className={`bi ${opt.icon} me-2`}></i>}
                 {opt.label}
               </div>
@@ -204,33 +204,33 @@ function CardRadio({ name, value, options, onChange, errors }) {
   );
 }
 
-// ─── Step 1 ───────────────────────────────────────────────────────────────────
+// â”€â”€â”€ Step 1 â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function Step1({ formData, onChange, errors, usernameAvailable, checkingUsername }) {
   return (
     <div className="row g-3">
       <div className="col-sm-6">
-        <label className="form-label fw-semibold small">First Name <span className="text-danger">*</span></label>
+        <label className="form-label fw-semibold small">First Name <span className="text-primary">*</span></label>
         <input type="text" name="firstName" value={formData.firstName} onChange={onChange}
           className={`form-control ${errors.firstName ? 'is-invalid' : ''}`}
           placeholder="Enter first name" />
         <FieldError msg={errors.firstName} />
       </div>
       <div className="col-sm-6">
-        <label className="form-label fw-semibold small">Last Name <span className="text-danger">*</span></label>
+        <label className="form-label fw-semibold small">Last Name <span className="text-primary">*</span></label>
         <input type="text" name="lastName" value={formData.lastName} onChange={onChange}
           className={`form-control ${errors.lastName ? 'is-invalid' : ''}`}
           placeholder="Enter last name" />
         <FieldError msg={errors.lastName} />
       </div>
       <div className="col-sm-6">
-        <label className="form-label fw-semibold small">Email Address <span className="text-danger">*</span></label>
+        <label className="form-label fw-semibold small">Email Address <span className="text-primary">*</span></label>
         <input type="email" name="email" value={formData.email} onChange={onChange}
           className={`form-control ${errors.email ? 'is-invalid' : ''}`}
           placeholder="you@example.com" />
         <FieldError msg={errors.email} />
       </div>
       <div className="col-sm-6">
-        <label className="form-label fw-semibold small">Mobile Number <span className="text-danger">*</span></label>
+        <label className="form-label fw-semibold small">Mobile Number <span className="text-primary">*</span></label>
         <div className="input-group">
           <select name="countryCode" value={formData.countryCode} onChange={onChange}
             className="form-select" style={{ maxWidth: 110 }}>
@@ -249,7 +249,7 @@ function Step1({ formData, onChange, errors, usernameAvailable, checkingUsername
         <FieldError msg={errors.phone} />
       </div>
       <div className="col-sm-6">
-        <label className="form-label fw-semibold small">Username <span className="text-danger">*</span></label>
+        <label className="form-label fw-semibold small">Username <span className="text-primary">*</span></label>
         <input type="text" name="username" value={formData.username} onChange={onChange}
           className={`form-control ${errors.username ? 'is-invalid' : usernameAvailable === true ? 'is-valid' : ''}`}
           placeholder="Choose a unique username" minLength={3} autoComplete="off" />
@@ -266,7 +266,7 @@ function Step1({ formData, onChange, errors, usernameAvailable, checkingUsername
         <FieldError msg={errors.username} />
       </div>
       <div className="col-sm-6">
-        <label className="form-label fw-semibold small">Attended Program <span className="text-danger">*</span></label>
+        <label className="form-label fw-semibold small">Attended Program <span className="text-primary">*</span></label>
         <select name="attended_program" value={formData.attended_program} onChange={onChange}
           className={`form-select ${errors.attended_program ? 'is-invalid' : ''}`}>
           <option value="">Select class attended</option>
@@ -279,14 +279,14 @@ function Step1({ formData, onChange, errors, usernameAvailable, checkingUsername
         <FieldError msg={errors.attended_program} />
       </div>
       <div className="col-sm-6">
-        <label className="form-label fw-semibold small">Password <span className="text-danger">*</span></label>
+        <label className="form-label fw-semibold small">Password <span className="text-primary">*</span></label>
         <input type="password" name="password" value={formData.password} onChange={onChange}
           className={`form-control ${errors.password ? 'is-invalid' : ''}`}
           placeholder="Minimum 6 characters" autoComplete="new-password" />
         <FieldError msg={errors.password} />
       </div>
       <div className="col-sm-6">
-        <label className="form-label fw-semibold small">Confirm Password <span className="text-danger">*</span></label>
+        <label className="form-label fw-semibold small">Confirm Password <span className="text-primary">*</span></label>
         <input type="password" name="confirmPassword" value={formData.confirmPassword} onChange={onChange}
           className={`form-control ${errors.confirmPassword ? 'is-invalid' : ''}`}
           placeholder="Re-enter password" autoComplete="new-password" />
@@ -298,7 +298,7 @@ function Step1({ formData, onChange, errors, usernameAvailable, checkingUsername
         <FieldError msg={errors.confirmPassword} />
       </div>
       <div className="col-12 mt-1">
-        <label className="form-label fw-semibold small">Program Status <span className="text-danger">*</span></label>
+        <label className="form-label fw-semibold small">Program Status <span className="text-primary">*</span></label>
         <CardRadio
           name="program_type"
           value={formData.program_type}
@@ -314,11 +314,11 @@ function Step1({ formData, onChange, errors, usernameAvailable, checkingUsername
         <div style={{ background: '#f8f9fa', borderRadius: 12, padding: '16px 20px' }}>
           <label style={{ display: 'flex', alignItems: 'flex-start', gap: 10, cursor: 'pointer', marginBottom: 12 }}>
             <input type="checkbox" name="terms" checked={formData.terms} onChange={onChange}
-              style={{ marginTop: 2, accentColor: '#dc3545', width: 16, height: 16, flexShrink: 0 }} />
+              style={{ marginTop: 2, accentColor: '#197fe6', width: 16, height: 16, flexShrink: 0 }} />
             <span style={{ fontSize: 13, color: '#555', lineHeight: 1.5 }}>
-              I agree to the <span style={{ color: '#dc3545', cursor: 'pointer' }}>Terms & Conditions</span> and{' '}
-              <span style={{ color: '#dc3545', cursor: 'pointer' }}>Privacy Policy</span>
-              <span className="text-danger"> *</span>
+              I agree to the <span style={{ color: '#197fe6', cursor: 'pointer' }}>Terms & Conditions</span> and{' '}
+              <span style={{ color: '#197fe6', cursor: 'pointer' }}>Privacy Policy</span>
+              <span className="text-primary"> *</span>
             </span>
           </label>
           <FieldError msg={errors.terms} />
@@ -336,35 +336,35 @@ function Step1({ formData, onChange, errors, usernameAvailable, checkingUsername
   );
 }
 
-// ─── Step 2 ───────────────────────────────────────────────────────────────────
+// â”€â”€â”€ Step 2 â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function Step2({ formData, onChange, errors }) {
   return (
     <div className="row g-3">
       <div className="col-sm-6">
-        <label className="form-label fw-semibold small">Current Country <span className="text-danger">*</span></label>
+        <label className="form-label fw-semibold small">Current Country <span className="text-primary">*</span></label>
         <ComboBox name="country" value={formData.country} onChange={onChange}
           options={COUNTRIES} placeholder="Search or type country" required />
         <FieldError msg={errors.country} />
       </div>
       <div className="col-sm-6">
-        <label className="form-label fw-semibold small">Current City <span className="text-danger">*</span></label>
+        <label className="form-label fw-semibold small">Current City <span className="text-primary">*</span></label>
         <ComboBox name="city" value={formData.city} onChange={onChange}
           options={CITIES} placeholder="Search or type city" required />
         <FieldError msg={errors.city} />
       </div>
       <div className="col-sm-6">
-        <label className="form-label fw-semibold small">Date of Birth <span className="text-danger">*</span></label>
+        <label className="form-label fw-semibold small">Date of Birth <span className="text-primary">*</span></label>
         <input type="date" name="dob" value={formData.dob} onChange={onChange}
           className={`form-control ${errors.dob ? 'is-invalid' : ''}`} />
         <FieldError msg={errors.dob} />
       </div>
       <div className="col-sm-6">
-        <label className="form-label fw-semibold small">Gender <span className="text-danger">*</span></label>
+        <label className="form-label fw-semibold small">Gender <span className="text-primary">*</span></label>
         <div style={{ display: 'flex', gap: 20, marginTop: 10 }}>
           {['Male', 'Female', 'Other'].map(g => (
             <label key={g} style={{ display: 'flex', alignItems: 'center', gap: 7, cursor: 'pointer' }}>
               <input type="radio" name="gender" value={g} checked={formData.gender === g}
-                onChange={onChange} style={{ accentColor: '#dc3545', width: 15, height: 15 }} />
+                onChange={onChange} style={{ accentColor: '#197fe6', width: 15, height: 15 }} />
               <span style={{ fontSize: 14, color: '#444' }}>{g}</span>
             </label>
           ))}
@@ -377,20 +377,20 @@ function Step2({ formData, onChange, errors }) {
           {['Pursuing Studies', 'Completed'].map(s => (
             <label key={s} style={{ display: 'flex', alignItems: 'center', gap: 7, cursor: 'pointer' }}>
               <input type="radio" name="education_status" value={s} checked={formData.education_status === s}
-                onChange={onChange} style={{ accentColor: '#dc3545', width: 15, height: 15 }} />
+                onChange={onChange} style={{ accentColor: '#197fe6', width: 15, height: 15 }} />
               <span style={{ fontSize: 14, color: '#444' }}>{s}</span>
             </label>
           ))}
         </div>
       </div>
       <div className="col-sm-6">
-        <label className="form-label fw-semibold small">Education Level <span className="text-danger">*</span></label>
+        <label className="form-label fw-semibold small">Education Level <span className="text-primary">*</span></label>
         <ComboBox name="education_level" value={formData.education_level} onChange={onChange}
           options={EDUCATION_LEVELS} placeholder="Select or type level" required />
         <FieldError msg={errors.education_level} />
       </div>
       <div className="col-12 mt-1">
-        <label className="form-label fw-semibold small">Working Status <span className="text-danger">*</span></label>
+        <label className="form-label fw-semibold small">Working Status <span className="text-primary">*</span></label>
         <CardRadio
           name="working_status"
           value={formData.working_status}
@@ -406,12 +406,12 @@ function Step2({ formData, onChange, errors }) {
   );
 }
 
-// ─── Step 3 ───────────────────────────────────────────────────────────────────
+// â”€â”€â”€ Step 3 â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function Step3({ formData, onChange, errors, years }) {
   return (
     <div className="row g-3">
       <div className="col-sm-8">
-        <label className="form-label fw-semibold small">Institution / School Name <span className="text-danger">*</span></label>
+        <label className="form-label fw-semibold small">Institution / School Name <span className="text-primary">*</span></label>
         <input type="text" name="institution" value={formData.institution} onChange={onChange}
           className={`form-control ${errors.institution ? 'is-invalid' : ''}`}
           placeholder="Name of your school / college / university" />
@@ -423,7 +423,7 @@ function Step3({ formData, onChange, errors, years }) {
           className="form-control" placeholder="e.g. 2020CS001" />
       </div>
       <div className="col-sm-6">
-        <label className="form-label fw-semibold small">Start Year <span className="text-danger">*</span></label>
+        <label className="form-label fw-semibold small">Start Year <span className="text-primary">*</span></label>
         <select name="batch" value={formData.batch} onChange={onChange}
           className={`form-select ${errors.batch ? 'is-invalid' : ''}`}>
           <option value="">Select year</option>
@@ -465,10 +465,10 @@ function Step3({ formData, onChange, errors, years }) {
         <div style={{ background: '#fff8f0', border: '1px solid #ffd9b3', borderRadius: 12, padding: '16px 20px' }}>
           <label style={{ display: 'flex', alignItems: 'flex-start', gap: 10, cursor: 'pointer' }}>
             <input type="checkbox" name="authorization" checked={formData.authorization} onChange={onChange}
-              style={{ marginTop: 3, accentColor: '#dc3545', width: 16, height: 16, flexShrink: 0 }} />
+              style={{ marginTop: 3, accentColor: '#197fe6', width: 16, height: 16, flexShrink: 0 }} />
             <span style={{ fontSize: 13, color: '#555', lineHeight: 1.6 }}>
               I authorize the institution to use my information for alumni networking and communications, and confirm that all the details I have provided are accurate.
-              <span className="text-danger"> *</span>
+              <span className="text-primary"> *</span>
             </span>
           </label>
           <FieldError msg={errors.authorization} />
@@ -478,7 +478,7 @@ function Step3({ formData, onChange, errors, years }) {
   );
 }
 
-// ─── Step 4 ───────────────────────────────────────────────────────────────────
+// â”€â”€â”€ Step 4 â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function Step4({ formData, onChange, imagePreview, onImageChange }) {
   const isWorking = formData.working_status === 'Working';
   return (
@@ -490,7 +490,7 @@ function Step4({ formData, onChange, imagePreview, onImageChange }) {
           {imagePreview ? (
             <img src={imagePreview} alt="Preview" style={{
               width: 84, height: 84, borderRadius: '50%', objectFit: 'cover',
-              border: '3px solid #dc3545', flexShrink: 0
+              border: '3px solid #197fe6', flexShrink: 0
             }} />
           ) : (
             <div style={{
@@ -507,7 +507,7 @@ function Step4({ formData, onChange, imagePreview, onImageChange }) {
               {imagePreview ? 'Change Photo' : 'Upload Photo'}
             </label>
             <input type="file" id="photo" accept="image/*" onChange={onImageChange} className="d-none" />
-            <div style={{ fontSize: 12, color: '#aaa', marginTop: 6 }}>JPG, PNG or GIF · Max 5MB</div>
+            <div style={{ fontSize: 12, color: '#aaa', marginTop: 6 }}>JPG, PNG or GIF Â· Max 5MB</div>
           </div>
         </div>
       </div>
@@ -547,7 +547,7 @@ function Step4({ formData, onChange, imagePreview, onImageChange }) {
               {['Office', 'Remote', 'Hybrid'].map(mode => (
                 <label key={mode} style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
                   <input type="radio" name="work_mode" value={mode} checked={formData.work_mode === mode}
-                    onChange={onChange} style={{ accentColor: '#dc3545', width: 15, height: 15 }} />
+                    onChange={onChange} style={{ accentColor: '#197fe6', width: 15, height: 15 }} />
                   <span style={{ fontSize: 14 }}>{mode}</span>
                 </label>
               ))}
@@ -596,11 +596,11 @@ function Step4({ formData, onChange, imagePreview, onImageChange }) {
   );
 }
 
-// ─── Success Screen ───────────────────────────────────────────────────────────
+// â”€â”€â”€ Success Screen â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function SuccessScreen({ navigate }) {
   return (
     <div className="min-vh-100 d-flex align-items-center justify-content-center"
-      style={{ background: 'linear-gradient(135deg, #fff5f5 0%, #fff 100%)' }}>
+      style={{ background: 'linear-gradient(135deg, #e8f2fd 0%, #fff 100%)' }}>
       <div className="container">
         <div className="row justify-content-center">
           <div className="col-md-7 col-lg-6">
@@ -657,7 +657,7 @@ function SuccessScreen({ navigate }) {
   );
 }
 
-// ─── Right Panel Info ─────────────────────────────────────────────────────────
+// â”€â”€â”€ Right Panel Info â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const RIGHT_PANEL_INFO = {
   1: {
     icon: 'bi-stars',
@@ -683,7 +683,7 @@ const RIGHT_PANEL_INFO = {
 
 const STEP_LABELS = ['Account Setup', 'Personal Info', 'Academic Info', 'Professional Info'];
 
-// ─── Main Component ───────────────────────────────────────────────────────────
+// â”€â”€â”€ Main Component â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function UserRegistration() {
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
@@ -867,20 +867,20 @@ function UserRegistration() {
           position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)',
           display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999
         }}>
-          <div className="spinner-border text-danger" style={{ width: '3rem', height: '3rem' }}>
+          <div className="spinner-border text-primary" style={{ width: '3rem', height: '3rem' }}>
             <span className="visually-hidden">Loading...</span>
           </div>
         </div>
       )}
 
-      {/* ── Left: Form Panel ── */}
+      {/* â”€â”€ Left: Form Panel â”€â”€ */}
       <div style={{ flex: 1, overflowX: 'hidden', padding: '48px 40px 80px', minWidth: 0 }}>
         <div style={{ maxWidth: 560, margin: '0 auto' }}>
           {/* Branding */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 40 }}>
             <div style={{
               width: 42, height: 42, borderRadius: '50%',
-              background: 'linear-gradient(135deg, #dc3545, #8b0000)',
+              background: 'linear-gradient(135deg, #197fe6, #1368c4)',
               display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0
             }}>
               <i className="bi bi-mortarboard-fill text-white" style={{ fontSize: 20 }}></i>
@@ -934,26 +934,26 @@ function UserRegistration() {
               </button>
             ) : (
               <a href="/user/login" style={{ fontSize: 13, color: '#999', textDecoration: 'none' }}>
-                Already registered? <span style={{ color: '#dc3545', fontWeight: 600 }}>Login</span>
+                Already registered? <span style={{ color: '#197fe6', fontWeight: 600 }}>Login</span>
               </a>
             )}
 
             {step < TOTAL_STEPS ? (
               <button onClick={nextStep} style={{
-                background: 'linear-gradient(135deg, #dc3545, #8b0000)', color: '#fff',
+                background: 'linear-gradient(135deg, #197fe6, #1368c4)', color: '#fff',
                 border: 'none', borderRadius: 10, padding: '12px 30px', fontWeight: 700,
                 fontSize: 15, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8,
-                boxShadow: '0 4px 12px rgba(220,53,69,0.35)'
+                boxShadow: '0 4px 12px rgba(25,127,230,0.35)'
               }}>
                 Continue <i className="bi bi-arrow-right"></i>
               </button>
             ) : (
               <button onClick={handleSubmit} disabled={loading} style={{
-                background: 'linear-gradient(135deg, #dc3545, #8b0000)', color: '#fff',
+                background: 'linear-gradient(135deg, #197fe6, #1368c4)', color: '#fff',
                 border: 'none', borderRadius: 10, padding: '12px 30px', fontWeight: 700,
                 fontSize: 15, cursor: loading ? 'not-allowed' : 'pointer',
                 opacity: loading ? 0.7 : 1, minWidth: 180,
-                boxShadow: '0 4px 12px rgba(220,53,69,0.35)'
+                boxShadow: '0 4px 12px rgba(25,127,230,0.35)'
               }}>
                 {loading
                   ? <><span className="spinner-border spinner-border-sm me-2"></span>Submitting...</>
@@ -965,12 +965,12 @@ function UserRegistration() {
         </div>
       </div>
 
-      {/* ── Right: Info Panel ── */}
+      {/* â”€â”€ Right: Info Panel â”€â”€ */}
       <div
         className="d-none d-lg-flex"
         style={{
           width: 360, flexShrink: 0,
-          background: 'linear-gradient(160deg, #c62828 0%, #7b1717 55%, #4a0e0e 100%)',
+          background: 'linear-gradient(160deg, #197fe6 0%, #1368c4 55%, #0d52a0 100%)',
           position: 'sticky', top: 0, height: '100vh', overflow: 'hidden',
           flexDirection: 'column', justifyContent: 'space-between',
           padding: '56px 36px'
@@ -1003,8 +1003,8 @@ function UserRegistration() {
                     transition: 'all 0.3s'
                   }}>
                     {isDone
-                      ? <i className="bi bi-check2" style={{ color: '#c62828', fontSize: 14, fontWeight: 900 }}></i>
-                      : <span style={{ fontSize: 12, fontWeight: 700, color: isActive ? '#c62828' : 'rgba(255,255,255,0.5)' }}>{n}</span>
+                      ? <i className="bi bi-check2" style={{ color: '#197fe6', fontSize: 14, fontWeight: 900 }}></i>
+                      : <span style={{ fontSize: 12, fontWeight: 700, color: isActive ? '#197fe6' : 'rgba(255,255,255,0.5)' }}>{n}</span>
                     }
                   </div>
                   <span style={{

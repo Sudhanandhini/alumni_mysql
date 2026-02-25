@@ -1,21 +1,24 @@
-/* Override Bootstrap primary color to match #1a2744 navy */
+/* Override Bootstrap primary color to #197fe6 */
 :root {
-  --bs-primary: #1a2744;
-  --bs-primary-rgb: 26, 39, 68;
-  --bs-link-color: #1a2744;
-  --bs-link-hover-color: #141e36;
+  --primary: #197fe6;
+  --primary-dark: #1368c4;
+  --primary-light: #e8f2fd;
+  --bs-primary: #197fe6;
+  --bs-primary-rgb: 25, 127, 230;
+  --bs-link-color: #197fe6;
+  --bs-link-hover-color: #1368c4;
 }
 .btn-primary {
-  background-color: #1a2744 !important;
-  border-color: #1a2744 !important;
+  background-color: #197fe6 !important;
+  border-color: #197fe6 !important;
   color: #fff !important;
 }
-.btn-primary:hover { background-color: #141e36 !important; border-color: #141e36 !important; }
-.btn-outline-primary { color: #1a2744 !important; border-color: #1a2744 !important; }
-.btn-outline-primary:hover { background-color: #1a2744 !important; color: #fff !important; }
-.bg-primary { background-color: #1a2744 !important; }
-.text-primary { color: #1a2744 !important; }
-.border-primary { border-color: #1a2744 !important; }
+.btn-primary:hover { background-color: #1368c4 !important; border-color: #1368c4 !important; }
+.btn-outline-primary { color: #197fe6 !important; border-color: #197fe6 !important; }
+.btn-outline-primary:hover { background-color: #197fe6 !important; color: #fff !important; }
+.bg-primary { background-color: #197fe6 !important; }
+.text-primary { color: #197fe6 !important; }
+.border-primary { border-color: #197fe6 !important; }
 
 /* General Styles */
 * {
@@ -24,14 +27,15 @@
   box-sizing: border-box;
 }
 
-.app {
-  min-h-screen: 100vh;
-  background-color: #f8f9fa;
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-.bg-gradient-danger {
-  background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+.app {
+  min-height: 100vh;
+  background-color: #f3f4f6;
 }
 
 /* Loading Overlay */
@@ -50,181 +54,40 @@
 
 /* Carousel Section */
 .carousel-section {
-  background-color: #fff;
+  background-color: #f3f4f6;
 }
 
 .alumni-carousel-container {
-  padding: 0 40px;
+  padding: 0 50px;
   position: relative;
 }
 
 .carousel-item-wrapper {
-  padding: 0 15px;
-}
-
-/* Uniform Alumni Cards */
-.alumni-card-uniform {
-  background: white;
-  border-radius: 20px;
-  border: none;
-  overflow: hidden;
-  transition: all 0.4s ease;
-  height: 520px;
-  display: flex;
-  flex-direction: column;
-  position: relative;
-}
-
-.alumni-card-uniform:hover {
-  transform: translateY(-15px);
-  box-shadow: 0 20px 40px rgba(220, 53, 69, 0.4) !important;
-}
-
-.card-body-uniform {
-  padding: 25px;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  height: 100%;
+  padding: 0 12px;
 }
 
 /* Status Badge */
 .status-badge-top {
   position: absolute;
-  top: 15px;
-  right: 15px;
-  font-size: 0.75rem;
-  padding: 0.4rem 0.8rem;
+  top: 12px;
+  right: 12px;
+  font-size: 0.7rem;
+  padding: 0.3rem 0.75rem;
   border-radius: 20px;
-  font-weight: 600;
-  z-index: 10;
-  animation: pulse 2s infinite;
-  color:#fff;
-}
-
-@keyframes pulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.8; transform: scale(1.05); }
-}
-
-/* Alumni Photo */
-.alumni-photo-wrapper {
-  width: 130px;
-  height: 130px;
-  margin: 0 auto 20px;
-  position: relative;
-}
-
-.alumni-photo {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: 50%;
-  border: 5px solid #dc3545;
-  transition: all 0.3s ease;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-}
-
-.alumni-card-uniform:hover .alumni-photo {
-  transform: scale(1.1);
-  border-color: #c82333;
-  box-shadow: 0 8px 20px rgba(220, 53, 69, 0.5);
-}
-
-/* Alumni Name */
-.alumni-name {
-  font-size: 1.4rem;
   font-weight: 700;
-  color: #dc3545;
-  margin-bottom: 20px;
-  min-height: 35px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  z-index: 10;
+  letter-spacing: 0.5px;
+  color: #fff;
 }
 
-/* Alumni Info */
-.alumni-info {
-  text-align: left;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-bottom: 15px;
-  overflow-y: auto;
-  max-height: 220px;
-}
-
-.alumni-info::-webkit-scrollbar {
-  width: 4px;
-}
-
-.alumni-info::-webkit-scrollbar-thumb {
-  background: #dc3545;
-  border-radius: 10px;
-}
-
-.info-item {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  font-size: 0.9rem;
-  color: #555;
-  transition: all 0.2s ease;
-  padding: 5px;
-  border-radius: 5px;
-}
-
-.info-item:hover {
-  background-color: #fff5f5;
-  transform: translateX(5px);
-}
-
-.info-item i {
-  color: #dc3545;
-  font-size: 1.1rem;
-  flex-shrink: 0;
-  margin-top: 2px;
-}
-
-.info-item span {
-  flex: 1;
-  line-height: 1.4;
-  word-break: break-word;
-}
-
-/* LinkedIn Button */
-.linkedin-btn {
-  display: inline-block;
-  width: 100%;
-  padding: 10px 15px;
-  background: linear-gradient(135deg, #0077b5 0%, #005885 100%);
-  color: white;
-  text-decoration: none;
-  border-radius: 25px;
-  font-weight: 600;
-  font-size: 0.9rem;
-  transition: all 0.3s ease;
-  margin-top: auto;
-  text-align: center;
-}
-
-.linkedin-btn:hover {
-  background: linear-gradient(135deg, #005885 0%, #004060 100%);
-  transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(0, 119, 181, 0.3);
-  color: white;
-}
-
-/* Slick Carousel Custom Styles */
+/* Slick Carousel */
 .slick-slider {
   position: relative;
-  margin: 0 -15px;
 }
 
 .slick-list {
   overflow: hidden;
-  padding: 20px 0 40px 0 !important;
+  padding: 16px 0 36px 0 !important;
 }
 
 .slick-track {
@@ -242,32 +105,41 @@
 
 .slick-prev,
 .slick-next {
-  width: 50px;
-  height: 50px;
-  background: #dc3545 !important;
-  border-radius: 50%;
+  width: 40px !important;
+  height: 40px !important;
+  background: #fff !important;
+  border: 1.5px solid #e5e7eb !important;
+  border-radius: 50% !important;
   z-index: 100;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08) !important;
 }
 
 .slick-prev {
-  left: -10px;
+  left: -48px !important;
 }
 
 .slick-next {
-  right: -10px;
+  right: -48px !important;
 }
 
 .slick-prev:hover,
 .slick-next:hover {
-  background: #c82333 !important;
-  transform: scale(1.1);
+  background: #197fe6 !important;
+  border-color: #197fe6 !important;
+  box-shadow: 0 4px 14px rgba(25,127,230,0.35) !important;
 }
 
 .slick-prev:before,
 .slick-next:before {
-  font-size: 28px;
-  opacity: 1;
+  font-size: 16px !important;
+  opacity: 1 !important;
+  color: #374151;
+}
+
+.slick-prev:hover:before,
+.slick-next:hover:before {
+  color: #fff;
 }
 
 .slick-dots {
@@ -275,34 +147,29 @@
 }
 
 .slick-dots li {
-  margin: 0 5px;
+  margin: 0 3px !important;
 }
 
 .slick-dots li button:before {
-  font-size: 14px;
-  color: #dc3545;
-  opacity: 0.5;
+  font-size: 10px !important;
+  color: #197fe6 !important;
+  opacity: 0.3 !important;
 }
 
 .slick-dots li.slick-active button:before {
-  color: #dc3545;
-  opacity: 1;
+  color: #197fe6 !important;
+  opacity: 1 !important;
 }
 
 /* Stats Section */
 .stat-card {
-  transition: all 0.3s ease;
+  transition: all 0.25s ease;
+  cursor: default;
 }
 
 .stat-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15) !important;
-}
-
-/* Login Page */
-.login-page {
- 
-  min-height: 100vh;
+  transform: translateY(-4px);
+  box-shadow: 0 12px 28px rgba(25,127,230,0.12) !important;
 }
 
 /* Image Upload */
@@ -310,13 +177,13 @@
   padding: 30px;
   background: #f8f9fa;
   border-radius: 15px;
-  border: 2px dashed #dc3545;
+  border: 2px dashed #197fe6;
   transition: all 0.3s ease;
 }
 
 .image-upload-container:hover {
-  border-color: #c82333;
-  background: #fff5f5;
+  border-color: #1368c4;
+  background: #e8f2fd;
 }
 
 .img-preview {
@@ -324,190 +191,30 @@
   height: 200px;
   object-fit: cover;
   border-radius: 50%;
-  border: 6px solid #dc3545;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  border: 6px solid #197fe6;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
 }
 
 /* Admin Table */
 .table-hover tbody tr:hover {
-  background-color: #fff5f5;
+  background-color: #e8f2fd;
   cursor: pointer;
 }
 
 /* Animations */
 @keyframes fadeInDown {
-  from {
-    opacity: 0;
-    transform: translateY(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .animate-fade-in {
-  animation: fadeInDown 1s ease;
+  animation: fadeInDown 0.8s ease;
 }
-
-/* Responsive Styles */
-@media (max-width: 1200px) {
-  .alumni-carousel-container {
-    padding: 0 30px;
-  }
-  
-  .alumni-card-uniform {
-    height: 500px;
-  }
-}
-
-@media (max-width: 992px) {
-  .alumni-carousel-container {
-    padding: 0 20px;
-  }
-  
-  .alumni-card-uniform {
-    height: 480px;
-  }
-
-  .slick-prev {
-    left: 0;
-  }
-
-  .slick-next {
-    right: 0;
-  }
-}
-
-@media (max-width: 768px) {
-  .alumni-carousel-container {
-    padding: 0 15px;
-  }
-
-  .alumni-card-uniform {
-    height: 460px;
-  }
-
-  .alumni-photo-wrapper {
-    width: 110px;
-    height: 110px;
-  }
-
-  .alumni-name {
-    font-size: 1.2rem;
-  }
-
-  .info-item {
-    font-size: 0.85rem;
-  }
-
-  .slick-prev,
-  .slick-next {
-    width: 40px;
-    height: 40px;
-  }
-
-  .slick-prev:before,
-  .slick-next:before {
-    font-size: 22px;
-  }
-
-  .display-3 {
-    font-size: 2.5rem;
-  }
-}
-
-@media (max-width: 576px) {
-  .alumni-carousel-container {
-    padding: 0 10px;
-  }
-
-  .alumni-card-uniform {
-    height: 500px;
-    margin: 0 10px;
-  }
-
-  .carousel-item-wrapper {
-    padding: 0 5px;
-  }
-
-  .card-body-uniform {
-    padding: 20px;
-  }
-
-  .alumni-photo-wrapper {
-    width: 100px;
-    height: 100px;
-  }
-
-  .alumni-name {
-    font-size: 1.1rem;
-    margin-bottom: 15px;
-  }
-
-  .alumni-info {
-    gap: 10px;
-    max-height: 240px;
-  }
-
-  .info-item {
-    font-size: 0.8rem;
-  }
-
-  .linkedin-btn {
-    font-size: 0.85rem;
-    padding: 8px 12px;
-  }
-
-  .slick-prev,
-  .slick-next {
-    width: 35px;
-    height: 35px;
-  }
-
-  .slick-prev:before,
-  .slick-next:before {
-    font-size: 18px;
-  }
-
-  .slick-prev {
-    left: -5px;
-  }
-
-  .slick-next {
-    right: -5px;
-  }
-
-  .stat-card {
-    margin-bottom: 1rem;
-  }
-
-  .btn-lg {
-    padding: 0.5rem 1rem;
-    font-size: 1rem;
-  }
-}
-
-/* Extra Small Devices */
-@media (max-width: 400px) {
-  .alumni-card-uniform {
-    height: 480px;
-  }
-
-  .alumni-info {
-    max-height: 220px;
-  }
-
-  .display-3 {
-    font-size: 2rem;
-  }
-
-  .fs-4 {
-    font-size: 1rem !important;
-  }
-}
-
-/* Add to existing App.css */
 
 /* Action Cards */
 .action-card {
@@ -538,29 +245,15 @@
   border-bottom: 2px solid #f0f0f0;
 }
 
-/* Super Admin Dashboard */
-.superadmin-dashboard .stat-card {
-  transition: all 0.3s ease;
-}
-
-.superadmin-dashboard .stat-card:hover {
-  transform: translateY(-10px);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3) !important;
-}
-
-/* Modal Overlay */
+/* Modal */
 .modal.show {
   display: block;
   animation: fadeIn 0.3s ease;
 }
 
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 .modal-dialog {
@@ -568,17 +261,11 @@
 }
 
 @keyframes slideDown {
-  from {
-    transform: translateY(-50px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
+  from { transform: translateY(-50px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
 }
 
-/* Dropdown User Menu */
+/* Dropdown */
 .dropdown-menu {
   min-width: 250px;
 }
@@ -592,22 +279,28 @@
   padding: 0.25rem 0.5rem;
 }
 
-/* Responsive Tables */
+/* Responsive */
+@media (max-width: 992px) {
+  .alumni-carousel-container {
+    padding: 0 30px;
+  }
+  .slick-prev { left: -30px !important; }
+  .slick-next { right: -30px !important; }
+}
+
 @media (max-width: 768px) {
-  .table-responsive {
-pulse animation {
-    opacity: 0.879238;
-    transform: scale(1.03019);
+  .alumni-carousel-container {
+    padding: 0 15px;
+  }
+  .slick-prev { left: 5px !important; }
+  .slick-next { right: 5px !important; }
 }
 
-.status-badge-top {
-
-    font-size: 0.875rem;
+@media (max-width: 576px) {
+  .alumni-carousel-container {
+    padding: 0 10px;
   }
-  
-  .btn-group .btn {
-    padding: 0.2rem 0.4rem;
-    font-size: 0.75rem;
+  .carousel-item-wrapper {
+    padding: 0 6px;
   }
-}
 }

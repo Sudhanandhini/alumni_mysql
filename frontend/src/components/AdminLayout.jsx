@@ -32,9 +32,9 @@ export default function AdminLayout({ children, title }) {
   return (
     <div style={{ display: 'flex', minHeight: '100vh', background: '#f0f2f5', fontFamily: 'Inter, system-ui, sans-serif' }}>
 
-      {/* ── Sidebar ── */}
+      {/* â”€â”€ Sidebar â”€â”€ */}
       <aside style={{
-        width: open ? 230 : 64, flexShrink: 0, background: '#1a2744',
+        width: open ? 230 : 64, flexShrink: 0, background: '#0f1f3d',
         display: 'flex', flexDirection: 'column',
         transition: 'width 0.25s', overflow: 'hidden',
         position: 'sticky', top: 0, height: '100vh', zIndex: 200
@@ -94,7 +94,7 @@ export default function AdminLayout({ children, title }) {
         </div>
       </aside>
 
-      {/* ── Main ── */}
+      {/* â”€â”€ Main â”€â”€ */}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
         {/* Top bar */}
         <header className="bg-white border-b border-gray-100 flex items-center justify-between sticky top-0 z-40" style={{ height: 60, padding: '0 28px' }}>
@@ -109,7 +109,7 @@ export default function AdminLayout({ children, title }) {
               <div className="text-primary-700 font-bold text-sm">Admin</div>
               <div className="text-gray-400 text-xs">Administrator</div>
             </div>
-            <div className="w-9 h-9 rounded-full flex items-center justify-center text-white font-bold text-sm" style={{ background: '#1a2744' }}>A</div>
+            <div className="w-9 h-9 rounded-full flex items-center justify-center text-white font-bold text-sm" style={{ background: '#0f1f3d' }}>A</div>
           </div>
         </header>
 

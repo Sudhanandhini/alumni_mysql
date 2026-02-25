@@ -847,7 +847,84 @@ apiRouter.put('/admin/alumni/:id/approve', async (req, res) => {
   try {
     if (!requireDb(res)) return;
     const { id } = req.params;
+
+    // Fetch alumni details before approving
+    const [[alumni]] = await db.query(
+      'SELECT name, email FROM alumni WHERE id = ?', [id]
+    );
+
     await db.query("UPDATE alumni SET approval_status = 'approved' WHERE id = ?", [id]);
+
+    // Send welcome email if SMTP is configured and alumni has email
+    if (alumni && alumni.email && process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
+      try {
+        const transporter = nodemailer.createTransport({
+          host: process.env.SMTP_HOST,
+          port: parseInt(process.env.SMTP_PORT) || 587,
+          secure: process.env.SMTP_SECURE === 'true',
+          auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS },
+          tls: { rejectUnauthorized: false }
+        });
+
+        const loginUrl = process.env.CLIENT_URL || 'http://localhost:5173';
+
+        await transporter.sendMail({
+          from: `"Alumni Portal" <${process.env.EMAIL_FROM || process.env.SMTP_USER}>`,
+          to: alumni.email,
+          subject: '🎉 Your Registration is Approved — Welcome to Alumni Portal!',
+          html: `
+            <div style="font-family:Inter,Arial,sans-serif;max-width:600px;margin:0 auto;background:#f4f6fa;padding:32px 16px;">
+              <div style="background:#1a2744;border-radius:16px 16px 0 0;padding:32px 40px;text-align:center;">
+                <div style="display:inline-flex;align-items:center;justify-content:center;width:60px;height:60px;background:rgba(255,255,255,0.12);border-radius:16px;margin-bottom:16px;">
+                  <span style="font-size:28px;">🎓</span>
+                </div>
+                <h1 style="color:#fff;font-size:24px;font-weight:800;margin:0 0 6px;">Welcome to Alumni Portal!</h1>
+                <p style="color:rgba(255,255,255,0.65);font-size:14px;margin:0;">Your registration has been officially approved.</p>
+              </div>
+
+              <div style="background:#fff;border-radius:0 0 16px 16px;padding:36px 40px;">
+                <p style="font-size:16px;color:#1a2744;font-weight:700;margin:0 0 8px;">Dear ${alumni.name},</p>
+                <p style="font-size:14px;color:#555;line-height:1.8;margin:0 0 24px;">
+                  We are delighted to inform you that your alumni registration has been reviewed and
+                  <strong style="color:#16a34a;">approved</strong> by the admin. You are now an official member of our Alumni Network!
+                </p>
+
+                <div style="background:#f0f4ff;border-left:4px solid #1a2744;border-radius:8px;padding:16px 20px;margin-bottom:28px;">
+                  <p style="margin:0;font-size:13px;color:#374151;font-weight:600;">What you can do now:</p>
+                  <ul style="margin:8px 0 0;padding-left:18px;font-size:13px;color:#555;line-height:2;">
+                    <li>Log in to your alumni dashboard</li>
+                    <li>Update and complete your profile</li>
+                    <li>Connect with fellow alumni</li>
+                    <li>Explore opportunities in the network</li>
+                  </ul>
+                </div>
+
+                <div style="text-align:center;margin-bottom:28px;">
+                  <a href="${loginUrl}/user/login" style="display:inline-block;background:#1a2744;color:#fff;text-decoration:none;padding:14px 36px;border-radius:10px;font-weight:700;font-size:15px;">
+                    Login to Your Account →
+                  </a>
+                </div>
+
+                <p style="font-size:13px;color:#9ca3af;text-align:center;margin:0;">
+                  If you have any questions, please contact the admin team.<br/>
+                  <strong style="color:#1a2744;">Alumni Portal Admin</strong>
+                </p>
+              </div>
+
+              <p style="text-align:center;font-size:12px;color:#aaa;margin-top:20px;">
+                &copy; ${new Date().getFullYear()} Alumni Portal. All rights reserved.
+              </p>
+            </div>
+          `
+        });
+
+        console.log(`✅ Approval email sent to ${alumni.email}`);
+      } catch (emailErr) {
+        // Log email error but don't fail the approval
+        console.error('⚠️ Could not send approval email:', emailErr.message);
+      }
+    }
+
     res.json({ message: 'Alumni approved successfully' });
   } catch (err) {
     console.error('Error approving alumni:', err);

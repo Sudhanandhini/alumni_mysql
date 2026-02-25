@@ -4,7 +4,7 @@ import axios from 'axios';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
-// Single unified login — tries alumni table first, then users table
+// Single unified login â€” tries alumni table first, then users table
 function UserLogin() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({ username: '', password: '' });
@@ -22,7 +22,7 @@ function UserLogin() {
     setLoading(true);
     setError('');
 
-    // 1️⃣  Try Alumni login first
+    // 1ï¸âƒ£  Try Alumni login first
     try {
       const res = await axios.post(`${API_URL}/alumni/login`, formData);
       if (res.data.token) {
@@ -36,16 +36,16 @@ function UserLogin() {
       }
     } catch (alumniErr) {
       const alumniStatus = alumniErr.response?.status;
-      // 401 = wrong password for an existing alumni account → show error, don't try user table
+      // 401 = wrong password for an existing alumni account â†’ show error, don't try user table
       if (alumniStatus === 401) {
         setError('Invalid username or password.');
         setLoading(false);
         return;
       }
-      // Any other error (404, 500, network) → fall through and try user table
+      // Any other error (404, 500, network) â†’ fall through and try user table
     }
 
-    // 2️⃣  Fall back to regular User login
+    // 2ï¸âƒ£  Fall back to regular User login
     try {
       const res = await axios.post(`${API_URL}/user/login`, formData);
       if (res.data.token) {
@@ -74,7 +74,7 @@ function UserLogin() {
   return (
     <div style={{ display: 'flex', minHeight: '100vh', background: '#f4f6fa' }}>
 
-      {/* ── Left Panel ── */}
+      {/* â”€â”€ Left Panel â”€â”€ */}
       <div
         className="d-none d-lg-flex"
         style={{
@@ -90,7 +90,7 @@ function UserLogin() {
         <div style={{ position: 'relative' }}>
           {/* Logo */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 52 }}>
-            <div style={{ width: 48, height: 48, borderRadius: 12, background: 'linear-gradient(135deg, #dc3545, #8b0000)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+            <div style={{ width: 48, height: 48, borderRadius: 12, background: 'linear-gradient(135deg, #197fe6, #1368c4)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
               <i className="bi bi-mortarboard-fill text-white" style={{ fontSize: 22 }}></i>
             </div>
             <div>
@@ -125,13 +125,13 @@ function UserLogin() {
         </div>
       </div>
 
-      {/* ── Right Panel ── */}
+      {/* â”€â”€ Right Panel â”€â”€ */}
       <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px 24px', minWidth: 0 }}>
         <div style={{ width: '100%', maxWidth: 420 }}>
 
           {/* Mobile logo */}
           <div className="d-flex d-lg-none align-items-center gap-3 mb-5">
-            <div style={{ width: 40, height: 40, borderRadius: 10, background: 'linear-gradient(135deg, #dc3545, #8b0000)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ width: 40, height: 40, borderRadius: 10, background: 'linear-gradient(135deg, #197fe6, #1368c4)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <i className="bi bi-mortarboard-fill text-white" style={{ fontSize: 18 }}></i>
             </div>
             <div style={{ fontWeight: 800, fontSize: 16, color: '#1a2744' }}>Alumni Connect</div>
@@ -145,9 +145,9 @@ function UserLogin() {
 
           {/* Error */}
           {error && (
-            <div style={{ background: '#fff5f5', border: '1px solid #fecaca', borderRadius: 10, padding: '12px 16px', marginBottom: 20, display: 'flex', alignItems: 'center', gap: 10 }}>
-              <i className="bi bi-exclamation-circle-fill" style={{ color: '#dc3545', fontSize: 16, flexShrink: 0 }}></i>
-              <span style={{ fontSize: 14, color: '#b91c1c' }}>{error}</span>
+            <div style={{ background: '#e8f2fd', border: '1px solid #bfdbfe', borderRadius: 10, padding: '12px 16px', marginBottom: 20, display: 'flex', alignItems: 'center', gap: 10 }}>
+              <i className="bi bi-exclamation-circle-fill" style={{ color: '#197fe6', fontSize: 16, flexShrink: 0 }}></i>
+              <span style={{ fontSize: 14, color: '#197fe6' }}>{error}</span>
             </div>
           )}
 
@@ -161,7 +161,7 @@ function UserLogin() {
                   type="text" name="username" value={formData.username} onChange={handleChange}
                   placeholder="Enter your username" required autoFocus autoComplete="username"
                   style={{ width: '100%', padding: '13px 14px 13px 40px', border: '1.5px solid #e5e7eb', borderRadius: 10, fontSize: 14, outline: 'none', boxSizing: 'border-box', background: '#fafafa' }}
-                  onFocus={e => e.target.style.borderColor = '#1a2744'}
+                  onFocus={e => e.target.style.borderColor = '#197fe6'}
                   onBlur={e => e.target.style.borderColor = '#e5e7eb'}
                 />
               </div>
@@ -176,7 +176,7 @@ function UserLogin() {
                   type={showPass ? 'text' : 'password'} name="password" value={formData.password} onChange={handleChange}
                   placeholder="Enter your password" required autoComplete="current-password"
                   style={{ width: '100%', padding: '13px 44px 13px 40px', border: '1.5px solid #e5e7eb', borderRadius: 10, fontSize: 14, outline: 'none', boxSizing: 'border-box', background: '#fafafa' }}
-                  onFocus={e => e.target.style.borderColor = '#1a2744'}
+                  onFocus={e => e.target.style.borderColor = '#197fe6'}
                   onBlur={e => e.target.style.borderColor = '#e5e7eb'}
                 />
                 <button type="button" onClick={() => setShowPass(p => !p)}
@@ -189,7 +189,7 @@ function UserLogin() {
             {/* Forgot password */}
             <div style={{ textAlign: 'right', marginBottom: 28 }}>
               <button type="button" onClick={() => navigate('/forgot-password')}
-                style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, color: '#1a2744', fontWeight: 600, padding: 0 }}>
+                style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, color: '#197fe6', fontWeight: 600, padding: 0 }}>
                 Forgot password?
               </button>
             </div>
@@ -198,11 +198,11 @@ function UserLogin() {
             <button type="submit" disabled={loading}
               style={{
                 width: '100%', padding: '14px',
-                background: loading ? '#9ca3af' : 'linear-gradient(135deg, #0d1b3a, #1a2744)',
+                background: loading ? '#9ca3af' : 'linear-gradient(135deg, #197fe6, #1368c4)',
                 color: '#fff', border: 'none', borderRadius: 10, fontWeight: 700, fontSize: 15,
                 cursor: loading ? 'not-allowed' : 'pointer',
                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-                boxShadow: '0 4px 14px rgba(26,39,68,0.3)', marginBottom: 24
+                boxShadow: '0 4px 14px rgba(25,127,230,0.3)', marginBottom: 24
               }}>
               {loading
                 ? <><span className="spinner-border spinner-border-sm"></span> Signing in...</>
@@ -214,7 +214,7 @@ function UserLogin() {
             <p style={{ textAlign: 'center', fontSize: 13, color: '#6b7280', margin: 0 }}>
               New alumni?{' '}
               <button type="button" onClick={() => navigate('/register')}
-                style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#dc3545', fontWeight: 700, padding: 0, fontSize: 13 }}>
+                style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#197fe6', fontWeight: 700, padding: 0, fontSize: 13 }}>
                 Register here
               </button>
             </p>

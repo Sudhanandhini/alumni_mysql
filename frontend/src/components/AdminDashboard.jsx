@@ -70,7 +70,7 @@ function AdminDashboard() {
   return (
     <div style={{ display: 'flex', minHeight: '100vh', background: '#f0f2f5', fontFamily: 'Inter, sans-serif' }}>
 
-      {/* ── Left Sidebar ── */}
+      {/* â”€â”€ Left Sidebar â”€â”€ */}
       <aside style={{
         width: sidebarOpen ? 230 : 64, flexShrink: 0,
         background: '#1a2744', display: 'flex', flexDirection: 'column',
@@ -79,7 +79,7 @@ function AdminDashboard() {
       }}>
         {/* Logo */}
         <div style={{ padding: '22px 16px 20px', display: 'flex', alignItems: 'center', gap: 10, borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
-          <div style={{ width: 36, height: 36, flexShrink: 0, borderRadius: 10, background: 'linear-gradient(135deg,#dc3545,#8b0000)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ width: 36, height: 36, flexShrink: 0, borderRadius: 10, background: 'linear-gradient(135deg,#197fe6,#1368c4)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <i className="bi bi-mortarboard-fill" style={{ color: '#fff', fontSize: 17 }}></i>
           </div>
           {sidebarOpen && (
@@ -99,7 +99,7 @@ function AdminDashboard() {
                 width: '100%', display: 'flex', alignItems: 'center', gap: 12,
                 padding: '11px 12px', borderRadius: 10, border: 'none', cursor: 'pointer',
                 marginBottom: 4,
-                background: active ? 'rgba(220,53,69,0.18)' : 'transparent',
+                background: active ? 'rgba(25,127,230,0.18)' : 'transparent',
                 color: active ? '#ff6b7a' : 'rgba(255,255,255,0.65)',
                 fontWeight: active ? 700 : 500, fontSize: 14,
                 transition: 'all 0.15s', whiteSpace: 'nowrap', overflow: 'hidden',
@@ -109,14 +109,14 @@ function AdminDashboard() {
                 {sidebarOpen && n.label}
                 {n.badge && pendingCount > 0 && sidebarOpen && (
                   <span style={{
-                    marginLeft: 'auto', background: '#dc3545', color: '#fff',
+                    marginLeft: 'auto', background: '#197fe6', color: '#fff',
                     borderRadius: 20, padding: '1px 8px', fontSize: 11, fontWeight: 700
                   }}>{pendingCount}</span>
                 )}
                 {n.badge && pendingCount > 0 && !sidebarOpen && (
                   <span style={{
                     position: 'absolute', top: 6, right: 6, width: 8, height: 8,
-                    background: '#dc3545', borderRadius: '50%'
+                    background: '#197fe6', borderRadius: '50%'
                   }}></span>
                 )}
               </button>
@@ -138,7 +138,7 @@ function AdminDashboard() {
         </div>
       </aside>
 
-      {/* ── Main Area ── */}
+      {/* â”€â”€ Main Area â”€â”€ */}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
 
         {/* Top bar */}
@@ -164,7 +164,7 @@ function AdminDashboard() {
             </div>
             <div style={{
               width: 38, height: 38, borderRadius: '50%',
-              background: 'linear-gradient(135deg,#dc3545,#8b0000)',
+              background: 'linear-gradient(135deg,#197fe6,#1368c4)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               color: '#fff', fontWeight: 800, fontSize: 15
             }}>A</div>
@@ -176,7 +176,7 @@ function AdminDashboard() {
 
           {/* Welcome banner */}
           <div style={{
-            background: 'linear-gradient(135deg,#1a2744 0%,#2d4a8a 100%)',
+            background: 'linear-gradient(135deg,#1368c4 0%,#197fe6 100%)',
             borderRadius: 16, padding: '24px 32px', marginBottom: 28,
             display: 'flex', alignItems: 'center', justifyContent: 'space-between',
             flexWrap: 'wrap', gap: 16
@@ -191,7 +191,7 @@ function AdminDashboard() {
             </div>
             <div style={{ display: 'flex', gap: 10 }}>
               <button onClick={() => navigate('/admin/add')} style={{
-                background: '#dc3545', color: '#fff', border: 'none',
+                background: '#197fe6', color: '#fff', border: 'none',
                 borderRadius: 10, padding: '10px 20px', fontWeight: 700, fontSize: 13, cursor: 'pointer'
               }}>
                 <i className="bi bi-person-plus-fill me-2"></i>Add Alumni
@@ -205,7 +205,7 @@ function AdminDashboard() {
                 <i className="bi bi-hourglass-split"></i>
                 Approvals
                 {pendingCount > 0 && (
-                  <span style={{ background: '#dc3545', color: '#fff', borderRadius: 20, padding: '1px 8px', fontSize: 11, fontWeight: 700 }}>
+                  <span style={{ background: '#197fe6', color: '#fff', borderRadius: 20, padding: '1px 8px', fontSize: 11, fontWeight: 700 }}>
                     {pendingCount}
                   </span>
                 )}
@@ -231,7 +231,7 @@ function AdminDashboard() {
           {/* Quick actions */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(200px,1fr))', gap: 16, marginBottom: 28 }}>
             {[
-              { label: 'Add New Alumni',    desc: 'Create a new alumni profile', icon: 'bi-person-plus-fill', color: '#dc3545', path: '/admin/add' },
+              { label: 'Add New Alumni',    desc: 'Create a new alumni profile', icon: 'bi-person-plus-fill', color: '#197fe6', path: '/admin/add' },
               { label: 'Manage Alumni',     desc: 'View, edit and delete records', icon: 'bi-people-fill',      color: '#2563eb', path: '/admin/manage' },
               { label: 'Pending Approvals', desc: 'Review self-registrations',    icon: 'bi-hourglass-split',  color: '#d97706', path: '/admin/pending', badge: pendingCount },
             ].map((c, i) => (
@@ -245,7 +245,7 @@ function AdminDashboard() {
                 onMouseLeave={e => { e.currentTarget.style.borderColor = 'transparent'; e.currentTarget.style.boxShadow = '0 1px 4px rgba(0,0,0,0.07)'; }}
               >
                 {c.badge > 0 && (
-                  <span style={{ position: 'absolute', top: 12, right: 14, background: '#dc3545', color: '#fff', borderRadius: 20, padding: '2px 9px', fontSize: 11, fontWeight: 700 }}>
+                  <span style={{ position: 'absolute', top: 12, right: 14, background: '#197fe6', color: '#fff', borderRadius: 20, padding: '2px 9px', fontSize: 11, fontWeight: 700 }}>
                     {c.badge} new
                   </span>
                 )}
@@ -253,7 +253,7 @@ function AdminDashboard() {
                   <i className={`bi ${c.icon}`} style={{ color: c.color, fontSize: 22 }}></i>
                 </div>
                 <div>
-                  <div style={{ fontWeight: 700, fontSize: 15, color: '#1a2744', marginBottom: 3 }}>{c.label}</div>
+                  <div style={{ fontWeight: 700, fontSize: 15, color: '#111827', marginBottom: 3 }}>{c.label}</div>
                   <div style={{ fontSize: 13, color: '#9ca3af' }}>{c.desc}</div>
                 </div>
               </div>
@@ -263,12 +263,12 @@ function AdminDashboard() {
           {/* Recent Alumni table */}
           <div style={{ background: '#fff', borderRadius: 14, boxShadow: '0 1px 4px rgba(0,0,0,0.07)', overflow: 'hidden' }}>
             <div style={{ padding: '18px 24px', borderBottom: '1px solid #f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <div style={{ fontWeight: 700, fontSize: 15, color: '#1a2744', display: 'flex', alignItems: 'center', gap: 8 }}>
-                <i className="bi bi-clock-history" style={{ color: '#dc3545' }}></i> Recent Alumni
+              <div style={{ fontWeight: 700, fontSize: 15, color: '#111827', display: 'flex', alignItems: 'center', gap: 8 }}>
+                <i className="bi bi-clock-history" style={{ color: '#197fe6' }}></i> Recent Alumni
               </div>
               {alumni.length > 5 && (
                 <button onClick={() => navigate('/admin/manage')} style={{
-                  background: 'none', border: '1.5px solid #1a2744', color: '#1a2744',
+                  background: 'none', border: '1.5px solid #197fe6', color: '#197fe6',
                   borderRadius: 8, padding: '6px 16px', fontWeight: 600, fontSize: 13, cursor: 'pointer'
                 }}>View All</button>
               )}
@@ -276,7 +276,7 @@ function AdminDashboard() {
 
             {loading ? (
               <div style={{ textAlign: 'center', padding: 48 }}>
-                <div className="spinner-border text-danger" style={{ width: '2rem', height: '2rem' }}></div>
+                <div className="spinner-border text-primary" style={{ width: '2rem', height: '2rem' }}></div>
               </div>
             ) : alumni.length === 0 ? (
               <div style={{ textAlign: 'center', padding: 48, color: '#9ca3af' }}>
@@ -306,17 +306,17 @@ function AdminDashboard() {
                             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                               {a.photo
                                 ? <img src={`${API_BASE}${a.photo}`} alt={a.name} style={{ width: 38, height: 38, borderRadius: '50%', objectFit: 'cover', border: '2px solid #e5e7eb' }} />
-                                : <div style={{ width: 38, height: 38, borderRadius: '50%', background: 'linear-gradient(135deg,#dc3545,#8b0000)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700, fontSize: 13, flexShrink: 0 }}>
+                                : <div style={{ width: 38, height: 38, borderRadius: '50%', background: 'linear-gradient(135deg,#197fe6,#1368c4)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700, fontSize: 13, flexShrink: 0 }}>
                                     {a.name?.split(' ').map(n => n[0]).join('').slice(0,2).toUpperCase()}
                                   </div>
                               }
                               <div>
-                                <div style={{ fontWeight: 600, color: '#1a2744' }}>{a.name}</div>
+                                <div style={{ fontWeight: 600, color: '#111827' }}>{a.name}</div>
                                 <div style={{ fontSize: 12, color: '#9ca3af' }}>{a.email}</div>
                               </div>
                             </div>
                           </td>
-                          <td style={{ padding: '14px 18px', color: '#374151' }}>{a.designation || '—'}</td>
+                          <td style={{ padding: '14px 18px', color: '#374151' }}>{a.designation || 'â€”'}</td>
                           <td style={{ padding: '14px 18px' }}>
                             {a.batch && <span style={{ background: '#eff6ff', color: '#2563eb', borderRadius: 20, padding: '3px 10px', fontSize: 12, fontWeight: 600 }}>{a.batch}</span>}
                           </td>
