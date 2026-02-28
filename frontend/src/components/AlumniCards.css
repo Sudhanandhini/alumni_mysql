@@ -1,4 +1,4 @@
-/* Alumni Card Styles – primary #197fe6 */
+/* Alumni Card Styles – primary var(--color-primary) */
 
 .alumni-card-modern {
   cursor: default;
@@ -46,8 +46,8 @@
 }
 
 .slick-prev:hover, .slick-next:hover {
-  background: #197fe6 !important;
-  border-color: #197fe6 !important;
+  background: var(--color-primary) !important;
+  border-color: var(--color-primary) !important;
   box-shadow: 0 4px 14px rgba(25,127,230,0.35) !important;
 }
 
@@ -77,13 +77,13 @@
 /* Carousel Dots */
 .slick-dots li button:before {
   font-size: 10px !important;
-  color: #197fe6 !important;
+  color: var(--color-primary) !important;
   opacity: 0.3 !important;
 }
 
 .slick-dots li.slick-active button:before {
   opacity: 1 !important;
-  color: #197fe6 !important;
+  color: var(--color-primary) !important;
 }
 
 .slick-dots li {
@@ -145,7 +145,7 @@
 
 /* Focus States */
 .alumni-card-modern:focus {
-  outline: 2px solid #197fe6;
+  outline: 2px solid var(--color-primary);
   outline-offset: 2px;
 }
 

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import AdminLayout from '../../components/AdminLayout';
@@ -106,10 +106,10 @@ function ManageAlumni() {
       {/* Page header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24, flexWrap: 'wrap', gap: 14 }}>
         <div>
-          <h2 style={{ fontWeight: 800, fontSize: 22, color: '#1a2744', margin: 0, marginBottom: 4 }}>Manage Alumni</h2>
+          <h2 style={{ fontWeight: 800, fontSize: 22, color: 'var(--color-secondary)', margin: 0, marginBottom: 4 }}>Manage Alumni</h2>
           <p style={{ color: '#9ca3af', fontSize: 14, margin: 0 }}>View, filter, edit and manage alumni profiles</p>
         </div>
-        <button onClick={() => navigate('/admin/add')} style={{ background: '#197fe6', color: '#fff', border: 'none', borderRadius: 10, padding: '11px 22px', fontWeight: 700, fontSize: 14, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8 }}>
+        <button onClick={() => navigate('/admin/add')} style={{ background: 'var(--color-primary)', color: '#fff', border: 'none', borderRadius: 10, padding: '11px 22px', fontWeight: 700, fontSize: 14, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8 }}>
           <i className="bi bi-plus-circle-fill"></i>Add New Alumni
         </button>
       </div>
@@ -123,7 +123,7 @@ function ManageAlumni() {
           <button key={t.key} onClick={() => switchTab(t.key)} style={{
             padding: '9px 22px', borderRadius: 10, border: 'none', fontWeight: 600, fontSize: 13, cursor: 'pointer',
             background: activeTab === t.key ? '#fff' : 'transparent',
-            color: activeTab === t.key ? '#1a2744' : '#888',
+            color: activeTab === t.key ? 'var(--color-secondary)' : '#888',
             boxShadow: activeTab === t.key ? '0 1px 6px rgba(0,0,0,0.1)' : 'none',
             display: 'flex', alignItems: 'center', gap: 7, transition: 'all 0.2s'
           }}>
@@ -143,8 +143,8 @@ function ManageAlumni() {
       <div style={{ background: '#fff', borderRadius: 14, boxShadow: '0 1px 4px rgba(0,0,0,0.07)', marginBottom: 20, overflow: 'hidden' }}>
         <div style={{ padding: '14px 20px', borderBottom: showFilters ? '1px solid #f3f4f6' : 'none', display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }}
           onClick={() => setShowFilters(p => !p)}>
-          <div style={{ fontWeight: 700, fontSize: 14, color: '#1a2744', display: 'flex', alignItems: 'center', gap: 8 }}>
-            <i className="bi bi-funnel-fill" style={{ color: '#197fe6' }}></i>
+          <div style={{ fontWeight: 700, fontSize: 14, color: 'var(--color-secondary)', display: 'flex', alignItems: 'center', gap: 8 }}>
+            <i className="bi bi-funnel-fill" style={{ color: 'var(--color-primary)' }}></i>
             Filters
             <span style={{ background: '#f3f4f6', color: '#6b7280', borderRadius: 20, padding: '1px 10px', fontSize: 12, fontWeight: 600 }}>
               {filtered.length} / {alumni.length}
@@ -164,7 +164,7 @@ function ManageAlumni() {
                   <input type="text" name="searchTerm" value={filters.searchTerm} onChange={handleFilterChange}
                     placeholder="Name, email, designation, company…"
                     style={{ ...sel, paddingLeft: 34 }}
-                    onFocus={e => e.target.style.borderColor = '#1a2744'}
+                    onFocus={e => e.target.style.borderColor = 'var(--color-secondary)'}
                     onBlur={e => e.target.style.borderColor = '#e5e7eb'}
                   />
                 </div>
@@ -212,8 +212,8 @@ function ManageAlumni() {
       {/* Table card */}
       <div style={{ background: '#fff', borderRadius: 14, boxShadow: '0 1px 4px rgba(0,0,0,0.07)', overflow: 'hidden' }}>
         <div style={{ padding: '16px 22px', borderBottom: '1px solid #f3f4f6', display: 'flex', alignItems: 'center', gap: 10 }}>
-          <i className={`bi ${activeTab === 'deleted' ? 'bi-trash3-fill' : 'bi-list-ul'}`} style={{ color: activeTab === 'deleted' ? '#6b7280' : '#197fe6' }}></i>
-          <span style={{ fontWeight: 700, fontSize: 15, color: '#1a2744' }}>
+          <i className={`bi ${activeTab === 'deleted' ? 'bi-trash3-fill' : 'bi-list-ul'}`} style={{ color: activeTab === 'deleted' ? '#6b7280' : 'var(--color-primary)' }}></i>
+          <span style={{ fontWeight: 700, fontSize: 15, color: 'var(--color-secondary)' }}>
             {activeTab === 'deleted' ? 'Deleted Alumni' : 'Alumni List'}
           </span>
           <span style={{ background: '#f3f4f6', color: '#6b7280', borderRadius: 20, padding: '2px 10px', fontSize: 12, fontWeight: 600 }}>{filtered.length}</span>
@@ -256,12 +256,12 @@ function ManageAlumni() {
                         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                           {a.photo
                             ? <img src={`${API_BASE}${a.photo}`} alt={a.name} style={{ width: 40, height: 40, borderRadius: '50%', objectFit: 'cover', border: '2px solid #e5e7eb', filter: isDeleted ? 'grayscale(70%)' : 'none', flexShrink: 0 }} />
-                            : <div style={{ width: 40, height: 40, borderRadius: '50%', background: isDeleted ? '#9ca3af' : 'linear-gradient(135deg,#197fe6,#1368c4)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700, fontSize: 13, flexShrink: 0 }}>
+                            : <div style={{ width: 40, height: 40, borderRadius: '50%', background: isDeleted ? '#9ca3af' : 'linear-gradient(135deg,var(--color-primary),var(--color-primary-dark))', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700, fontSize: 13, flexShrink: 0 }}>
                                 {a.name?.split(' ').map(n => n[0]).join('').slice(0,2).toUpperCase()}
                               </div>
                           }
                           <div>
-                            <div style={{ fontWeight: 600, color: isDeleted ? '#9ca3af' : '#1a2744', textDecoration: isDeleted ? 'line-through' : 'none' }}>{a.name}</div>
+                            <div style={{ fontWeight: 600, color: isDeleted ? '#9ca3af' : 'var(--color-secondary)', textDecoration: isDeleted ? 'line-through' : 'none' }}>{a.name}</div>
                             <div style={{ fontSize: 12, color: '#9ca3af' }}>{a.email}</div>
                           </div>
                         </div>

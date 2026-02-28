@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
@@ -79,7 +79,7 @@ function UserLogin() {
         className="d-none d-lg-flex"
         style={{
           width: 420, flexShrink: 0, flexDirection: 'column',
-          background: 'linear-gradient(160deg, #197fe6 0%, #1368c4 55%, #0d52a0 100%)',
+          background: 'linear-gradient(160deg, var(--color-primary) 0%, var(--color-primary-dark) 55%, var(--color-primary-darker) 100%)',
           padding: '52px 44px', justifyContent: 'space-between',
           position: 'relative', overflow: 'hidden'
         }}
@@ -90,7 +90,7 @@ function UserLogin() {
         <div style={{ position: 'relative' }}>
           {/* Logo */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 52 }}>
-            <div style={{ width: 48, height: 48, borderRadius: 12, background: 'linear-gradient(135deg, #197fe6, #1368c4)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+            <div style={{ width: 48, height: 48, borderRadius: 12, background: 'linear-gradient(135deg, var(--color-primary), var(--color-primary-dark))', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
               <i className="bi bi-mortarboard-fill text-white" style={{ fontSize: 22 }}></i>
             </div>
             <div>
@@ -131,23 +131,23 @@ function UserLogin() {
 
           {/* Mobile logo */}
           <div className="d-flex d-lg-none align-items-center gap-3 mb-5">
-            <div style={{ width: 40, height: 40, borderRadius: 10, background: 'linear-gradient(135deg, #197fe6, #1368c4)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ width: 40, height: 40, borderRadius: 10, background: 'linear-gradient(135deg, var(--color-primary), var(--color-primary-dark))', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <i className="bi bi-mortarboard-fill text-white" style={{ fontSize: 18 }}></i>
             </div>
-            <div style={{ fontWeight: 800, fontSize: 16, color: '#1a2744' }}>Alumni Connect</div>
+            <div style={{ fontWeight: 800, fontSize: 16, color: 'var(--color-secondary)' }}>Alumni Connect</div>
           </div>
 
           {/* Heading */}
           <div style={{ marginBottom: 36 }}>
-            <h2 style={{ fontWeight: 800, fontSize: 26, color: '#1a2744', marginBottom: 6 }}>Sign in to your account</h2>
+            <h2 style={{ fontWeight: 800, fontSize: 26, color: 'var(--color-secondary)', marginBottom: 6 }}>Sign in to your account</h2>
             <p style={{ fontSize: 14, color: '#888', margin: 0 }}>Enter your registered username and password</p>
           </div>
 
           {/* Error */}
           {error && (
-            <div style={{ background: '#e8f2fd', border: '1px solid #bfdbfe', borderRadius: 10, padding: '12px 16px', marginBottom: 20, display: 'flex', alignItems: 'center', gap: 10 }}>
-              <i className="bi bi-exclamation-circle-fill" style={{ color: '#197fe6', fontSize: 16, flexShrink: 0 }}></i>
-              <span style={{ fontSize: 14, color: '#197fe6' }}>{error}</span>
+            <div style={{ background: 'var(--color-primary-light)', border: '1px solid #bfdbfe', borderRadius: 10, padding: '12px 16px', marginBottom: 20, display: 'flex', alignItems: 'center', gap: 10 }}>
+              <i className="bi bi-exclamation-circle-fill" style={{ color: 'var(--color-primary)', fontSize: 16, flexShrink: 0 }}></i>
+              <span style={{ fontSize: 14, color: 'var(--color-primary)' }}>{error}</span>
             </div>
           )}
 
@@ -161,7 +161,7 @@ function UserLogin() {
                   type="text" name="username" value={formData.username} onChange={handleChange}
                   placeholder="Enter your username" required autoFocus autoComplete="username"
                   style={{ width: '100%', padding: '13px 14px 13px 40px', border: '1.5px solid #e5e7eb', borderRadius: 10, fontSize: 14, outline: 'none', boxSizing: 'border-box', background: '#fafafa' }}
-                  onFocus={e => e.target.style.borderColor = '#197fe6'}
+                  onFocus={e => e.target.style.borderColor = 'var(--color-primary)'}
                   onBlur={e => e.target.style.borderColor = '#e5e7eb'}
                 />
               </div>
@@ -176,7 +176,7 @@ function UserLogin() {
                   type={showPass ? 'text' : 'password'} name="password" value={formData.password} onChange={handleChange}
                   placeholder="Enter your password" required autoComplete="current-password"
                   style={{ width: '100%', padding: '13px 44px 13px 40px', border: '1.5px solid #e5e7eb', borderRadius: 10, fontSize: 14, outline: 'none', boxSizing: 'border-box', background: '#fafafa' }}
-                  onFocus={e => e.target.style.borderColor = '#197fe6'}
+                  onFocus={e => e.target.style.borderColor = 'var(--color-primary)'}
                   onBlur={e => e.target.style.borderColor = '#e5e7eb'}
                 />
                 <button type="button" onClick={() => setShowPass(p => !p)}
@@ -189,7 +189,7 @@ function UserLogin() {
             {/* Forgot password */}
             <div style={{ textAlign: 'right', marginBottom: 28 }}>
               <button type="button" onClick={() => navigate('/forgot-password')}
-                style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, color: '#197fe6', fontWeight: 600, padding: 0 }}>
+                style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, color: 'var(--color-primary)', fontWeight: 600, padding: 0 }}>
                 Forgot password?
               </button>
             </div>
@@ -198,7 +198,7 @@ function UserLogin() {
             <button type="submit" disabled={loading}
               style={{
                 width: '100%', padding: '14px',
-                background: loading ? '#9ca3af' : 'linear-gradient(135deg, #197fe6, #1368c4)',
+                background: loading ? '#9ca3af' : 'linear-gradient(135deg, var(--color-primary), var(--color-primary-dark))',
                 color: '#fff', border: 'none', borderRadius: 10, fontWeight: 700, fontSize: 15,
                 cursor: loading ? 'not-allowed' : 'pointer',
                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
@@ -214,7 +214,7 @@ function UserLogin() {
             <p style={{ textAlign: 'center', fontSize: 13, color: '#6b7280', margin: 0 }}>
               New alumni?{' '}
               <button type="button" onClick={() => navigate('/register')}
-                style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#197fe6', fontWeight: 700, padding: 0, fontSize: 13 }}>
+                style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-primary)', fontWeight: 700, padding: 0, fontSize: 13 }}>
                 Register here
               </button>
             </p>

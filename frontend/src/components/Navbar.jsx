@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 
 function Navbar() {
@@ -40,7 +40,7 @@ function Navbar() {
         }}>
           <div style={{
             width: 38, height: 38, borderRadius: 10,
-            background: '#197fe6',
+            background: 'var(--color-primary)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             boxShadow: '0 2px 8px rgba(25,127,230,0.3)'
           }}>
@@ -60,11 +60,11 @@ function Navbar() {
               textDecoration: 'none',
               fontSize: 14.5,
               fontWeight: 500,
-              color: location.pathname === link.to ? '#197fe6' : '#374151',
+              color: location.pathname === link.to ? 'var(--color-primary)' : '#374151',
               background: 'transparent',
               transition: 'color 0.15s',
             }}
-              onMouseEnter={e => { if (location.pathname !== link.to) e.currentTarget.style.color = '#197fe6'; }}
+              onMouseEnter={e => { if (location.pathname !== link.to) e.currentTarget.style.color = 'var(--color-primary)'; }}
               onMouseLeave={e => { if (location.pathname !== link.to) e.currentTarget.style.color = '#374151'; }}
             >
               {link.label}
@@ -75,10 +75,10 @@ function Navbar() {
             <Link to="/admin" style={{
               padding: '8px 14px', borderRadius: 8, textDecoration: 'none',
               fontSize: 14.5, fontWeight: 500,
-              color: location.pathname === '/admin' ? '#197fe6' : '#374151',
+              color: location.pathname === '/admin' ? 'var(--color-primary)' : '#374151',
               transition: 'color 0.15s',
             }}
-              onMouseEnter={e => { if (location.pathname !== '/admin') e.currentTarget.style.color = '#197fe6'; }}
+              onMouseEnter={e => { if (location.pathname !== '/admin') e.currentTarget.style.color = 'var(--color-primary)'; }}
               onMouseLeave={e => { if (location.pathname !== '/admin') e.currentTarget.style.color = '#374151'; }}
             >
               Dashboard
@@ -91,28 +91,28 @@ function Navbar() {
           {isAuthenticated ? (
             <button onClick={handleLogout} style={{
               padding: '9px 22px', borderRadius: 9,
-              border: '1.5px solid #197fe6',
-              background: 'transparent', color: '#197fe6',
+              border: '1.5px solid var(--color-primary)',
+              background: 'transparent', color: 'var(--color-primary)',
               fontSize: 14, fontWeight: 600, cursor: 'pointer',
               display: 'flex', alignItems: 'center', gap: 6,
               transition: 'all 0.15s'
             }}
-              onMouseEnter={e => { e.currentTarget.style.background = '#197fe6'; e.currentTarget.style.color = '#fff'; }}
-              onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#197fe6'; }}
+              onMouseEnter={e => { e.currentTarget.style.background = 'var(--color-primary)'; e.currentTarget.style.color = '#fff'; }}
+              onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--color-primary)'; }}
             >
               <i className="bi bi-box-arrow-right"></i> Logout
             </button>
           ) : (
             <Link to="/login" style={{
               padding: '9px 22px', borderRadius: 9,
-              background: '#197fe6', color: '#fff',
+              background: 'var(--color-primary)', color: '#fff',
               fontSize: 14, fontWeight: 700, textDecoration: 'none',
               display: 'flex', alignItems: 'center', gap: 6,
               boxShadow: '0 2px 8px rgba(25,127,230,0.3)',
               transition: 'all 0.15s'
             }}
-              onMouseEnter={e => { e.currentTarget.style.background = '#1368c4'; }}
-              onMouseLeave={e => { e.currentTarget.style.background = '#197fe6'; }}
+              onMouseEnter={e => { e.currentTarget.style.background = 'var(--color-primary-dark)'; }}
+              onMouseLeave={e => { e.currentTarget.style.background = 'var(--color-primary)'; }}
             >
               Portal Login
             </Link>
@@ -142,9 +142,9 @@ function Navbar() {
             <Link key={item.to} to={item.to} onClick={() => setIsOpen(false)} style={{
               display: 'flex', alignItems: 'center', padding: '11px 12px',
               borderRadius: 9, textDecoration: 'none',
-              color: location.pathname === item.to ? '#197fe6' : '#374151',
+              color: location.pathname === item.to ? 'var(--color-primary)' : '#374151',
               fontSize: 14.5, fontWeight: 500, marginBottom: 4,
-              background: location.pathname === item.to ? '#e8f2fd' : 'transparent',
+              background: location.pathname === item.to ? 'var(--color-primary-light)' : 'transparent',
             }}>
               {item.label}
             </Link>
@@ -160,8 +160,8 @@ function Navbar() {
               </Link>
               <button onClick={handleLogout} style={{
                 width: '100%', marginTop: 8, padding: '11px 12px', borderRadius: 9,
-                border: '1.5px solid #197fe6', background: 'transparent',
-                color: '#197fe6', fontSize: 14, fontWeight: 600,
+                border: '1.5px solid var(--color-primary)', background: 'transparent',
+                color: 'var(--color-primary)', fontSize: 14, fontWeight: 600,
                 cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 10
               }}>
                 <i className="bi bi-box-arrow-right"></i> Logout
@@ -171,7 +171,7 @@ function Navbar() {
             <Link to="/login" onClick={() => setIsOpen(false)} style={{
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               marginTop: 8, padding: '11px 12px', borderRadius: 9,
-              background: '#197fe6', textDecoration: 'none',
+              background: 'var(--color-primary)', textDecoration: 'none',
               color: '#fff', fontSize: 14, fontWeight: 700,
               boxShadow: '0 2px 8px rgba(25,127,230,0.3)'
             }}>

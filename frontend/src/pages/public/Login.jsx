@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 function Login() {
@@ -36,7 +36,7 @@ function Login() {
     <div style={{ display: 'flex', minHeight: '100vh', background: '#f4f6fa', fontFamily: 'Inter, system-ui, sans-serif' }}>
 
       {/* Left panel */}
-      <div className="d-none d-lg-flex" style={{ width: 420, flexShrink: 0, flexDirection: 'column', background: 'linear-gradient(160deg, #197fe6 0%, #1368c4 55%, #0d52a0 100%)', padding: '52px 44px', justifyContent: 'space-between', position: 'relative', overflow: 'hidden' }}>
+      <div className="d-none d-lg-flex" style={{ width: 420, flexShrink: 0, flexDirection: 'column', background: 'linear-gradient(160deg, var(--color-primary) 0%, var(--color-primary-dark) 55%, var(--color-primary-darker) 100%)', padding: '52px 44px', justifyContent: 'space-between', position: 'relative', overflow: 'hidden' }}>
         <div style={{ position: 'absolute', top: -80, right: -80, width: 300, height: 300, borderRadius: '50%', background: 'rgba(255,255,255,0.04)', pointerEvents: 'none' }} />
         <div style={{ position: 'relative' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 52 }}>
@@ -70,14 +70,14 @@ function Login() {
       <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px 24px' }}>
         <div style={{ width: '100%', maxWidth: 420 }}>
           <div className="d-flex d-lg-none align-items-center gap-3 mb-5">
-            <div style={{ width: 40, height: 40, borderRadius: 10, background: '#197fe6', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ width: 40, height: 40, borderRadius: 10, background: 'var(--color-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <i className="bi bi-shield-lock-fill text-white" style={{ fontSize: 18 }}></i>
             </div>
-            <div style={{ fontWeight: 800, fontSize: 16, color: '#197fe6' }}>Admin Portal</div>
+            <div style={{ fontWeight: 800, fontSize: 16, color: 'var(--color-primary)' }}>Admin Portal</div>
           </div>
 
           <div style={{ marginBottom: 36 }}>
-            <h2 style={{ fontWeight: 800, fontSize: 26, color: '#1a2744', marginBottom: 6 }}>Admin Sign In</h2>
+            <h2 style={{ fontWeight: 800, fontSize: 26, color: 'var(--color-secondary)', marginBottom: 6 }}>Admin Sign In</h2>
             <p style={{ fontSize: 14, color: '#888', margin: 0 }}>Enter your administrator credentials</p>
           </div>
 
@@ -96,7 +96,7 @@ function Login() {
                 <input type="text" name="username" value={credentials.username} onChange={handleChange}
                   placeholder="Enter admin username" required autoFocus autoComplete="username"
                   style={inputStyle}
-                  onFocus={e => e.target.style.borderColor = '#197fe6'}
+                  onFocus={e => e.target.style.borderColor = 'var(--color-primary)'}
                   onBlur={e => e.target.style.borderColor = '#e5e7eb'}
                 />
               </div>
@@ -109,7 +109,7 @@ function Login() {
                 <input type={showPass ? 'text' : 'password'} name="password" value={credentials.password} onChange={handleChange}
                   placeholder="Enter password" required autoComplete="current-password"
                   style={{ ...inputStyle, paddingRight: 44 }}
-                  onFocus={e => e.target.style.borderColor = '#197fe6'}
+                  onFocus={e => e.target.style.borderColor = 'var(--color-primary)'}
                   onBlur={e => e.target.style.borderColor = '#e5e7eb'}
                 />
                 <button type="button" onClick={() => setShowPass(p => !p)}
@@ -120,7 +120,7 @@ function Login() {
             </div>
 
             <button type="submit" disabled={loading} style={{
-              width: '100%', padding: 14, background: loading ? '#9ca3af' : '#197fe6',
+              width: '100%', padding: 14, background: loading ? '#9ca3af' : 'var(--color-primary)',
               color: '#fff', border: 'none', borderRadius: 10, fontWeight: 700, fontSize: 15,
               cursor: loading ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center',
               justifyContent: 'center', gap: 8, boxShadow: '0 4px 14px rgba(25,127,230,0.3)', marginBottom: 20
@@ -132,8 +132,8 @@ function Login() {
             </button>
 
             <div style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: 10, padding: '12px 16px', fontSize: 13, color: '#6b7280', textAlign: 'center' }}>
-              <i className="bi bi-info-circle me-1" style={{ color: '#197fe6' }}></i>
-              Demo: <strong style={{ color: '#197fe6' }}>admin</strong> / <strong style={{ color: '#197fe6' }}>admin123</strong>
+              <i className="bi bi-info-circle me-1" style={{ color: 'var(--color-primary)' }}></i>
+              Demo: <strong style={{ color: 'var(--color-primary)' }}>admin</strong> / <strong style={{ color: 'var(--color-primary)' }}>admin123</strong>
             </div>
           </form>
 

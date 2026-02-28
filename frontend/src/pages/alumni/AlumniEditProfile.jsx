@@ -1,12 +1,12 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 const API_BASE = API_URL.replace(/\/api\/?$/, '');
 
-// Univariety-inspired color constants
-const NAV_COLOR = '#197fe6';
+// Color constants — driven by CSS variables (change in index.css to update everywhere)
+const NAV_COLOR = 'var(--color-primary)';
 const NAV_TEXT = 'rgba(255,255,255,0.85)';
 
 const TABS = [
@@ -174,7 +174,7 @@ function AlumniEditProfile() {
 
   if (loading) return (
     <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f5f6f8' }}>
-      <div className="spinner-border" style={{ width: '3rem', height: '3rem', color: NAV_COLOR }}></div>
+      <div className="spinner-border" style={{ width: '3rem', height: '3rem', color: 'var(--color-primary)' }}></div>
     </div>
   );
 
@@ -242,7 +242,7 @@ function AlumniEditProfile() {
         {/* ── Profile Header Card ── */}
         <div style={{ background: '#fff', borderRadius: 14, boxShadow: '0 1px 8px rgba(0,0,0,0.07)', marginBottom: 20, overflow: 'hidden' }}>
           {/* Cover strip */}
-          <div style={{ height: 90, background: `linear-gradient(135deg, ${NAV_COLOR} 0%, #1368c4 100%)` }}></div>
+          <div style={{ height: 90, background: 'linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%)' }}></div>
 
           <div style={{ padding: '0 32px 24px', display: 'flex', alignItems: 'flex-end', gap: 24, flexWrap: 'wrap' }}>
             {/* Photo */}
@@ -290,7 +290,7 @@ function AlumniEditProfile() {
                 )}
                 {formData.address && (
                   <span style={{ fontSize: 14, color: '#6b7280', display: 'flex', alignItems: 'center', gap: 5 }}>
-                    <i className="bi bi-geo-alt-fill" style={{ color: '#197fe6', fontSize: 12 }}></i>
+                    <i className="bi bi-geo-alt-fill" style={{ color: 'var(--color-primary)', fontSize: 12 }}></i>
                     {formData.address}
                   </span>
                 )}
@@ -611,7 +611,7 @@ function AlumniEditProfile() {
 function SectionTitle({ icon, title }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4 }}>
-      <div style={{ width: 34, height: 34, borderRadius: 8, background: '#197fe6', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+      <div style={{ width: 34, height: 34, borderRadius: 8, background: 'var(--color-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
         <i className={`bi ${icon}`} style={{ color: '#fff', fontSize: 14 }}></i>
       </div>
       <h5 style={{ fontWeight: 700, fontSize: 16, color: '#111827', margin: 0 }}>{title}</h5>

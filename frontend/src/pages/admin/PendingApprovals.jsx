@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import AdminLayout from '../../components/AdminLayout';
 
@@ -93,7 +93,7 @@ function PendingApprovals() {
     { key: 'pending',  label: 'Pending',  color: '#d97706', bgOn: '#fef9c3' },
     { key: 'approved', label: 'Approved', color: '#16a34a', bgOn: '#dcfce7' },
     { key: 'rejected', label: 'Rejected', color: '#dc2626', bgOn: '#fee2e2' },
-    { key: 'all',      label: 'All',      color: '#1a2744', bgOn: '#eff6ff' },
+    { key: 'all',      label: 'All',      color: 'var(--color-secondary)', bgOn: '#eff6ff' },
   ];
 
   return (
@@ -116,14 +116,14 @@ function PendingApprovals() {
 
       {/* Page header */}
       <div style={{ marginBottom: 24 }}>
-        <h2 style={{ fontWeight: 800, fontSize: 22, color: '#1a2744', margin: 0, marginBottom: 4 }}>Registration Approvals</h2>
+        <h2 style={{ fontWeight: 800, fontSize: 22, color: 'var(--color-secondary)', margin: 0, marginBottom: 4 }}>Registration Approvals</h2>
         <p style={{ color: '#9ca3af', fontSize: 14, margin: 0 }}>Review and manage alumni self-registrations</p>
       </div>
 
       {/* Stats cards */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(140px,1fr))', gap: 16, marginBottom: 24 }}>
         {[
-          { label: 'Total',    value: counts.all,      color: '#1a2744', icon: 'bi-people-fill'     },
+          { label: 'Total',    value: counts.all,      color: 'var(--color-secondary)', icon: 'bi-people-fill'     },
           { label: 'Pending',  value: counts.pending,  color: '#d97706', icon: 'bi-hourglass-split' },
           { label: 'Approved', value: counts.approved, color: '#16a34a', icon: 'bi-check-circle-fill'},
           { label: 'Rejected', value: counts.rejected, color: '#dc2626', icon: 'bi-x-circle-fill'  },
@@ -154,7 +154,7 @@ function PendingApprovals() {
                 <input type="text" placeholder="Name, email, designation…" value={filters.search}
                   onChange={e => setFilters(f => ({ ...f, search: e.target.value }))}
                   style={{ ...inp, paddingLeft: 32 }}
-                  onFocus={e => e.target.style.borderColor = '#1a2744'}
+                  onFocus={e => e.target.style.borderColor = 'var(--color-secondary)'}
                   onBlur={e => e.target.style.borderColor = '#e5e7eb'}
                 />
               </div>
@@ -237,12 +237,12 @@ function PendingApprovals() {
                         <div style={{ display: 'flex', alignItems: 'center', gap: 11 }}>
                           {a.photo
                             ? <img src={`${API_BASE}${a.photo}`} alt={a.name} onClick={() => setSelectedAlumni(a)} style={{ width: 42, height: 42, borderRadius: '50%', objectFit: 'cover', border: '2px solid #e5e7eb', cursor: 'pointer', flexShrink: 0 }} />
-                            : <div onClick={() => setSelectedAlumni(a)} style={{ width: 42, height: 42, borderRadius: '50%', background: 'linear-gradient(135deg,#197fe6,#1368c4)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700, fontSize: 14, flexShrink: 0, cursor: 'pointer' }}>
+                            : <div onClick={() => setSelectedAlumni(a)} style={{ width: 42, height: 42, borderRadius: '50%', background: 'linear-gradient(135deg,var(--color-primary),var(--color-primary-dark))', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700, fontSize: 14, flexShrink: 0, cursor: 'pointer' }}>
                                 {a.name?.split(' ').map(n => n[0]).join('').slice(0,2).toUpperCase()}
                               </div>
                           }
                           <div>
-                            <div onClick={() => setSelectedAlumni(a)} style={{ fontWeight: 600, color: '#1a2744', cursor: 'pointer', marginBottom: 2 }}>{a.name}</div>
+                            <div onClick={() => setSelectedAlumni(a)} style={{ fontWeight: 600, color: 'var(--color-secondary)', cursor: 'pointer', marginBottom: 2 }}>{a.name}</div>
                             <div style={{ fontSize: 12, color: '#9ca3af' }}>{a.email}</div>
                             {a.designation && <div style={{ fontSize: 11, color: '#6b7280', marginTop: 1 }}>{a.designation}{a.organization_name ? ` · ${a.organization_name}` : ''}</div>}
                           </div>
@@ -308,7 +308,7 @@ function PendingApprovals() {
             <div style={{ background: '#fff', borderRadius: 18, width: '100%', maxWidth: 680, maxHeight: '90vh', overflow: 'auto', boxShadow: '0 20px 60px rgba(0,0,0,0.25)' }}
               onClick={e => e.stopPropagation()}>
               {/* Header strip */}
-              <div style={{ height: 80, background: 'linear-gradient(135deg,#197fe6,#1368c4)', borderRadius: '18px 18px 0 0', position: 'relative', display: 'flex', alignItems: 'flex-end', padding: '0 28px 16px' }}>
+              <div style={{ height: 80, background: 'linear-gradient(135deg,var(--color-primary),var(--color-primary-dark))', borderRadius: '18px 18px 0 0', position: 'relative', display: 'flex', alignItems: 'flex-end', padding: '0 28px 16px' }}>
                 <span style={{ fontWeight: 700, fontSize: 16, color: '#fff' }}>Registration Details</span>
                 <button onClick={() => setSelectedAlumni(null)} style={{ position: 'absolute', top: 14, right: 14, background: 'rgba(255,255,255,0.15)', border: 'none', borderRadius: '50%', width: 34, height: 34, color: '#fff', fontSize: 18, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <i className="bi bi-x"></i>
@@ -319,12 +319,12 @@ function PendingApprovals() {
                 <div style={{ display: 'flex', alignItems: 'flex-end', gap: 18, marginTop: -28, marginBottom: 20 }}>
                   {selectedAlumni.photo
                     ? <img src={`${API_BASE}${selectedAlumni.photo}`} alt={selectedAlumni.name} style={{ width: 80, height: 80, borderRadius: '50%', objectFit: 'cover', border: '4px solid #fff', boxShadow: '0 2px 10px rgba(0,0,0,0.15)' }} />
-                    : <div style={{ width: 80, height: 80, borderRadius: '50%', border: '4px solid #fff', background: 'linear-gradient(135deg,#197fe6,#1368c4)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 800, fontSize: 24, boxShadow: '0 2px 10px rgba(0,0,0,0.15)' }}>
+                    : <div style={{ width: 80, height: 80, borderRadius: '50%', border: '4px solid #fff', background: 'linear-gradient(135deg,var(--color-primary),var(--color-primary-dark))', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 800, fontSize: 24, boxShadow: '0 2px 10px rgba(0,0,0,0.15)' }}>
                         {selectedAlumni.name?.split(' ').map(n => n[0]).join('').slice(0,2).toUpperCase()}
                       </div>
                   }
                   <div style={{ paddingBottom: 4 }}>
-                    <div style={{ fontWeight: 800, fontSize: 20, color: '#1a2744' }}>{selectedAlumni.name}</div>
+                    <div style={{ fontWeight: 800, fontSize: 20, color: 'var(--color-secondary)' }}>{selectedAlumni.name}</div>
                     <span style={{ background: as_.bg, color: as_.text, borderRadius: 20, padding: '3px 12px', fontSize: 12, fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: 4, textTransform: 'capitalize', marginTop: 4 }}>
                       <i className={`bi ${as_.icon}`}></i>{selectedAlumni.approval_status}
                     </span>

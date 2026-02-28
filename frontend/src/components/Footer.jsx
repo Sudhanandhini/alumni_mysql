@@ -1,8 +1,8 @@
-import React from "react";
+﻿import React from "react";
 
 const Footer = () => {
   return (
-    <footer style={{ background: '#1a2744', color: '#fff', fontFamily: 'Inter, system-ui, sans-serif' }}>
+    <footer style={{ background: 'var(--color-secondary)', color: '#fff', fontFamily: 'Inter, system-ui, sans-serif' }}>
       <div style={{ maxWidth: 1200, margin: '0 auto', padding: '28px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
         {/* <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <div style={{ width: 32, height: 32, borderRadius: 8, background: 'rgba(255,255,255,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>

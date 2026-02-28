@@ -1,4 +1,4 @@
-// src/pages/Home.jsx
+﻿// src/pages/Home.jsx
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import Slider from 'react-slick';
@@ -58,7 +58,7 @@ function PrevArrow({ onClick }) {
       cursor: 'pointer', zIndex: 10, transition: 'all 0.2s',
       padding: 0,
     }}
-      onMouseEnter={e => { e.currentTarget.style.background = '#197fe6'; e.currentTarget.style.borderColor = '#197fe6'; e.currentTarget.querySelector('i').style.color = '#fff'; }}
+      onMouseEnter={e => { e.currentTarget.style.background = 'var(--color-primary)'; e.currentTarget.style.borderColor = 'var(--color-primary)'; e.currentTarget.querySelector('i').style.color = '#fff'; }}
       onMouseLeave={e => { e.currentTarget.style.background = '#fff'; e.currentTarget.style.borderColor = '#e5e7eb'; e.currentTarget.querySelector('i').style.color = '#374151'; }}
     >
       <i className="bi bi-chevron-left" style={{ fontSize: 14, color: '#374151' }}></i>
@@ -77,7 +77,7 @@ function NextArrow({ onClick }) {
       cursor: 'pointer', zIndex: 10, transition: 'all 0.2s',
       padding: 0,
     }}
-      onMouseEnter={e => { e.currentTarget.style.background = '#197fe6'; e.currentTarget.style.borderColor = '#197fe6'; e.currentTarget.querySelector('i').style.color = '#fff'; }}
+      onMouseEnter={e => { e.currentTarget.style.background = 'var(--color-primary)'; e.currentTarget.style.borderColor = 'var(--color-primary)'; e.currentTarget.querySelector('i').style.color = '#fff'; }}
       onMouseLeave={e => { e.currentTarget.style.background = '#fff'; e.currentTarget.style.borderColor = '#e5e7eb'; e.currentTarget.querySelector('i').style.color = '#374151'; }}
     >
       <i className="bi bi-chevron-right" style={{ fontSize: 14, color: '#374151' }}></i>
@@ -148,7 +148,7 @@ function Home() {
     return () => { mounted = false; };
   }, []);
 
-  const slidesToShow = Math.min(3, Math.max(1, alumni.length || 1));
+  const slidesToShow = Math.min(4, Math.max(1, alumni.length || 1));
   const slidesToShowMD = Math.min(2, Math.max(1, alumni.length || 1));
 
   const carouselSettings = {
@@ -167,6 +167,15 @@ function Home() {
       <div><ul style={{ margin: '0px' }}>{dots}</ul></div>
     ),
     responsive: [
+      {
+        breakpoint: 1200,
+        settings: {
+          slidesToShow: Math.min(3, Math.max(1, alumni.length || 1)),
+          slidesToScroll: 1,
+          infinite: alumni.length > 3,
+          arrows: true,
+        },
+      },
       {
         breakpoint: 992,
         settings: {
@@ -198,7 +207,7 @@ function Home() {
 
   const getStatusColor = (status) => {
     if (status === 'Employed') return '#16a34a';
-    if (status === 'Self-Employed') return '#197fe6';
+    if (status === 'Self-Employed') return 'var(--color-primary)';
     return '#0891b2';
   };
 
@@ -217,7 +226,7 @@ function Home() {
                 display: 'inline-flex', alignItems: 'center', gap: 8,
                 background: 'rgba(25,127,230,0.08)', border: '1.5px solid rgba(25,127,230,0.2)',
                 borderRadius: 24, padding: '6px 16px', marginBottom: 28,
-                fontSize: 11.5, fontWeight: 700, color: '#197fe6', letterSpacing: '1.2px'
+                fontSize: 11.5, fontWeight: 700, color: 'var(--color-primary)', letterSpacing: '1.2px'
               }}>
                 <i className="bi bi-shield-fill-check" style={{ fontSize: 13 }}></i>
                 OFFICIAL UNIVERSITY NETWORK
@@ -229,7 +238,7 @@ function Home() {
                 lineHeight: 1.08, marginBottom: 20, color: '#111827'
               }}>
                 Our<br />Distinguished<br />
-                <span style={{ color: '#197fe6' }}>Alumni</span>
+                <span style={{ color: 'var(--color-primary)' }}>Alumni</span>
               </h1>
 
               {/* Description */}
@@ -245,13 +254,13 @@ function Home() {
               <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap' }}>
                 <a href="/register" style={{
                   display: 'inline-flex', alignItems: 'center', gap: 9,
-                  padding: '13px 28px', background: '#197fe6', color: '#fff',
+                  padding: '13px 28px', background: 'var(--color-primary)', color: '#fff',
                   borderRadius: 10, fontWeight: 700, fontSize: '0.95rem',
                   textDecoration: 'none', boxShadow: '0 4px 16px rgba(25,127,230,0.32)',
                   transition: 'all 0.2s'
                 }}
-                  onMouseEnter={e => { e.currentTarget.style.background = '#1368c4'; }}
-                  onMouseLeave={e => { e.currentTarget.style.background = '#197fe6'; }}
+                  onMouseEnter={e => { e.currentTarget.style.background = 'var(--color-primary-dark)'; }}
+                  onMouseLeave={e => { e.currentTarget.style.background = 'var(--color-primary)'; }}
                 >
                   Join Alumni Network <i className="bi bi-arrow-right"></i>
                 </a>
@@ -262,7 +271,7 @@ function Home() {
                   textDecoration: 'none', border: '1.5px solid #d1d5db',
                   boxShadow: '0 2px 6px rgba(0,0,0,0.06)', transition: 'all 0.2s'
                 }}
-                  onMouseEnter={e => { e.currentTarget.style.borderColor = '#197fe6'; e.currentTarget.style.color = '#197fe6'; }}
+                  onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--color-primary)'; e.currentTarget.style.color = 'var(--color-primary)'; }}
                   onMouseLeave={e => { e.currentTarget.style.borderColor = '#d1d5db'; e.currentTarget.style.color = '#111827'; }}
                 >
                   View Directory
@@ -295,7 +304,7 @@ function Home() {
                   minWidth: 220
                 }}>
                   <div style={{ display: 'flex', alignItems: 'center' }}>
-                    {['#197fe6', '#1368c4', '#0d52a0'].map((bg, i) => (
+                    {['var(--color-primary)', 'var(--color-primary-dark)', 'var(--color-primary-darker)'].map((bg, i) => (
                       <div key={i} style={{
                         width: 32, height: 32, borderRadius: '50%',
                         background: bg, border: '2.5px solid #fff',
@@ -308,7 +317,7 @@ function Home() {
                     ))}
                     <div style={{
                       width: 32, height: 32, borderRadius: '50%',
-                      background: '#197fe6', border: '2.5px solid #fff',
+                      background: 'var(--color-primary)', border: '2.5px solid #fff',
                       marginLeft: -9,
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
                       color: '#fff', fontSize: 8.5, fontWeight: 800, zIndex: 0
@@ -341,19 +350,19 @@ function Home() {
 
           {stats.loading ? (
             <div className="text-center py-4">
-              <div className="spinner-border" style={{ width: '2.5rem', height: '2.5rem', color: '#197fe6' }}>
+              <div className="spinner-border" style={{ width: '2.5rem', height: '2.5rem', color: 'var(--color-primary)' }}>
                 <span className="visually-hidden">Loading...</span>
               </div>
             </div>
           ) : (
-            <div className="row g-3 g-md-4">
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1rem' }}>
               {[
                 { icon: 'bi-people-fill', value: stats.totalAlumni, label: 'Active Members' },
                 { icon: 'bi-graph-up-arrow', value: stats.totalCareers, label: 'Careers Launched' },
                 { icon: 'bi-building', value: stats.totalCompanies, label: 'Global Companies' },
                 { icon: 'bi-globe2', value: stats.totalCountries, label: 'Countries Represented' },
               ].map((item, idx) => (
-                <div key={idx} className="col-6 col-lg-3">
+                <div key={idx}>
                   <div className="stat-card" style={{
                     background: '#f3f4f6', borderRadius: 16,
                     padding: '28px 24px', border: '1px solid #e5e7eb',
@@ -361,11 +370,11 @@ function Home() {
                   }}>
                     <div style={{
                       width: 44, height: 44, borderRadius: 10,
-                      background: '#e8f2fd',
+                      background: 'var(--color-primary-light)',
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
                       marginBottom: 18
                     }}>
-                      <i className={`bi ${item.icon}`} style={{ fontSize: 20, color: '#197fe6' }}></i>
+                      <i className={`bi ${item.icon}`} style={{ fontSize: 20, color: 'var(--color-primary)' }}></i>
                     </div>
                     <div style={{ fontSize: 'clamp(1.7rem, 4vw, 2.2rem)', fontWeight: 900, color: '#111827', lineHeight: 1, marginBottom: 6 }}>
                       <AnimatedCounter end={item.value} duration={2000} />
@@ -392,7 +401,7 @@ function Home() {
 
           {loading ? (
             <div className="text-center py-5">
-              <div className="spinner-border" style={{ width: '2.5rem', height: '2.5rem', color: '#197fe6' }}>
+              <div className="spinner-border" style={{ width: '2.5rem', height: '2.5rem', color: 'var(--color-primary)' }}>
                 <span className="visually-hidden">Loading...</span>
               </div>
             </div>
@@ -455,7 +464,7 @@ function Home() {
 
                         {(alumnus.designation || alumnus.organization_name) && (
                           <p style={{
-                            fontSize: '0.875rem', color: '#197fe6',
+                            fontSize: '0.875rem', color: 'var(--color-primary)',
                             fontWeight: 600, marginBottom: 14
                           }}>
                             {alumnus.designation}
@@ -496,7 +505,7 @@ function Home() {
       <div style={{ background: '#f3f4f6', padding: '0 0 70px' }}>
         <div className="container">
           <div style={{
-            background: '#197fe6',
+            background: 'var(--color-primary)',
             borderRadius: 20,
             padding: 'clamp(40px, 6vw, 64px)',
             position: 'relative', overflow: 'hidden',
@@ -529,7 +538,7 @@ function Home() {
               <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap' }}>
                 <a href="/register" style={{
                   display: 'inline-flex', alignItems: 'center', gap: 8,
-                  padding: '12px 26px', background: '#fff', color: '#197fe6',
+                  padding: '12px 26px', background: '#fff', color: 'var(--color-primary)',
                   borderRadius: 10, fontWeight: 700, fontSize: '0.93rem',
                   textDecoration: 'none', boxShadow: '0 4px 14px rgba(0,0,0,0.15)',
                   transition: 'all 0.2s'

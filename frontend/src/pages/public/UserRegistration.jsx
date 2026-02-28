@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+﻿import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
@@ -144,7 +144,7 @@ function StepIndicator({ step, total }) {
             <div style={{
               width: 34, height: 34, borderRadius: '50%', display: 'flex',
               alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: 13,
-              background: isActive ? '#197fe6' : isDone ? '#28a745' : '#e9ecef',
+              background: isActive ? 'var(--color-primary)' : isDone ? '#28a745' : '#e9ecef',
               color: isActive || isDone ? '#fff' : '#aaa',
               flexShrink: 0, transition: 'all 0.3s',
               boxShadow: isActive ? '0 2px 8px rgba(25,127,230,0.4)' : 'none'
@@ -168,7 +168,7 @@ function StepIndicator({ step, total }) {
 function FieldError({ msg }) {
   if (!msg) return null;
   return (
-    <div style={{ color: '#197fe6', fontSize: 12, marginTop: 4 }}>
+    <div style={{ color: 'var(--color-primary)', fontSize: 12, marginTop: 4 }}>
       <i className="bi bi-exclamation-circle me-1"></i>{msg}
     </div>
   );
@@ -181,16 +181,16 @@ function CardRadio({ name, value, options, onChange, errors }) {
       <div style={{ display: 'flex', gap: 14, marginTop: 4, flexWrap: 'wrap' }}>
         {options.map(opt => (
           <label key={opt.val} style={{
-            flex: '1 1 140px', border: `2px solid ${value === opt.val ? '#197fe6' : '#e9ecef'}`,
+            flex: '1 1 140px', border: `2px solid ${value === opt.val ? 'var(--color-primary)' : '#e9ecef'}`,
             borderRadius: 12, padding: '14px 16px', cursor: 'pointer',
-            background: value === opt.val ? '#e8f2fd' : '#fff',
+            background: value === opt.val ? 'var(--color-primary-light)' : '#fff',
             display: 'flex', alignItems: 'center', gap: 10, transition: 'all 0.2s',
             userSelect: 'none'
           }}>
             <input type="radio" name={name} value={opt.val} checked={value === opt.val}
-              onChange={onChange} style={{ accentColor: '#197fe6', width: 16, height: 16, flexShrink: 0 }} />
+              onChange={onChange} style={{ accentColor: 'var(--color-primary)', width: 16, height: 16, flexShrink: 0 }} />
             <div>
-              <div style={{ fontWeight: 600, fontSize: 14, color: value === opt.val ? '#197fe6' : '#333' }}>
+              <div style={{ fontWeight: 600, fontSize: 14, color: value === opt.val ? 'var(--color-primary)' : '#333' }}>
                 {opt.icon && <i className={`bi ${opt.icon} me-2`}></i>}
                 {opt.label}
               </div>
@@ -314,10 +314,10 @@ function Step1({ formData, onChange, errors, usernameAvailable, checkingUsername
         <div style={{ background: '#f8f9fa', borderRadius: 12, padding: '16px 20px' }}>
           <label style={{ display: 'flex', alignItems: 'flex-start', gap: 10, cursor: 'pointer', marginBottom: 12 }}>
             <input type="checkbox" name="terms" checked={formData.terms} onChange={onChange}
-              style={{ marginTop: 2, accentColor: '#197fe6', width: 16, height: 16, flexShrink: 0 }} />
+              style={{ marginTop: 2, accentColor: 'var(--color-primary)', width: 16, height: 16, flexShrink: 0 }} />
             <span style={{ fontSize: 13, color: '#555', lineHeight: 1.5 }}>
-              I agree to the <span style={{ color: '#197fe6', cursor: 'pointer' }}>Terms & Conditions</span> and{' '}
-              <span style={{ color: '#197fe6', cursor: 'pointer' }}>Privacy Policy</span>
+              I agree to the <span style={{ color: 'var(--color-primary)', cursor: 'pointer' }}>Terms & Conditions</span> and{' '}
+              <span style={{ color: 'var(--color-primary)', cursor: 'pointer' }}>Privacy Policy</span>
               <span className="text-primary"> *</span>
             </span>
           </label>
@@ -364,7 +364,7 @@ function Step2({ formData, onChange, errors }) {
           {['Male', 'Female', 'Other'].map(g => (
             <label key={g} style={{ display: 'flex', alignItems: 'center', gap: 7, cursor: 'pointer' }}>
               <input type="radio" name="gender" value={g} checked={formData.gender === g}
-                onChange={onChange} style={{ accentColor: '#197fe6', width: 15, height: 15 }} />
+                onChange={onChange} style={{ accentColor: 'var(--color-primary)', width: 15, height: 15 }} />
               <span style={{ fontSize: 14, color: '#444' }}>{g}</span>
             </label>
           ))}
@@ -377,7 +377,7 @@ function Step2({ formData, onChange, errors }) {
           {['Pursuing Studies', 'Completed'].map(s => (
             <label key={s} style={{ display: 'flex', alignItems: 'center', gap: 7, cursor: 'pointer' }}>
               <input type="radio" name="education_status" value={s} checked={formData.education_status === s}
-                onChange={onChange} style={{ accentColor: '#197fe6', width: 15, height: 15 }} />
+                onChange={onChange} style={{ accentColor: 'var(--color-primary)', width: 15, height: 15 }} />
               <span style={{ fontSize: 14, color: '#444' }}>{s}</span>
             </label>
           ))}
@@ -465,7 +465,7 @@ function Step3({ formData, onChange, errors, years }) {
         <div style={{ background: '#fff8f0', border: '1px solid #ffd9b3', borderRadius: 12, padding: '16px 20px' }}>
           <label style={{ display: 'flex', alignItems: 'flex-start', gap: 10, cursor: 'pointer' }}>
             <input type="checkbox" name="authorization" checked={formData.authorization} onChange={onChange}
-              style={{ marginTop: 3, accentColor: '#197fe6', width: 16, height: 16, flexShrink: 0 }} />
+              style={{ marginTop: 3, accentColor: 'var(--color-primary)', width: 16, height: 16, flexShrink: 0 }} />
             <span style={{ fontSize: 13, color: '#555', lineHeight: 1.6 }}>
               I authorize the institution to use my information for alumni networking and communications, and confirm that all the details I have provided are accurate.
               <span className="text-primary"> *</span>
@@ -490,7 +490,7 @@ function Step4({ formData, onChange, imagePreview, onImageChange }) {
           {imagePreview ? (
             <img src={imagePreview} alt="Preview" style={{
               width: 84, height: 84, borderRadius: '50%', objectFit: 'cover',
-              border: '3px solid #197fe6', flexShrink: 0
+              border: '3px solid var(--color-primary)', flexShrink: 0
             }} />
           ) : (
             <div style={{
@@ -547,7 +547,7 @@ function Step4({ formData, onChange, imagePreview, onImageChange }) {
               {['Office', 'Remote', 'Hybrid'].map(mode => (
                 <label key={mode} style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
                   <input type="radio" name="work_mode" value={mode} checked={formData.work_mode === mode}
-                    onChange={onChange} style={{ accentColor: '#197fe6', width: 15, height: 15 }} />
+                    onChange={onChange} style={{ accentColor: 'var(--color-primary)', width: 15, height: 15 }} />
                   <span style={{ fontSize: 14 }}>{mode}</span>
                 </label>
               ))}
@@ -600,7 +600,7 @@ function Step4({ formData, onChange, imagePreview, onImageChange }) {
 function SuccessScreen({ navigate }) {
   return (
     <div className="min-vh-100 d-flex align-items-center justify-content-center"
-      style={{ background: 'linear-gradient(135deg, #e8f2fd 0%, #fff 100%)' }}>
+      style={{ background: 'linear-gradient(135deg, var(--color-primary-light) 0%, #fff 100%)' }}>
       <div className="container">
         <div className="row justify-content-center">
           <div className="col-md-7 col-lg-6">
@@ -880,7 +880,7 @@ function UserRegistration() {
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 40 }}>
             <div style={{
               width: 42, height: 42, borderRadius: '50%',
-              background: 'linear-gradient(135deg, #197fe6, #1368c4)',
+              background: 'linear-gradient(135deg, var(--color-primary), var(--color-primary-dark))',
               display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0
             }}>
               <i className="bi bi-mortarboard-fill text-white" style={{ fontSize: 20 }}></i>
@@ -934,13 +934,13 @@ function UserRegistration() {
               </button>
             ) : (
               <a href="/user/login" style={{ fontSize: 13, color: '#999', textDecoration: 'none' }}>
-                Already registered? <span style={{ color: '#197fe6', fontWeight: 600 }}>Login</span>
+                Already registered? <span style={{ color: 'var(--color-primary)', fontWeight: 600 }}>Login</span>
               </a>
             )}
 
             {step < TOTAL_STEPS ? (
               <button onClick={nextStep} style={{
-                background: 'linear-gradient(135deg, #197fe6, #1368c4)', color: '#fff',
+                background: 'linear-gradient(135deg, var(--color-primary), var(--color-primary-dark))', color: '#fff',
                 border: 'none', borderRadius: 10, padding: '12px 30px', fontWeight: 700,
                 fontSize: 15, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8,
                 boxShadow: '0 4px 12px rgba(25,127,230,0.35)'
@@ -949,7 +949,7 @@ function UserRegistration() {
               </button>
             ) : (
               <button onClick={handleSubmit} disabled={loading} style={{
-                background: 'linear-gradient(135deg, #197fe6, #1368c4)', color: '#fff',
+                background: 'linear-gradient(135deg, var(--color-primary), var(--color-primary-dark))', color: '#fff',
                 border: 'none', borderRadius: 10, padding: '12px 30px', fontWeight: 700,
                 fontSize: 15, cursor: loading ? 'not-allowed' : 'pointer',
                 opacity: loading ? 0.7 : 1, minWidth: 180,
@@ -970,7 +970,7 @@ function UserRegistration() {
         className="d-none d-lg-flex"
         style={{
           width: 360, flexShrink: 0,
-          background: 'linear-gradient(160deg, #197fe6 0%, #1368c4 55%, #0d52a0 100%)',
+          background: 'linear-gradient(160deg, var(--color-primary) 0%, var(--color-primary-dark) 55%, var(--color-primary-darker) 100%)',
           position: 'sticky', top: 0, height: '100vh', overflow: 'hidden',
           flexDirection: 'column', justifyContent: 'space-between',
           padding: '56px 36px'
@@ -1003,8 +1003,8 @@ function UserRegistration() {
                     transition: 'all 0.3s'
                   }}>
                     {isDone
-                      ? <i className="bi bi-check2" style={{ color: '#197fe6', fontSize: 14, fontWeight: 900 }}></i>
-                      : <span style={{ fontSize: 12, fontWeight: 700, color: isActive ? '#197fe6' : 'rgba(255,255,255,0.5)' }}>{n}</span>
+                      ? <i className="bi bi-check2" style={{ color: 'var(--color-primary)', fontSize: 14, fontWeight: 900 }}></i>
+                      : <span style={{ fontSize: 12, fontWeight: 700, color: isActive ? 'var(--color-primary)' : 'rgba(255,255,255,0.5)' }}>{n}</span>
                     }
                   </div>
                   <span style={{

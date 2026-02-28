@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import AdminLayout from '../../components/AdminLayout';
 
@@ -266,7 +266,7 @@ function ManageUsers() {
           alignItems: 'center',
           zIndex: 9999
         }}>
-          <div className="spinner-border" style={{ width: '3rem', height: '3rem', color: '#197fe6' }}>
+          <div className="spinner-border" style={{ width: '3rem', height: '3rem', color: 'var(--color-primary)' }}>
             <span className="visually-hidden">Loading...</span>
           </div>
         </div>

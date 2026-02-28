@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 
@@ -70,10 +70,10 @@ export default function AdminLayout({ children, title }) {
                 <i className={`bi ${n.icon}`} style={{ fontSize: 18, flexShrink: 0 }}></i>
                 {open && <span>{n.label}</span>}
                 {n.badge && count > 0 && open && (
-                  <span style={{ marginLeft: 'auto', background: '#197fe6', color: '#fff', borderRadius: 20, padding: '1px 8px', fontSize: 11, fontWeight: 700 }}>{count}</span>
+                  <span style={{ marginLeft: 'auto', background: 'var(--color-primary)', color: '#fff', borderRadius: 20, padding: '1px 8px', fontSize: 11, fontWeight: 700 }}>{count}</span>
                 )}
                 {n.badge && count > 0 && !open && (
-                  <span style={{ position: 'absolute', top: 8, right: 8, width: 8, height: 8, background: '#197fe6', borderRadius: '50%' }}></span>
+                  <span style={{ position: 'absolute', top: 8, right: 8, width: 8, height: 8, background: 'var(--color-primary)', borderRadius: '50%' }}></span>
                 )}
               </button>
             );
@@ -109,7 +109,7 @@ export default function AdminLayout({ children, title }) {
               <div className="text-primary-700 font-bold text-sm">Admin</div>
               <div className="text-gray-400 text-xs">Administrator</div>
             </div>
-            <div className="w-9 h-9 rounded-full flex items-center justify-center text-white font-bold text-sm" style={{ background: 'linear-gradient(135deg,#197fe6,#1368c4)' }}>A</div>
+            <div className="w-9 h-9 rounded-full flex items-center justify-center text-white font-bold text-sm" style={{ background: 'linear-gradient(135deg,var(--color-primary),var(--color-primary-dark))' }}>A</div>
           </div>
         </header>
 

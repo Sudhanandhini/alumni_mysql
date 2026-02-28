@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
@@ -104,14 +104,14 @@ function ViewAlumni() {
 
       {/* ── Left Sidebar ── */}
       <aside style={{
-        width: sidebarOpen ? 220 : 64, flexShrink: 0, background: '#1a2744',
+        width: sidebarOpen ? 220 : 64, flexShrink: 0, background: 'var(--color-secondary)',
         display: 'flex', flexDirection: 'column',
         transition: 'width 0.25s', overflow: 'hidden',
         position: 'sticky', top: 0, height: '100vh'
       }}>
         {/* Logo row */}
         <div style={{ padding: '22px 16px 20px', display: 'flex', alignItems: 'center', gap: 10, borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
-          <div style={{ width: 36, height: 36, flexShrink: 0, borderRadius: 10, background: 'linear-gradient(135deg,#197fe6,#1368c4)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ width: 36, height: 36, flexShrink: 0, borderRadius: 10, background: 'linear-gradient(135deg,var(--color-primary),var(--color-primary-dark))', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <i className="bi bi-mortarboard-fill" style={{ color: '#fff', fontSize: 17 }}></i>
           </div>
           {sidebarOpen && (
@@ -185,18 +185,18 @@ function ViewAlumni() {
             }}>
               <i className="bi bi-list"></i>
             </button>
-            <h1 style={{ fontWeight: 700, fontSize: 18, color: '#1a2744', margin: 0 }}>
+            <h1 style={{ fontWeight: 700, fontSize: 18, color: 'var(--color-secondary)', margin: 0 }}>
               {activeTab === 'dashboard' ? 'My Dashboard' : 'Connect'}
             </h1>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
             <div style={{ textAlign: 'right', lineHeight: 1.3 }}>
-              <div style={{ fontWeight: 700, fontSize: 14, color: '#1a2744' }}>{userName}</div>
+              <div style={{ fontWeight: 700, fontSize: 14, color: 'var(--color-secondary)' }}>{userName}</div>
               <div style={{ fontSize: 12, color: '#9ca3af' }}>{isAlumniLoggedIn ? 'Alumni' : 'User'}</div>
             </div>
             <div style={{
               width: 38, height: 38, borderRadius: '50%',
-              background: 'linear-gradient(135deg,#197fe6,#1368c4)',
+              background: 'linear-gradient(135deg,var(--color-primary),var(--color-primary-dark))',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               color: '#fff', fontWeight: 800, fontSize: 14, flexShrink: 0
             }}>{userInitials}</div>
@@ -211,7 +211,7 @@ function ViewAlumni() {
             <div>
               {/* Welcome banner */}
               <div style={{
-                background: 'linear-gradient(135deg,#197fe6 0%,#1368c4 100%)',
+                background: 'linear-gradient(135deg,var(--color-primary) 0%,var(--color-primary-dark) 100%)',
                 borderRadius: 16, padding: '28px 32px', marginBottom: 28,
                 display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                 flexWrap: 'wrap', gap: 20
@@ -228,7 +228,7 @@ function ViewAlumni() {
                 </div>
                 <div style={{ display: 'flex', gap: 12 }}>
                   <button onClick={() => setActiveTab('connect')} style={{
-                    background: '#197fe6', color: '#fff', border: 'none', borderRadius: 10,
+                    background: 'var(--color-primary)', color: '#fff', border: 'none', borderRadius: 10,
                     padding: '10px 22px', fontWeight: 700, fontSize: 14, cursor: 'pointer'
                   }}>
                     <i className="bi bi-people-fill me-2"></i>Browse Alumni
@@ -260,7 +260,7 @@ function ViewAlumni() {
                       </div>
                       <span style={{ fontSize: 13, color: '#6b7280', fontWeight: 500 }}>{s.label}</span>
                     </div>
-                    <div style={{ fontWeight: 800, fontSize: 28, color: '#1a2744' }}>{s.value}</div>
+                    <div style={{ fontWeight: 800, fontSize: 28, color: 'var(--color-secondary)' }}>{s.value}</div>
                   </div>
                 ))}
               </div>
@@ -268,18 +268,18 @@ function ViewAlumni() {
               {/* Own profile card (alumni only) */}
               {isAlumniLoggedIn && ownAlumnus && (
                 <div style={{ background: '#fff', borderRadius: 16, padding: 24, boxShadow: '0 1px 4px rgba(0,0,0,0.07)', marginBottom: 28 }}>
-                  <div style={{ fontWeight: 700, fontSize: 15, color: '#1a2744', marginBottom: 18, display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <i className="bi bi-person-badge-fill" style={{ color: '#197fe6' }}></i> Your Profile
+                  <div style={{ fontWeight: 700, fontSize: 15, color: 'var(--color-secondary)', marginBottom: 18, display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <i className="bi bi-person-badge-fill" style={{ color: 'var(--color-primary)' }}></i> Your Profile
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 20, flexWrap: 'wrap' }}>
                     {ownAlumnus.photo
-                      ? <img src={`${API_BASE}${ownAlumnus.photo}`} alt={ownAlumnus.name} style={{ width: 72, height: 72, borderRadius: '50%', objectFit: 'cover', border: '3px solid #197fe6' }} />
-                      : <div style={{ width: 72, height: 72, borderRadius: '50%', background: 'linear-gradient(135deg,#197fe6,#1368c4)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 800, fontSize: 22 }}>
+                      ? <img src={`${API_BASE}${ownAlumnus.photo}`} alt={ownAlumnus.name} style={{ width: 72, height: 72, borderRadius: '50%', objectFit: 'cover', border: '3px solid var(--color-primary)' }} />
+                      : <div style={{ width: 72, height: 72, borderRadius: '50%', background: 'linear-gradient(135deg,var(--color-primary),var(--color-primary-dark))', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 800, fontSize: 22 }}>
                           {ownAlumnus.name?.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
                         </div>
                     }
                     <div style={{ flex: 1 }}>
-                      <div style={{ fontWeight: 800, fontSize: 18, color: '#1a2744' }}>{ownAlumnus.name}</div>
+                      <div style={{ fontWeight: 800, fontSize: 18, color: 'var(--color-secondary)' }}>{ownAlumnus.name}</div>
                       <div style={{ fontSize: 14, color: '#6b7280', marginBottom: 6 }}>
                         {ownAlumnus.designation}{ownAlumnus.organization_name ? ` @ ${ownAlumnus.organization_name}` : ''}
                       </div>
@@ -290,7 +290,7 @@ function ViewAlumni() {
                       </div>
                     </div>
                     <button onClick={() => navigate('/alumni/edit-profile')} style={{
-                      background: '#197fe6', color: '#fff', border: 'none',
+                      background: 'var(--color-primary)', color: '#fff', border: 'none',
                       borderRadius: 10, padding: '10px 20px', fontWeight: 700, fontSize: 13, cursor: 'pointer'
                     }}>
                       <i className="bi bi-pencil-square me-2"></i>Edit Profile
@@ -307,14 +307,14 @@ function ViewAlumni() {
                   display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 14
                 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-                    <i className="bi bi-person-badge-fill" style={{ color: '#197fe6', fontSize: 26 }}></i>
+                    <i className="bi bi-person-badge-fill" style={{ color: 'var(--color-primary)', fontSize: 26 }}></i>
                     <div>
-                      <div style={{ fontWeight: 700, fontSize: 15, color: '#1a2744' }}>Are you an alumni?</div>
+                      <div style={{ fontWeight: 700, fontSize: 15, color: 'var(--color-secondary)' }}>Are you an alumni?</div>
                       <div style={{ fontSize: 13, color: '#6b7280' }}>Log in with your alumni credentials to view and edit your profile.</div>
                     </div>
                   </div>
                   <button onClick={() => navigate('/user/login')} style={{
-                    background: '#197fe6', color: '#fff', border: 'none',
+                    background: 'var(--color-primary)', color: '#fff', border: 'none',
                     borderRadius: 10, padding: '10px 20px', fontWeight: 700, fontSize: 13, cursor: 'pointer'
                   }}>
                     <i className="bi bi-box-arrow-in-right me-2"></i>Alumni Sign In
@@ -330,16 +330,16 @@ function ViewAlumni() {
               {/* Top bar */}
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20, flexWrap: 'wrap', gap: 12 }}>
                 <div>
-                  <div style={{ fontWeight: 700, fontSize: 18, color: '#1a2744' }}>Alumni Directory</div>
+                  <div style={{ fontWeight: 700, fontSize: 18, color: 'var(--color-secondary)' }}>Alumni Directory</div>
                   <div style={{ fontSize: 13, color: '#9ca3af', marginTop: 2 }}>
                     Showing <strong>{filteredAlumni.length}</strong> of <strong>{alumni.length}</strong> alumni
                   </div>
                 </div>
                 <button onClick={() => setShowFilters(p => !p)} style={{
                   display: 'flex', alignItems: 'center', gap: 8,
-                  background: showFilters ? '#197fe6' : '#fff',
-                  color: showFilters ? '#fff' : '#197fe6',
-                  border: '1.5px solid #197fe6', borderRadius: 10,
+                  background: showFilters ? 'var(--color-primary)' : '#fff',
+                  color: showFilters ? '#fff' : 'var(--color-primary)',
+                  border: '1.5px solid var(--color-primary)', borderRadius: 10,
                   padding: '9px 18px', fontWeight: 700, fontSize: 13, cursor: 'pointer'
                 }}>
                   <i className="bi bi-funnel-fill"></i>
@@ -359,7 +359,7 @@ function ViewAlumni() {
                         <input type="text" name="searchTerm" value={filters.searchTerm} onChange={handleFilterChange}
                           placeholder="Name, email, designation, company…"
                           style={{ width: '100%', padding: '10px 12px 10px 36px', border: '1.5px solid #e5e7eb', borderRadius: 9, fontSize: 14, boxSizing: 'border-box', outline: 'none' }}
-                          onFocus={e => e.target.style.borderColor = '#197fe6'}
+                          onFocus={e => e.target.style.borderColor = 'var(--color-primary)'}
                           onBlur={e => e.target.style.borderColor = '#e5e7eb'}
                         />
                       </div>
@@ -440,31 +440,31 @@ function ViewAlumni() {
                         <div key={a.id} onClick={() => setSelectedAlumni(a)}
                           style={{
                             background: '#fff', borderRadius: 14, overflow: 'hidden',
-                            boxShadow: isOwn ? '0 0 0 2px #197fe6, 0 4px 16px rgba(25,127,230,0.15)' : '0 1px 4px rgba(0,0,0,0.07)',
+                            boxShadow: isOwn ? '0 0 0 2px var(--color-primary), 0 4px 16px rgba(25,127,230,0.15)' : '0 1px 4px rgba(0,0,0,0.07)',
                             cursor: 'pointer', transition: 'box-shadow 0.15s'
                           }}
-                          onMouseEnter={e => e.currentTarget.style.boxShadow = isOwn ? '0 0 0 2px #197fe6,0 8px 24px rgba(25,127,230,0.2)' : '0 4px 16px rgba(0,0,0,0.13)'}
-                          onMouseLeave={e => e.currentTarget.style.boxShadow = isOwn ? '0 0 0 2px #197fe6,0 4px 16px rgba(25,127,230,0.15)' : '0 1px 4px rgba(0,0,0,0.07)'}
+                          onMouseEnter={e => e.currentTarget.style.boxShadow = isOwn ? '0 0 0 2px var(--color-primary),0 8px 24px rgba(25,127,230,0.2)' : '0 4px 16px rgba(0,0,0,0.13)'}
+                          onMouseLeave={e => e.currentTarget.style.boxShadow = isOwn ? '0 0 0 2px var(--color-primary),0 4px 16px rgba(25,127,230,0.15)' : '0 1px 4px rgba(0,0,0,0.07)'}
                         >
                           {isOwn && (
-                            <div style={{ background: '#197fe6', color: '#fff', textAlign: 'center', padding: '4px 0', fontSize: 12, fontWeight: 700 }}>
+                            <div style={{ background: 'var(--color-primary)', color: '#fff', textAlign: 'center', padding: '4px 0', fontSize: 12, fontWeight: 700 }}>
                               <i className="bi bi-person-check-fill me-1"></i>Your Profile
                             </div>
                           )}
                           {/* Cover strip */}
-                          <div style={{ height: 56, background: 'linear-gradient(135deg,#197fe6,#1368c4)' }}></div>
+                          <div style={{ height: 56, background: 'linear-gradient(135deg,var(--color-primary),var(--color-primary-dark))' }}></div>
                           {/* Photo */}
                           <div style={{ display: 'flex', justifyContent: 'center', marginTop: -28 }}>
                             {a.photo
                               ? <img src={`${API_BASE}${a.photo}`} alt={a.name} style={{ width: 56, height: 56, borderRadius: '50%', objectFit: 'cover', border: '3px solid #fff', background: '#fff' }} />
-                              : <div style={{ width: 56, height: 56, borderRadius: '50%', border: '3px solid #fff', background: 'linear-gradient(135deg,#197fe6,#1368c4)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 800, fontSize: 18 }}>
+                              : <div style={{ width: 56, height: 56, borderRadius: '50%', border: '3px solid #fff', background: 'linear-gradient(135deg,var(--color-primary),var(--color-primary-dark))', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 800, fontSize: 18 }}>
                                   {a.name?.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
                                 </div>
                             }
                           </div>
                           {/* Info */}
                           <div style={{ padding: '10px 16px 16px', textAlign: 'center' }}>
-                            <div style={{ fontWeight: 700, fontSize: 15, color: '#1a2744', marginBottom: 3 }}>{a.name}</div>
+                            <div style={{ fontWeight: 700, fontSize: 15, color: 'var(--color-secondary)', marginBottom: 3 }}>{a.name}</div>
                             <div style={{ fontSize: 12, color: '#6b7280', marginBottom: 8, minHeight: 32 }}>
                               {a.designation && <span>{a.designation}</span>}
                               {a.designation && a.organization_name && <span style={{ color: '#d1d5db' }}> · </span>}
@@ -476,7 +476,7 @@ function ViewAlumni() {
                             </div>
                             {isOwn && (
                               <button onClick={e => { e.stopPropagation(); navigate('/alumni/edit-profile'); }} style={{
-                                width: '100%', background: '#197fe6', color: '#fff', border: 'none',
+                                width: '100%', background: 'var(--color-primary)', color: '#fff', border: 'none',
                                 borderRadius: 8, padding: '7px 0', fontWeight: 700, fontSize: 12, cursor: 'pointer'
                               }}>
                                 <i className="bi bi-pencil-square me-1"></i>Edit My Profile
@@ -501,7 +501,7 @@ function ViewAlumni() {
           <div style={{ background: '#fff', borderRadius: 18, width: '100%', maxWidth: 640, maxHeight: '90vh', overflow: 'auto', boxShadow: '0 20px 60px rgba(0,0,0,0.25)' }}
             onClick={e => e.stopPropagation()}>
             {/* Header strip */}
-            <div style={{ height: 90, background: 'linear-gradient(135deg,#197fe6,#1368c4)', borderRadius: '18px 18px 0 0', position: 'relative' }}>
+            <div style={{ height: 90, background: 'linear-gradient(135deg,var(--color-primary),var(--color-primary-dark))', borderRadius: '18px 18px 0 0', position: 'relative' }}>
               <button onClick={() => setSelectedAlumni(null)} style={{
                 position: 'absolute', top: 14, right: 14, background: 'rgba(255,255,255,0.15)',
                 border: 'none', borderRadius: '50%', width: 34, height: 34,
@@ -513,12 +513,12 @@ function ViewAlumni() {
               <div style={{ marginTop: 20, display: 'flex', justifyContent: 'center' }}>
                 {selectedAlumni.photo
                   ? <img src={`${API_BASE}${selectedAlumni.photo}`} alt={selectedAlumni.name} style={{ width: 88, height: 88, borderRadius: '50%', objectFit: 'cover', border: '4px solid #fff', boxShadow: '0 2px 10px rgba(0,0,0,0.15)' }} />
-                  : <div style={{ width: 88, height: 88, borderRadius: '50%', border: '4px solid #fff', background: 'linear-gradient(135deg,#197fe6,#1368c4)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 800, fontSize: 28, boxShadow: '0 2px 10px rgba(0,0,0,0.15)' }}>
+                  : <div style={{ width: 88, height: 88, borderRadius: '50%', border: '4px solid #fff', background: 'linear-gradient(135deg,var(--color-primary),var(--color-primary-dark))', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 800, fontSize: 28, boxShadow: '0 2px 10px rgba(0,0,0,0.15)' }}>
                       {selectedAlumni.name?.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
                     </div>
                 }
               </div>
-              <div style={{ fontWeight: 800, fontSize: 22, color: '#1a2744', marginBottom: 4 }}>{selectedAlumni.name}</div>
+              <div style={{ fontWeight: 800, fontSize: 22, color: 'var(--color-secondary)', marginBottom: 4 }}>{selectedAlumni.name}</div>
               <div style={{ fontSize: 14, color: '#6b7280', marginBottom: 14 }}>
                 {selectedAlumni.designation}{selectedAlumni.organization_name ? ` @ ${selectedAlumni.organization_name}` : ''}
               </div>
