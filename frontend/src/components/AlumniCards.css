@@ -76,18 +76,21 @@
 
 /* Carousel Dots */
 .slick-dots li button:before {
-  font-size: 10px !important;
+  font-size: 9px !important;
   color: var(--color-primary) !important;
-  opacity: 0.3 !important;
+  opacity: 0.25 !important;
+  transition: all 0.2s ease !important;
 }
 
 .slick-dots li.slick-active button:before {
+  font-size: 11px !important;
   opacity: 1 !important;
   color: var(--color-primary) !important;
 }
 
 .slick-dots li {
-  margin: 0 3px !important;
+  margin: 0 2px !important;
+  transition: all 0.2s ease !important;
 }
 
 /* Smooth Scroll */

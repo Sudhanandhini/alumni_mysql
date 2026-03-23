@@ -88,6 +88,7 @@ function NextArrow({ onClick }) {
 function Home() {
   const [alumni, setAlumni] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [currentSlide, setCurrentSlide] = useState(0);
 
   const [stats, setStats] = useState({
     totalAlumni: 0,
@@ -163,9 +164,15 @@ function Home() {
     arrows: true,
     prevArrow: <PrevArrow />,
     nextArrow: <NextArrow />,
-    appendDots: dots => (
-      <div><ul style={{ margin: '0px' }}>{dots}</ul></div>
-    ),
+    afterChange: (current) => setCurrentSlide(current),
+    appendDots: dots => {
+      const total = dots.length;
+      if (total <= 5) return <div><ul style={{ margin: '0px' }}>{dots}</ul></div>;
+      let start = Math.max(0, currentSlide - 2);
+      let end = Math.min(total, start + 5);
+      if (end - start < 5) start = Math.max(0, end - 5);
+      return <div><ul style={{ margin: '0px' }}>{dots.slice(start, end)}</ul></div>;
+    },
     responsive: [
       {
         breakpoint: 1200,
@@ -195,6 +202,16 @@ function Home() {
           dots: true,
         },
       },
+      {
+        breakpoint: 576,
+        settings: {
+          slidesToShow: 1,
+          slidesToScroll: 1,
+          infinite: alumni.length > 1,
+          arrows: false,
+          dots: true,
+        },
+      },
     ],
   };
 
@@ -215,7 +232,7 @@ function Home() {
     <div className="home-page" style={{ background: '#f3f4f6' }}>
 
       {/* ── HERO SECTION ── */}
-      <div style={{ background: 'linear-gradient(135deg, #eef4ff 0%, #ddeaff 100%)', padding: '80px 0 110px' }}>
+      <div style={{ background: 'linear-gradient(135deg, #eef4ff 0%, #ddeaff 100%)', padding: 'clamp(40px, 8vw, 80px) 0 clamp(60px, 10vw, 110px)' }}>
         <div className="container">
           <div className="row align-items-center g-5">
 
@@ -337,7 +354,7 @@ function Home() {
       </div>
 
       {/* ── NETWORK AT A GLANCE ── */}
-      <div style={{ background: '#fff', padding: '60px 0' }}>
+      <div style={{ background: '#fff', padding: 'clamp(32px, 6vw, 60px) 0' }}>
         <div className="container">
           <div style={{ marginBottom: 36 }}>
             <h2 style={{ fontSize: '1.65rem', fontWeight: 800, color: '#111827', marginBottom: 6 }}>
@@ -355,7 +372,7 @@ function Home() {
               </div>
             </div>
           ) : (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '1rem' }}>
               {[
                 { icon: 'bi-people-fill', value: stats.totalAlumni, label: 'Active Members' },
                 { icon: 'bi-graph-up-arrow', value: stats.totalCareers, label: 'Careers Launched' },
@@ -365,7 +382,7 @@ function Home() {
                 <div key={idx}>
                   <div className="stat-card" style={{
                     background: '#f3f4f6', borderRadius: 16,
-                    padding: '28px 24px', border: '1px solid #e5e7eb',
+                    padding: 'clamp(16px, 4vw, 28px) clamp(14px, 3vw, 24px)', border: '1px solid #e5e7eb',
                     transition: 'all 0.25s ease'
                   }}>
                     <div style={{
@@ -411,86 +428,94 @@ function Home() {
               <p style={{ color: '#9ca3af', marginTop: 16, fontSize: '1rem' }}>No alumni profiles available yet.</p>
             </div>
           ) : (
-            <div className="alumni-carousel-container" style={{ padding: '0 60px', position: 'relative' }}>
+            <div className="alumni-carousel-container">
               <Slider {...carouselSettings}>
                 {alumni.map((alumnus) => (
-                  <div key={alumnus.id} style={{ padding: '0 10px' }}>
+                  <div key={alumnus.id} className="carousel-item-wrapper">
                     <div
                       className="alumni-card-modern"
                       style={{
                         background: '#fff',
-                        borderRadius: 18,
-                        overflow: 'hidden',
+                        borderRadius: 20,
                         border: '1px solid #e5e7eb',
                         boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
                         transition: 'all 0.25s ease',
                         margin: '8px 4px 16px',
+                        padding: '28px 20px 24px',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        textAlign: 'center',
+                        position: 'relative',
                       }}
                     >
-                      {/* Photo area */}
-                      <div style={{ position: 'relative', background: '#f3f4f6', padding: '24px 24px 0' }}>
-                        {alumnus.current_status && (
-                          <span style={{
-                            position: 'absolute', top: 14, right: 14,
-                            background: getStatusColor(alumnus.current_status),
-                            color: '#fff', fontSize: '0.68rem', fontWeight: 700,
-                            padding: '4px 10px', borderRadius: 20,
-                            letterSpacing: '0.6px', textTransform: 'uppercase',
-                            zIndex: 2
-                          }}>
-                            {alumnus.current_status}
-                          </span>
-                        )}
+                      {/* Status Badge */}
+                      {alumnus.current_status && (
+                        <span className="status-badge" style={{
+                          position: 'absolute', top: 14, right: 14,
+                          background: getStatusColor(alumnus.current_status),
+                          color: '#fff', fontSize: '0.63rem', fontWeight: 700,
+                          padding: '3px 9px', borderRadius: 20,
+                          letterSpacing: '0.6px', textTransform: 'uppercase',
+                          zIndex: 2
+                        }}>
+                          {alumnus.current_status}
+                        </span>
+                      )}
+
+                      {/* Circular Photo */}
+                      <div style={{
+                        width: 88, height: 88,
+                        borderRadius: '50%',
+                        overflow: 'hidden',
+                        border: '3px solid var(--color-primary)',
+                        boxShadow: '0 4px 16px rgba(25,127,230,0.18)',
+                        marginBottom: 16,
+                        flexShrink: 0,
+                      }}>
                         <img
                           src={buildPhotoUrl(alumnus.photo)}
                           alt={alumnus.name || 'Alumnus'}
-                          style={{
-                            width: '100%', height: 220,
-                            objectFit: 'cover',
-                            borderRadius: 12,
-                            display: 'block'
-                          }}
+                          className="alumni-photo"
+                          style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
                         />
                       </div>
 
-                      {/* Info area */}
-                      <div style={{ padding: '20px 22px 24px' }}>
-                        <h5 style={{
-                          fontSize: '1.05rem', fontWeight: 800,
-                          color: '#111827', marginBottom: 4
-                        }}>
-                          {alumnus.name || '—'}
-                        </h5>
+                      {/* Name */}
+                      <h5 style={{ fontSize: '1.0rem', fontWeight: 800, color: '#111827', marginBottom: 4 }}>
+                        {alumnus.name || '—'}
+                      </h5>
 
-                        {(alumnus.designation || alumnus.organization_name) && (
-                          <p style={{
-                            fontSize: '0.875rem', color: 'var(--color-primary)',
-                            fontWeight: 600, marginBottom: 14
-                          }}>
-                            {alumnus.designation}
-                            {alumnus.designation && alumnus.organization_name && ' at '}
-                            {alumnus.organization_name}
-                          </p>
+                      {/* Designation */}
+                      {(alumnus.designation || alumnus.organization_name) && (
+                        <p style={{ fontSize: '0.82rem', color: 'var(--color-primary)', fontWeight: 600, marginBottom: 14 }}>
+                          {alumnus.designation}
+                          {alumnus.designation && alumnus.organization_name && ' at '}
+                          {alumnus.organization_name}
+                        </p>
+                      )}
+
+                      {/* Divider */}
+                      <div style={{ width: 40, height: 2, background: '#e5e7eb', borderRadius: 2, marginBottom: 14 }} />
+
+                      {/* Details */}
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 7, alignItems: 'center', width: '100%' }}>
+                        {alumnus.institution && (
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                            <i className="bi bi-mortarboard" style={{ color: '#9ca3af', fontSize: 13, flexShrink: 0 }}></i>
+                            <span style={{ fontSize: '0.80rem', color: '#6b7280' }}>
+                              {alumnus.institution}{alumnus.batch ? `, Class of ${alumnus.batch}` : ''}
+                            </span>
+                          </div>
                         )}
-
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                          {alumnus.institution && (
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                              <i className="bi bi-mortarboard" style={{ color: '#9ca3af', fontSize: 14, flexShrink: 0 }}></i>
-                              <span style={{ fontSize: '0.84rem', color: '#6b7280' }}>
-                                {alumnus.institution}{alumnus.batch ? `, Class of ${alumnus.batch}` : ''}
-                              </span>
-                            </div>
-                          )}
-                          {alumnus.work_location && (
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                              <i className="bi bi-geo-alt" style={{ color: '#9ca3af', fontSize: 14, flexShrink: 0 }}></i>
-                              <span style={{ fontSize: '0.84rem', color: '#6b7280' }}>
-                                {alumnus.work_location}
-                              </span>
-                            </div>
-                          )}
-                        </div>
+                        {alumnus.work_location && (
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                            <i className="bi bi-geo-alt" style={{ color: '#9ca3af', fontSize: 13, flexShrink: 0 }}></i>
+                            <span style={{ fontSize: '0.80rem', color: '#6b7280' }}>
+                              {alumnus.work_location}
+                            </span>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>

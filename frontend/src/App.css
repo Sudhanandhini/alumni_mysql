@@ -19,8 +19,8 @@ body {
 
 /* Carousel Section */
 .carousel-section  { background-color: #f3f4f6; }
-.alumni-carousel-container { padding: 0 50px; position: relative; }
-.carousel-item-wrapper     { padding: 0 12px; }
+.alumni-carousel-container { padding: 0 60px; position: relative; }
+.carousel-item-wrapper     { padding: 0 10px; }
 
 /* Status Badge */
 .status-badge-top {
@@ -126,16 +126,19 @@ body {
 
 /* Responsive */
 @media (max-width: 992px) {
-  .alumni-carousel-container { padding: 0 30px; }
-  .slick-prev { left: -30px !important; }
-  .slick-next { right: -30px !important; }
+  .alumni-carousel-container { padding: 0 44px; }
+  .slick-prev { left: -36px !important; }
+  .slick-next { right: -36px !important; }
 }
 @media (max-width: 768px) {
-  .alumni-carousel-container { padding: 0 15px; }
-  .slick-prev { left: 5px !important; }
-  .slick-next { right: 5px !important; }
+  .alumni-carousel-container { padding: 0 12px; }
+  .slick-prev, .slick-next { display: none !important; }
 }
 @media (max-width: 576px) {
-  .alumni-carousel-container { padding: 0 10px; }
-  .carousel-item-wrapper      { padding: 0 6px; }
+  .alumni-carousel-container { padding: 0 8px; }
+  .carousel-item-wrapper { padding: 0 4px; }
+  .slick-prev, .slick-next { display: none !important; }
+}
+@media (max-width: 400px) {
+  .alumni-carousel-container { padding: 0 4px; }
 }
