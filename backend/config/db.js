@@ -13,6 +13,8 @@ async function connectDatabase() {
       waitForConnections: true,
       connectionLimit: 10,
       queueLimit: 0,
+      enableKeepAlive: true,
+      keepAliveInitialDelay: 0,
     });
     await db.query('SELECT 1');
     console.log('✅ Connected to MySQL database!');
@@ -59,6 +61,24 @@ async function runMigrations() {
     await addIfMissing('city', 'VARCHAR(100) DEFAULT NULL');
     await addIfMissing('education_level', 'VARCHAR(100) DEFAULT NULL');
     await addIfMissing('work_city', 'VARCHAR(100) DEFAULT NULL');
+    await addIfMissing('parent_name', 'VARCHAR(255) DEFAULT NULL');
+    await addIfMissing('ug_college', 'VARCHAR(255) DEFAULT NULL');
+    await addIfMissing('pg_college', 'VARCHAR(255) DEFAULT NULL');
+    await addIfMissing('doctorate_name', 'VARCHAR(255) DEFAULT NULL');
+    await addIfMissing('social_links', 'TEXT DEFAULT NULL');
+
+    // Make previously NOT NULL columns nullable (no longer required in new form)
+    const makeNullable = async (col, type) => {
+      try { await db.query(`ALTER TABLE alumni MODIFY COLUMN \`${col}\` ${type} NULL DEFAULT NULL`); } catch (_) {}
+    };
+    await makeNullable('batch', 'VARCHAR(10)');
+    await makeNullable('department', 'VARCHAR(255)');
+    await makeNullable('institution', 'VARCHAR(255)');
+    await makeNullable('phone', 'VARCHAR(30)');
+    await makeNullable('gender', "ENUM('Male','Female','Other')");
+    await makeNullable('dob', 'DATE');
+    await makeNullable('current_status', "ENUM('Employed','Self-Employed','Studying','Not Working')");
+    await makeNullable('password', 'VARCHAR(255)');
 
     console.log('✅ All database migrations complete');
   } catch (err) {

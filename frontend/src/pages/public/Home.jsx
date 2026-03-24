@@ -12,14 +12,7 @@ import hero from "../../assets/po.jpg"
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
-const API_BASE = (() => {
-  try {
-    const tmp = API_URL.replace(/\/api\/?$/, '');
-    return tmp.startsWith('http') ? tmp : `http://${tmp}`;
-  } catch {
-    return 'http://localhost:5000';
-  }
-})();
+const API_BASE = API_URL.replace(/\/api\/?$/, '');
 
 // Animated Counter Component
 function AnimatedCounter({ end, duration = 2000, suffix = '' }) {
@@ -353,61 +346,7 @@ function Home() {
         </div>
       </div>
 
-      {/* ── NETWORK AT A GLANCE ── */}
-      <div style={{ background: '#fff', padding: 'clamp(32px, 6vw, 60px) 0' }}>
-        <div className="container">
-          <div style={{ marginBottom: 36 }}>
-            <h2 style={{ fontSize: '1.65rem', fontWeight: 800, color: '#111827', marginBottom: 6 }}>
-              Network at a Glance
-            </h2>
-            <p style={{ color: '#6b7280', fontSize: '0.95rem' }}>
-              Impacting the world through our collective reach.
-            </p>
-          </div>
-
-          {stats.loading ? (
-            <div className="text-center py-4">
-              <div className="spinner-border" style={{ width: '2.5rem', height: '2.5rem', color: 'var(--color-primary)' }}>
-                <span className="visually-hidden">Loading...</span>
-              </div>
-            </div>
-          ) : (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '1rem' }}>
-              {[
-                { icon: 'bi-people-fill', value: stats.totalAlumni, label: 'Active Members' },
-                { icon: 'bi-graph-up-arrow', value: stats.totalCareers, label: 'Careers Launched' },
-                { icon: 'bi-building', value: stats.totalCompanies, label: 'Global Companies' },
-                { icon: 'bi-globe2', value: stats.totalCountries, label: 'Countries Represented' },
-              ].map((item, idx) => (
-                <div key={idx}>
-                  <div className="stat-card" style={{
-                    background: '#f3f4f6', borderRadius: 16,
-                    padding: 'clamp(16px, 4vw, 28px) clamp(14px, 3vw, 24px)', border: '1px solid #e5e7eb',
-                    transition: 'all 0.25s ease'
-                  }}>
-                    <div style={{
-                      width: 44, height: 44, borderRadius: 10,
-                      background: 'var(--color-primary-light)',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      marginBottom: 18
-                    }}>
-                      <i className={`bi ${item.icon}`} style={{ fontSize: 20, color: 'var(--color-primary)' }}></i>
-                    </div>
-                    <div style={{ fontSize: 'clamp(1.7rem, 4vw, 2.2rem)', fontWeight: 900, color: '#111827', lineHeight: 1, marginBottom: 6 }}>
-                      <AnimatedCounter end={item.value} duration={2000} />
-                    </div>
-                    <div style={{ fontSize: '0.875rem', color: '#6b7280', fontWeight: 500 }}>
-                      {item.label}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* ── FEATURED ALUMNI ── */}
+        {/* ── FEATURED ALUMNI ── */}
       <div style={{ background: '#f3f4f6', padding: '60px 0 70px' }}>
         <div className="container">
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 32, flexWrap: 'wrap', gap: 12 }}>
@@ -468,7 +407,7 @@ function Home() {
                         width: 88, height: 88,
                         borderRadius: '50%',
                         overflow: 'hidden',
-                        border: '3px solid var(--color-primary)',
+                       
                         boxShadow: '0 4px 16px rgba(25,127,230,0.18)',
                         marginBottom: 16,
                         flexShrink: 0,
@@ -482,18 +421,18 @@ function Home() {
                       </div>
 
                       {/* Name */}
-                      <h5 style={{ fontSize: '1.0rem', fontWeight: 800, color: '#111827', marginBottom: 4 }}>
+                      <h5 style={{ fontSize: '1.0rem', fontWeight: 800, color: '#111827', marginBottom: 14,  textTransform: 'capitalize'}}>
                         {alumnus.name || '—'}
                       </h5>
 
                       {/* Designation */}
-                      {(alumnus.designation || alumnus.organization_name) && (
+                      {/* {(alumnus.designation || alumnus.organization_name) && (
                         <p style={{ fontSize: '0.82rem', color: 'var(--color-primary)', fontWeight: 600, marginBottom: 14 }}>
                           {alumnus.designation}
                           {alumnus.designation && alumnus.organization_name && ' at '}
                           {alumnus.organization_name}
                         </p>
-                      )}
+                      )} */}
 
                       {/* Divider */}
                       <div style={{ width: 40, height: 2, background: '#e5e7eb', borderRadius: 2, marginBottom: 14 }} />
@@ -526,8 +465,64 @@ function Home() {
         </div>
       </div>
 
+      {/* ── NETWORK AT A GLANCE ── */}
+      <div style={{ background: '#fff', padding: 'clamp(32px, 6vw, 60px) 0' }}>
+        <div className="container">
+          <div style={{ marginBottom: 36 }}>
+            <h2 style={{ fontSize: '1.65rem', fontWeight: 800, color: '#111827', marginBottom: 6 }}>
+              Network at a Glance
+            </h2>
+            <p style={{ color: '#6b7280', fontSize: '0.95rem' }}>
+              Impacting the world through our collective reach.
+            </p>
+          </div>
+
+          {stats.loading ? (
+            <div className="text-center py-4">
+              <div className="spinner-border" style={{ width: '2.5rem', height: '2.5rem', color: 'var(--color-primary)' }}>
+                <span className="visually-hidden">Loading...</span>
+              </div>
+            </div>
+          ) : (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '1rem' }}>
+              {[
+                { icon: 'bi-people-fill', value: stats.totalAlumni, label: 'Active Members' },
+                { icon: 'bi-graph-up-arrow', value: stats.totalCareers, label: 'Careers Launched' },
+                { icon: 'bi-building', value: stats.totalCompanies, label: 'Global Companies' },
+                { icon: 'bi-globe2', value: stats.totalCountries, label: 'Countries Represented' },
+              ].map((item, idx) => (
+                <div key={idx}>
+                  <div className="stat-card" style={{
+                    background: '#f3f4f6', borderRadius: 16,
+                    padding: 'clamp(16px, 4vw, 28px) clamp(14px, 3vw, 24px)', border: '1px solid #e5e7eb',
+                    transition: 'all 0.25s ease'
+                  }}>
+                    <div style={{
+                      width: 44, height: 44, borderRadius: 10,
+                      background: 'var(--color-primary-light)',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      marginBottom: 18
+                    }}>
+                      <i className={`bi ${item.icon}`} style={{ fontSize: 20, color: 'var(--color-primary)' }}></i>
+                    </div>
+                    <div style={{ fontSize: 'clamp(1.7rem, 4vw, 2.2rem)', fontWeight: 900, color: '#111827', lineHeight: 1, marginBottom: 6 }}>
+                      <AnimatedCounter end={item.value} duration={2000} />
+                    </div>
+                    <div style={{ fontSize: '0.875rem', color: '#6b7280', fontWeight: 500 }}>
+                      {item.label}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+    
+
       {/* ── CTA SECTION ── */}
-      <div style={{ background: '#f3f4f6', padding: '0 0 70px' }}>
+      <div style={{ background: '#f3f4f6', padding: '70px 70px' }}>
         <div className="container">
           <div style={{
             background: 'var(--color-primary)',

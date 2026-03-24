@@ -17,12 +17,11 @@ router.post('/alumni/forgot-password', async (req, res) => {
   try {
     const db = getDb();
     if (!requireDb(res)) return;
-    const { username, email } = req.body;
-    if (!username) return res.status(400).json({ message: 'Username is required' });
+    const { email } = req.body;
     if (!email) return res.status(400).json({ message: 'Email is required' });
 
-    const [rows] = await db.query('SELECT id, name, email, username FROM alumni WHERE username = ? AND email = ?', [username, email]);
-    if (!rows || rows.length === 0) return res.json({ message: 'If the username and email match, a reset link has been sent' });
+    const [rows] = await db.query('SELECT id, name, email, username FROM alumni WHERE email = ?', [email]);
+    if (!rows || rows.length === 0) return res.json({ message: 'If the email is registered, a reset link has been sent', success: true });
 
     const user = rows[0];
     const token = jwt.sign({ id: user.id, username: user.username }, ALUMNI_JWT_SECRET, { expiresIn: '1h' });
@@ -129,7 +128,8 @@ router.get('/alumni', async (req, res) => {
         work_location, experience_years, skills, achievements, higher_education, institution,
         approval_status, is_deleted, attended_program, program_type, facebook, enrollment_number,
         completion_year, functional_area, employment_type, seniority_level,
-        country, city, education_level, work_city, created_at
+        country, city, education_level, work_city, created_at,
+        parent_name, ug_college, pg_college, doctorate_name, social_links, username
        FROM alumni ${whereClause} ORDER BY id DESC`
     );
     res.json(results);
@@ -149,7 +149,8 @@ router.get('/alumni/me', verifyAlumniToken, async (req, res) => {
         work_location, experience_years, skills, achievements, higher_education, institution,
         approval_status, attended_program, program_type, facebook, enrollment_number,
         completion_year, functional_area, employment_type, seniority_level,
-        country, city, education_level, work_city, created_at, username
+        country, city, education_level, work_city, created_at, username,
+        parent_name, ug_college, pg_college, doctorate_name, social_links
        FROM alumni WHERE id = ?`,
       [req.alumniId]
     );
@@ -172,7 +173,8 @@ router.put('/alumni/me', verifyAlumniToken, runMulter(upload.single('photo')), a
       industry, work_location, experience_years, skills, achievements,
       higher_education, institution,
       attended_program, program_type, facebook, enrollment_number, completion_year,
-      functional_area, employment_type, seniority_level, country, city, education_level, work_city
+      functional_area, employment_type, seniority_level, country, city, education_level, work_city,
+      parent_name, ug_college, pg_college, doctorate_name, social_links
     } = body;
 
     let photo = body.existing_photo || null;
@@ -191,13 +193,15 @@ router.put('/alumni/me', verifyAlumniToken, runMulter(upload.single('photo')), a
        bio=?, current_status=?, organization_name=?, designation=?, industry=?, work_location=?, experience_years=?,
        skills=?, achievements=?, higher_education=?, institution=?,
        attended_program=?, program_type=?, facebook=?, enrollment_number=?, completion_year=?,
-       functional_area=?, employment_type=?, seniority_level=?, country=?, city=?, education_level=?, work_city=?
+       functional_area=?, employment_type=?, seniority_level=?, country=?, city=?, education_level=?, work_city=?,
+       parent_name=?, ug_college=?, pg_college=?, doctorate_name=?, social_links=?
        WHERE id=?`,
       [name, email, phone, gender, dob, batch, department, address, photo, linkedin,
        bio, current_status, organization_name, designation, industry, work_location, expYearsVal,
        skills, achievements, higher_education, institution,
        attended_program, program_type, facebook, enrollment_number, completion_year,
        functional_area, employment_type, seniority_level, country, city, education_level, work_city,
+       parent_name || null, ug_college || null, pg_college || null, doctorate_name || null, social_links || null,
        req.alumniId]
     );
     res.json({ message: 'Profile updated successfully' });
@@ -226,7 +230,11 @@ router.get('/alumni/:id', async (req, res) => {
     const [results] = await db.query(
       `SELECT id, name, email, phone, gender, dob, batch, department, address, photo,
         linkedin, bio, current_status, organization_name, designation, industry,
-        work_location, experience_years, skills, achievements, higher_education, institution, created_at
+        work_location, experience_years, skills, achievements, higher_education, institution,
+        attended_program, program_type, facebook, enrollment_number, completion_year,
+        functional_area, employment_type, seniority_level, country, city, education_level, work_city,
+        parent_name, ug_college, pg_college, doctorate_name, social_links, username,
+        approval_status, created_at
        FROM alumni WHERE id = ?`,
       [req.params.id]
     );
@@ -248,7 +256,8 @@ router.post('/alumni/register', runMulter(upload.single('photo')), async (req, r
       linkedin, bio, current_status, organization_name, designation, industry,
       work_location, experience_years, skills, achievements, higher_education, institution,
       attended_program, program_type, facebook, enrollment_number, completion_year,
-      functional_area, employment_type, seniority_level, country, city, education_level, work_city
+      functional_area, employment_type, seniority_level, country, city, education_level, work_city,
+      parent_name, ug_college, pg_college, doctorate_name, social_links
     } = body;
 
     if (!username || !password) return res.status(400).json({ message: 'Username and password are required' });
@@ -273,13 +282,15 @@ router.post('/alumni/register', runMulter(upload.single('photo')), async (req, r
         work_location, experience_years, skills, achievements, higher_education, institution,
         attended_program, program_type, facebook, enrollment_number, completion_year,
         functional_area, employment_type, seniority_level, country, city, education_level, work_city,
+        parent_name, ug_college, pg_college, doctorate_name, social_links,
         approval_status
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending')`,
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending')`,
       [username, hashedPassword, name, email, phone, gender, dob, batch, department, address,
        photo, linkedin, bio, current_status, organization_name, designation, industry,
        work_location, expYearsVal, skills, achievements, higher_education, institution,
        attended_program, program_type, facebook, enrollment_number, completion_year,
-       functional_area, employment_type, seniority_level, country, city, education_level, work_city]
+       functional_area, employment_type, seniority_level, country, city, education_level, work_city,
+       parent_name || null, ug_college || null, pg_college || null, doctorate_name || null, social_links || null]
     );
 
     try {
@@ -291,7 +302,7 @@ router.post('/alumni/register', runMulter(upload.single('photo')), async (req, r
     res.status(201).json({ message: 'Registration successful!', id: result.insertId });
   } catch (err) {
     console.error('Error registering alumni:', err);
-    res.status(500).json({ error: 'Failed to register alumni', message: err.message });
+    res.status(500).json({ error: 'Failed to register alumni', message: err.message || err.code || String(err) });
   }
 });
 
@@ -300,24 +311,40 @@ router.post('/alumni', runMulter(upload.single('photo')), async (req, res) => {
     const db = getDb();
     if (!requireDb(res)) return;
     const body = Object.fromEntries(Object.entries(req.body || {}).map(([k, v]) => [k, normalizeForDb(v)]));
-    const { name, email, phone, gender, dob, batch, department, address, linkedin, bio,
-      current_status, organization_name, designation, industry, work_location,
-      experience_years, skills, achievements, higher_education, institution } = body;
+    const {
+      username, password, name, email, phone, gender, dob, batch, department, address,
+      linkedin, bio, current_status, organization_name, designation, industry,
+      work_location, experience_years, skills, achievements, higher_education, institution,
+      attended_program, program_type, facebook, enrollment_number, completion_year,
+      functional_area, employment_type, seniority_level, country, city, education_level, work_city,
+      parent_name, ug_college, pg_college, doctorate_name, social_links
+    } = body;
 
     if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return res.status(400).json({ message: 'Invalid email format' });
 
     const photo = req.file ? `/uploads/${req.file.filename}` : null;
     const expYearsVal = experience_years ? (isNaN(Number(experience_years)) ? null : Number(experience_years)) : null;
+    const hashedPassword = password ? await bcrypt.hash(password, 10) : null;
+
+    // Auto-generate username if not provided
+    const finalUsername = username || (name ? name.toLowerCase().replace(/\s+/g, '') + Math.floor(Math.random() * 1000) : null);
 
     const [result] = await db.query(
       `INSERT INTO alumni (
-        name, email, phone, gender, dob, batch, department, address, photo, linkedin,
+        username, password, name, email, phone, gender, dob, batch, department, address, photo, linkedin,
         bio, current_status, organization_name, designation, industry, work_location,
-        experience_years, skills, achievements, higher_education, institution, approval_status
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'approved')`,
-      [name, email, phone, gender, dob, batch, department, address, photo, linkedin,
+        experience_years, skills, achievements, higher_education, institution,
+        attended_program, program_type, facebook, enrollment_number, completion_year,
+        functional_area, employment_type, seniority_level, country, city, education_level, work_city,
+        parent_name, ug_college, pg_college, doctorate_name, social_links,
+        approval_status
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'approved')`,
+      [finalUsername, hashedPassword, name, email, phone, gender, dob, batch, department, address, photo, linkedin,
        bio, current_status, organization_name, designation, industry, work_location,
-       expYearsVal, skills, achievements, higher_education, institution]
+       expYearsVal, skills, achievements, higher_education, institution,
+       attended_program, program_type, facebook, enrollment_number, completion_year,
+       functional_area, employment_type, seniority_level, country, city, education_level, work_city,
+       parent_name || null, ug_college || null, pg_college || null, doctorate_name || null, social_links || null]
     );
     res.status(201).json({ message: 'Alumni added!', id: result.insertId });
   } catch (err) {
@@ -334,7 +361,10 @@ router.put('/alumni/:id', runMulter(upload.single('photo')), async (req, res) =>
     const body = Object.fromEntries(Object.entries(req.body || {}).map(([k, v]) => [k, normalizeForDb(v)]));
     const { name, email, phone, gender, dob, batch, department, address, linkedin, bio,
       current_status, organization_name, designation, industry, work_location,
-      experience_years, skills, achievements, higher_education, institution } = body;
+      experience_years, skills, achievements, higher_education, institution,
+      attended_program, program_type, facebook, enrollment_number, completion_year,
+      functional_area, employment_type, seniority_level, country, city, education_level, work_city,
+      parent_name, ug_college, pg_college, doctorate_name, social_links, password } = body;
 
     let photo = body.existing_photo || null;
     if (req.file) {
@@ -347,13 +377,25 @@ router.put('/alumni/:id', runMulter(upload.single('photo')), async (req, res) =>
 
     const expYearsVal = experience_years ? (isNaN(Number(experience_years)) ? null : Number(experience_years)) : null;
 
+    // Only update password if a new one is provided
+    if (password && password.length >= 6) {
+      const hashedPassword = await bcrypt.hash(password, 10);
+      await db.query(`UPDATE alumni SET password=? WHERE id=?`, [hashedPassword, id]);
+    }
+
     await db.query(
       `UPDATE alumni SET name=?, email=?, phone=?, gender=?, dob=?, batch=?, department=?, address=?, photo=?, linkedin=?,
       bio=?, current_status=?, organization_name=?, designation=?, industry=?, work_location=?, experience_years=?,
-      skills=?, achievements=?, higher_education=?, institution=? WHERE id=?`,
+      skills=?, achievements=?, higher_education=?, institution=?,
+      attended_program=?, program_type=?, facebook=?, enrollment_number=?, completion_year=?,
+      functional_area=?, employment_type=?, seniority_level=?, country=?, city=?, education_level=?, work_city=?,
+      parent_name=?, ug_college=?, pg_college=?, doctorate_name=?, social_links=? WHERE id=?`,
       [name, email, phone, gender, dob, batch, department, address, photo, linkedin,
        bio, current_status, organization_name, designation, industry, work_location, expYearsVal,
-       skills, achievements, higher_education, institution, id]
+       skills, achievements, higher_education, institution,
+       attended_program, program_type, facebook, enrollment_number, completion_year,
+       functional_area, employment_type, seniority_level, country, city, education_level, work_city,
+       parent_name || null, ug_college || null, pg_college || null, doctorate_name || null, social_links || null, id]
     );
     res.json({ message: 'Alumni updated!' });
   } catch (err) {
@@ -412,15 +454,18 @@ router.post('/alumni/login', async (req, res) => {
   try {
     const db = getDb();
     if (!requireDb(res)) return;
-    const { username, password } = req.body;
-    if (!username || !password) return res.status(400).json({ message: 'Username and password are required' });
+    const { email, password } = req.body;
+    if (!email || !password) return res.status(400).json({ message: 'Email and password are required' });
 
-    const [alumni] = await db.query('SELECT * FROM alumni WHERE username = ?', [username]);
-    if (!alumni || alumni.length === 0) return res.status(401).json({ message: 'Invalid username or password' });
+    const [alumni] = await db.query('SELECT * FROM alumni WHERE email = ?', [email]);
+    if (!alumni || alumni.length === 0) return res.status(401).json({ message: 'Invalid email or password' });
 
     const alumniUser = alumni[0];
+    if (alumniUser.approval_status === 'pending') return res.status(403).json({ message: 'Your account is pending admin approval.' });
+    if (alumniUser.approval_status === 'rejected') return res.status(403).json({ message: 'Your account has been rejected. Contact admin.' });
+
     const isPasswordValid = await bcrypt.compare(password, alumniUser.password);
-    if (!isPasswordValid) return res.status(401).json({ message: 'Invalid username or password' });
+    if (!isPasswordValid) return res.status(401).json({ message: 'Invalid email or password' });
 
     const token = jwt.sign({ id: alumniUser.id, username: alumniUser.username, type: 'alumni' }, ALUMNI_JWT_SECRET, { expiresIn: '24h' });
     res.json({

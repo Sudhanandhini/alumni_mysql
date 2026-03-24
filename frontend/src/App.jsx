@@ -72,7 +72,7 @@ function Layout() {
 
 function App() {
   return (
-    <Router>
+    <Router basename="/alumni_app">
       <Layout />
     </Router>
   );

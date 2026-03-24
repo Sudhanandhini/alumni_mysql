@@ -40,9 +40,12 @@ function AlumniEditProfile() {
   const [imagePreview,  setImagePreview]  = useState(null);
 
   const [profile, setProfile] = useState(null); // raw fetched data
+  const [socialLinks, setSocialLinks] = useState([]);
   const [formData, setFormData] = useState({
     name: '', email: '', phone: '', gender: '', dob: '', address: '',
+    parent_name: '',
     institution: '', batch: '', department: '', higher_education: '',
+    education_level: '', ug_college: '', pg_college: '', doctorate_name: '',
     current_status: '', organization_name: '', designation: '',
     industry: '', work_location: '', experience_years: '',
     skills: '', achievements: '', bio: '',
@@ -76,10 +79,15 @@ function AlumniEditProfile() {
         gender:            d.gender || '',
         dob:               d.dob ? d.dob.split('T')[0] : '',
         address:           d.address || (d.city ? [d.city, d.country].filter(Boolean).join(', ') : ''),
+        parent_name:       d.parent_name || '',
         institution:       d.institution || '',
         batch:             d.batch || '',
-        department:        d.department || d.education_level || '',
+        department:        d.department || '',
         higher_education:  d.higher_education || '',
+        education_level:   d.education_level || '',
+        ug_college:        d.ug_college || '',
+        pg_college:        d.pg_college || '',
+        doctorate_name:    d.doctorate_name || '',
         current_status:    d.current_status || '',
         organization_name: d.organization_name || '',
         designation:       d.designation || '',
@@ -92,6 +100,11 @@ function AlumniEditProfile() {
         linkedin:          d.linkedin || '',
         photo:             d.photo || ''
       });
+      // Parse social_links JSON
+      try {
+        const parsed = d.social_links ? JSON.parse(d.social_links) : [];
+        setSocialLinks(Array.isArray(parsed) ? parsed : []);
+      } catch { setSocialLinks([]); }
       if (d.photo) setImagePreview(`${API_BASE}${d.photo}`);
     } catch (err) {
       console.error('Profile load error:', err);
@@ -129,6 +142,10 @@ function AlumniEditProfile() {
     reader.readAsDataURL(file);
   };
 
+  const addSocialLink = () => setSocialLinks(prev => [...prev, { platform: 'LinkedIn', url: '' }]);
+  const removeSocialLink = (i) => setSocialLinks(prev => prev.filter((_, idx) => idx !== i));
+  const changeSocialLink = (i, field, value) => setSocialLinks(prev => prev.map((l, idx) => idx === i ? { ...l, [field]: value } : l));
+
   const handleSave = async () => {
     try {
       setSaving(true);
@@ -137,6 +154,7 @@ function AlumniEditProfile() {
         if (k !== 'photo' && formData[k] !== undefined && formData[k] !== null)
           fd.append(k, formData[k]);
       });
+      fd.append('social_links', JSON.stringify(socialLinks));
       if (selectedImage) {
         fd.append('photo', selectedImage);
       } else if (formData.photo) {
@@ -392,6 +410,11 @@ function AlumniEditProfile() {
                     <input className="form-control" name="address" value={formData.address} onChange={onChange} placeholder="City, State, Country" />
                   </Field>
                 </div>
+                <div className="col-md-6">
+                  <Field label="Parent / Guardian Name">
+                    <input className="form-control" name="parent_name" value={formData.parent_name} onChange={onChange} placeholder="Parent or guardian name" />
+                  </Field>
+                </div>
               </div>
             </div>
           )}
@@ -422,6 +445,46 @@ function AlumniEditProfile() {
                     </select>
                   </Field>
                 </div>
+                <div className="col-md-6">
+                  <Field label="Education Level">
+                    <select className="form-select" name="education_level" value={formData.education_level} onChange={onChange}>
+                      <option value="">Select level</option>
+                      <option>High School</option>
+                      <option>Diploma</option>
+                      <option>Under Graduate (UG)</option>
+                      <option>Post Graduate (PG)</option>
+                      <option>Doctorate / PhD</option>
+                    </select>
+                  </Field>
+                </div>
+                {(formData.education_level === 'Post Graduate (PG)' || formData.education_level === 'Doctorate / PhD') && (
+                  <div className="col-md-6">
+                    <Field label="UG College Name">
+                      <input className="form-control" name="ug_college" value={formData.ug_college} onChange={onChange} placeholder="Undergraduate college name" />
+                    </Field>
+                  </div>
+                )}
+                {formData.education_level === 'Post Graduate (PG)' && (
+                  <div className="col-md-6">
+                    <Field label="PG College Name">
+                      <input className="form-control" name="pg_college" value={formData.pg_college} onChange={onChange} placeholder="Postgraduate college name" />
+                    </Field>
+                  </div>
+                )}
+                {formData.education_level === 'Doctorate / PhD' && (
+                  <div className="col-md-6">
+                    <Field label="PG College Name">
+                      <input className="form-control" name="pg_college" value={formData.pg_college} onChange={onChange} placeholder="Postgraduate college name" />
+                    </Field>
+                  </div>
+                )}
+                {formData.education_level === 'Doctorate / PhD' && (
+                  <div className="col-md-6">
+                    <Field label="Doctorate Institution">
+                      <input className="form-control" name="doctorate_name" value={formData.doctorate_name} onChange={onChange} placeholder="Doctorate institution name" />
+                    </Field>
+                  </div>
+                )}
                 <div className="col-md-6">
                   <Field label="Higher Education">
                     <input className="form-control" name="higher_education" value={formData.higher_education} onChange={onChange} placeholder="e.g. MBA from XYZ University" />
@@ -529,45 +592,55 @@ function AlumniEditProfile() {
           {activeTab === 'social' && (
             <div>
               <SectionTitle icon="bi-share-fill" title="Social & Online Presence" />
-              <div className="row g-3 mt-1">
-                <div className="col-md-8">
-                  <Field label="LinkedIn Profile">
-                    <div className="input-group">
-                      <span className="input-group-text" style={{ background: '#0a66c2', border: 'none', color: '#fff', borderRadius: '8px 0 0 8px' }}>
-                        <i className="bi bi-linkedin"></i>
-                      </span>
-                      <input className="form-control" type="url" name="linkedin" value={formData.linkedin} onChange={onChange}
-                        placeholder="https://linkedin.com/in/username" />
-                    </div>
-                  </Field>
-                </div>
 
-                {/* Profile summary read-only */}
-                <div className="col-12 mt-3">
-                  <div style={{ background: '#f9fafb', borderRadius: 12, padding: '20px 24px', border: '1px solid #e5e7eb' }}>
-                    <div style={{ fontSize: 13, fontWeight: 700, color: '#374151', marginBottom: 14 }}>
-                      <i className="bi bi-shield-check-fill me-2" style={{ color: NAV_COLOR }}></i>
-                      Account Details (Read-only)
-                    </div>
-                    <div className="row g-2">
-                      {[
-                        { label: 'Username', value: profile?.username, icon: 'bi-person-circle' },
-                        { label: 'Registered Email', value: formData.email, icon: 'bi-envelope-fill' },
-                        { label: 'Member Since', value: profile?.created_at ? new Date(profile.created_at).toLocaleDateString('en-IN', { year: 'numeric', month: 'long' }) : '—', icon: 'bi-calendar-check' },
-                        { label: 'Approval Status', value: profile?.approval_status || '—', icon: 'bi-check-circle' },
-                      ].map(item => (
-                        <div key={item.label} className="col-sm-6">
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                            <i className={`bi ${item.icon}`} style={{ color: NAV_COLOR, fontSize: 14, flexShrink: 0 }}></i>
-                            <div>
-                              <div style={{ fontSize: 11, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: 0.5 }}>{item.label}</div>
-                              <div style={{ fontSize: 14, fontWeight: 600, color: '#374151' }}>{item.value || '—'}</div>
-                            </div>
-                          </div>
-                        </div>
+              {/* Dynamic social links */}
+              <div style={{ marginTop: 16, display: 'flex', flexDirection: 'column', gap: 10 }}>
+                {socialLinks.map((link, i) => (
+                  <div key={i} style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                    <select value={link.platform} onChange={e => changeSocialLink(i, 'platform', e.target.value)}
+                      style={{ width: 160, padding: '10px 12px', border: '1.5px solid #e5e7eb', borderRadius: 8, fontSize: 13, flexShrink: 0 }}>
+                      {['LinkedIn','Facebook','Twitter','Instagram','GitHub','YouTube','Website','Other'].map(p => (
+                        <option key={p}>{p}</option>
                       ))}
-                    </div>
+                    </select>
+                    <input type="url" value={link.url} onChange={e => changeSocialLink(i, 'url', e.target.value)}
+                      placeholder="https://"
+                      style={{ flex: 1, padding: '10px 12px', border: '1.5px solid #e5e7eb', borderRadius: 8, fontSize: 13 }} />
+                    <button type="button" onClick={() => removeSocialLink(i)}
+                      style={{ background: '#fff1f1', border: 'none', borderRadius: 8, padding: '10px 12px', cursor: 'pointer', color: '#dc3545', flexShrink: 0 }}>
+                      <i className="bi bi-trash3-fill"></i>
+                    </button>
                   </div>
+                ))}
+                <button type="button" onClick={addSocialLink}
+                  style={{ alignSelf: 'flex-start', background: 'var(--color-primary-light)', border: '1.5px dashed var(--color-primary)', color: 'var(--color-primary)', borderRadius: 8, padding: '8px 18px', fontSize: 13, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 7, marginTop: 4 }}>
+                  <i className="bi bi-plus-circle-fill"></i> Add Social Link
+                </button>
+              </div>
+
+              {/* Profile summary read-only */}
+              <div style={{ background: '#f9fafb', borderRadius: 12, padding: '20px 24px', border: '1px solid #e5e7eb', marginTop: 24 }}>
+                <div style={{ fontSize: 13, fontWeight: 700, color: '#374151', marginBottom: 14 }}>
+                  <i className="bi bi-shield-check-fill me-2" style={{ color: NAV_COLOR }}></i>
+                  Account Details (Read-only)
+                </div>
+                <div className="row g-2">
+                  {[
+                    { label: 'Username', value: profile?.username, icon: 'bi-person-circle' },
+                    { label: 'Registered Email', value: formData.email, icon: 'bi-envelope-fill' },
+                    { label: 'Member Since', value: profile?.created_at ? new Date(profile.created_at).toLocaleDateString('en-IN', { year: 'numeric', month: 'long' }) : '—', icon: 'bi-calendar-check' },
+                    { label: 'Approval Status', value: profile?.approval_status || '—', icon: 'bi-check-circle' },
+                  ].map(item => (
+                    <div key={item.label} className="col-sm-6">
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                        <i className={`bi ${item.icon}`} style={{ color: NAV_COLOR, fontSize: 14, flexShrink: 0 }}></i>
+                        <div>
+                          <div style={{ fontSize: 11, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: 0.5 }}>{item.label}</div>
+                          <div style={{ fontSize: 14, fontWeight: 600, color: '#374151' }}>{item.value || '—'}</div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>

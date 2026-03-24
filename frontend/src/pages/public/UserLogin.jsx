@@ -7,7 +7,7 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 // Single unified login â€” tries alumni table first, then users table
 function UserLogin() {
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({ username: '', password: '' });
+  const [formData, setFormData] = useState({ email: '', password: '' });
   const [loading, setLoading] = useState(false);
   const [error, setError]     = useState('');
   const [showPass, setShowPass] = useState(false);
@@ -37,8 +37,8 @@ function UserLogin() {
     } catch (alumniErr) {
       const alumniStatus = alumniErr.response?.status;
       // 401 = wrong password for an existing alumni account â†’ show error, don't try user table
-      if (alumniStatus === 401) {
-        setError('Invalid username or password.');
+      if (alumniStatus === 401 || alumniStatus === 403) {
+        setError(alumniErr.response?.data?.message || 'Invalid email or password.');
         setLoading(false);
         return;
       }
@@ -140,7 +140,7 @@ function UserLogin() {
           {/* Heading */}
           <div style={{ marginBottom: 36 }}>
             <h2 style={{ fontWeight: 800, fontSize: 26, color: 'var(--color-secondary)', marginBottom: 6 }}>Sign in to your account</h2>
-            <p style={{ fontSize: 14, color: '#888', margin: 0 }}>Enter your registered username and password</p>
+            <p style={{ fontSize: 14, color: '#888', margin: 0 }}>Enter your registered email and password</p>
           </div>
 
           {/* Error */}
@@ -152,14 +152,14 @@ function UserLogin() {
           )}
 
           <form onSubmit={handleSubmit}>
-            {/* Username */}
+            {/* Email */}
             <div style={{ marginBottom: 20 }}>
-              <label style={{ display: 'block', fontWeight: 600, fontSize: 13, color: '#374151', marginBottom: 6 }}>Username</label>
+              <label style={{ display: 'block', fontWeight: 600, fontSize: 13, color: '#374151', marginBottom: 6 }}>Email Address</label>
               <div style={{ position: 'relative' }}>
-                <i className="bi bi-person-fill" style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', color: '#9ca3af', fontSize: 16, pointerEvents: 'none' }}></i>
+                <i className="bi bi-envelope-fill" style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', color: '#9ca3af', fontSize: 16, pointerEvents: 'none' }}></i>
                 <input
-                  type="text" name="username" value={formData.username} onChange={handleChange}
-                  placeholder="Enter your username" required autoFocus autoComplete="username"
+                  type="email" name="email" value={formData.email} onChange={handleChange}
+                  placeholder="Enter your email address" required autoFocus autoComplete="email"
                   style={{ width: '100%', padding: '13px 14px 13px 40px', border: '1.5px solid #e5e7eb', borderRadius: 10, fontSize: 14, outline: 'none', boxSizing: 'border-box', background: '#fafafa' }}
                   onFocus={e => e.target.style.borderColor = 'var(--color-primary)'}
                   onBlur={e => e.target.style.borderColor = '#e5e7eb'}
