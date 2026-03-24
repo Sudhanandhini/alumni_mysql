@@ -1,6 +1,7 @@
 ﻿import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { Link } from "react-router-dom";
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
@@ -434,11 +435,32 @@ function Step1({ formData, onChange, errors }) {
           <label style={{ display: 'flex', alignItems: 'flex-start', gap: 10, cursor: 'pointer', marginBottom: 12 }}>
             <input type="checkbox" name="terms" checked={formData.terms} onChange={onChange}
               style={{ marginTop: 2, accentColor: 'var(--color-primary)', width: 16, height: 16, flexShrink: 0 }} />
-            <span style={{ fontSize: 13, color: '#555', lineHeight: 1.5 }}>
+            {/* <span style={{ fontSize: 13, color: '#555', lineHeight: 1.5 }}>
               I agree to the <span style={{ color: 'var(--color-primary)', cursor: 'pointer' }}>Terms & Conditions</span> and{' '}
               <span style={{ color: 'var(--color-primary)', cursor: 'pointer' }}>Privacy Policy</span>
               <span className="text-primary"> *</span>
-            </span>
+            </span> */}
+            <span style={{ fontSize: 13, color: '#555', lineHeight: 1.5 }}>
+  I agree to the{" "}
+  
+  <Link 
+    to="/terms" 
+    style={{ color: 'var(--color-primary)', cursor: 'pointer', textDecoration: 'none' }}
+  >
+    Terms & Conditions
+  </Link>
+  
+  {" "}and{" "}
+  
+  <Link 
+    to="/privacy" 
+    style={{ color: 'var(--color-primary)', cursor: 'pointer', textDecoration: 'none' }}
+  >
+    Privacy Policy
+  </Link>
+  
+  <span className="text-primary"> *</span>
+</span>
           </label>
           <FieldError msg={errors.terms} />
         </div>

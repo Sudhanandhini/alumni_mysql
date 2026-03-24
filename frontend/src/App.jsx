@@ -17,6 +17,8 @@ import ViewAlumni from './pages/user/ViewAlumni';
 import AlumniEditProfile from './pages/alumni/AlumniEditProfile';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import './App.css';
+import Terms from './pages/public/Terms';
+import Privacy from './pages/public/Privacy';
 
 // Protected Route Component for Admin
 const AdminProtectedRoute = ({ children }) => {
@@ -48,6 +50,8 @@ function Layout() {
           <Route path="/login" element={<Login />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/terms" element={<Terms />}  />
+          <Route path="/privacy" element={<Privacy />} />
 
           {/* Protected Admin Routes */}
           <Route path="/admin" element={<AdminProtectedRoute><AdminDashboard /></AdminProtectedRoute>} />

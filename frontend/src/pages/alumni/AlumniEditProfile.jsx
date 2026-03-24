@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from 'react';
+﻿import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
@@ -20,15 +20,93 @@ const TABS = [
 const industries = [
   'Information Technology', 'Finance & Banking', 'Healthcare', 'Education',
   'Manufacturing', 'Retail & E-Commerce', 'Media & Entertainment', 'Consulting',
-  'Government & Public Sector', 'Real Estate', 'Telecommunications', 'Other'
+  'Government & Public Sector', 'Real Estate', 'Telecommunications',
+  'Agriculture', 'Pharmaceuticals', 'Automobile', 'Hospitality', 'Other'
 ];
-const departments = [
-  'Engineering & Technology', 'Economics & Commerce', 'Science',
-  'Arts & Humanities', 'Business Administration', 'Law', 'Medicine',
-  'Journalism, Media, PR & Communication', 'Other'
+
+const FUNCTIONAL_AREAS = [
+  'Engineering / Technology', 'Sales & Business Development', 'Marketing',
+  'Finance & Accounting', 'Human Resources', 'Operations',
+  'IT & Software', 'Research & Development', 'Design / Creative',
+  'Legal & Compliance', 'Customer Service', 'Healthcare / Medical',
+  'Teaching / Training', 'Management', 'Other'
+];
+const EMPLOYMENT_TYPES = [
+  'Full-time', 'Part-time', 'Contract', 'Freelance / Consulting',
+  'Internship', 'Self-employed / Entrepreneur'
+];
+const SENIORITY_LEVELS = [
+  'Fresher / Intern', 'Entry Level (0-2 years)', 'Junior (2-5 years)',
+  'Mid-level (5-8 years)', 'Senior (8-12 years)', 'Lead / Principal',
+  'Manager', 'Senior Manager', 'Director / VP', 'C-Suite (CEO, CTO, etc.)'
+];
+const ATTENDED_PROGRAMS = ['Class 8', 'Class 9', 'Class 10', 'Class 11', 'Class 12'];
+const EDUCATION_LEVELS = [
+  'Class 10 (SSC/ICSE)', 'Class 11', 'Class 12 (HSC/CBSE)',
+  'Undergraduate (B.Tech/B.Sc/BA/B.Com)',
+  'Postgraduate (MBA/M.Tech/M.Sc)', 'Doctoral (PhD)'
 ];
 const experienceYears = Array.from({ length: 51 }, (_, i) => i.toString());
 const years = Array.from({ length: 50 }, (_, i) => (new Date().getFullYear() - i).toString());
+
+const selectStyle = {
+  width: '100%', padding: '6px 12px', borderRadius: 6, fontSize: 14,
+  border: '1px solid #ced4da', background: '#fff', color: '#212529',
+  outline: 'none', height: 38,
+};
+
+function ComboBox({ name, value, onChange, options, placeholder }) {
+  const [open, setOpen] = useState(false);
+  const [inputVal, setInputVal] = useState(value || '');
+  const wrapRef = useRef(null);
+
+  useEffect(() => { setInputVal(value || ''); }, [value]);
+
+  useEffect(() => {
+    const close = (e) => { if (wrapRef.current && !wrapRef.current.contains(e.target)) setOpen(false); };
+    document.addEventListener('mousedown', close);
+    return () => document.removeEventListener('mousedown', close);
+  }, []);
+
+  const filtered = inputVal ? options.filter(o => o.toLowerCase().includes(inputVal.toLowerCase())) : options;
+
+  const handleInput = (e) => { setInputVal(e.target.value); onChange({ target: { name, value: e.target.value } }); setOpen(true); };
+  const select = (opt) => { setInputVal(opt); onChange({ target: { name, value: opt } }); setOpen(false); };
+
+  return (
+    <div ref={wrapRef} style={{ position: 'relative' }}>
+      <div style={{ display: 'flex' }}>
+        <input type="text" className="form-control" value={inputVal} onChange={handleInput}
+          onFocus={() => setOpen(true)} placeholder={placeholder} autoComplete="off"
+          style={{ borderRadius: '8px 0 0 8px', borderRight: 'none' }} />
+        <button type="button" onClick={() => setOpen(!open)} style={{
+          border: '1px solid #ced4da', borderLeft: 'none', background: '#f8f9fa',
+          borderRadius: '0 8px 8px 0', padding: '0 12px', cursor: 'pointer'
+        }}>
+          <i className={`bi bi-chevron-${open ? 'up' : 'down'}`} style={{ fontSize: 12 }}></i>
+        </button>
+      </div>
+      {open && filtered.length > 0 && (
+        <ul style={{
+          position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 9999,
+          maxHeight: 220, overflowY: 'auto', background: '#fff',
+          border: '1px solid #ddd', borderTop: 'none', borderRadius: '0 0 8px 8px',
+          listStyle: 'none', padding: '4px 0', margin: 0,
+          boxShadow: '0 8px 24px rgba(0,0,0,0.12)'
+        }}>
+          {filtered.map(opt => (
+            <li key={opt} onMouseDown={() => select(opt)}
+              style={{ padding: '9px 14px', cursor: 'pointer', fontSize: 14, color: '#333' }}
+              onMouseEnter={e => e.currentTarget.style.background = '#f0f0f0'}
+              onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
+              {opt}
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
 
 function AlumniEditProfile() {
   const navigate = useNavigate();
@@ -45,9 +123,12 @@ function AlumniEditProfile() {
     name: '', email: '', phone: '', gender: '', dob: '', address: '',
     parent_name: '',
     institution: '', batch: '', department: '', higher_education: '',
+    attended_program: '', enrollment_number: '', completion_year: '',
     education_level: '', ug_college: '', pg_college: '', doctorate_name: '',
     current_status: '', organization_name: '', designation: '',
     industry: '', work_location: '', experience_years: '',
+    functional_area: '', employment_type: '', seniority_level: '',
+    work_country: '', work_city: '', work_mode: '',
     skills: '', achievements: '', bio: '',
     linkedin: '', photo: ''
   });
@@ -84,6 +165,9 @@ function AlumniEditProfile() {
         batch:             d.batch || '',
         department:        d.department || '',
         higher_education:  d.higher_education || '',
+        attended_program:  d.attended_program || '',
+        enrollment_number: d.enrollment_number || '',
+        completion_year:   d.completion_year || '',
         education_level:   d.education_level || '',
         ug_college:        d.ug_college || '',
         pg_college:        d.pg_college || '',
@@ -92,8 +176,14 @@ function AlumniEditProfile() {
         organization_name: d.organization_name || '',
         designation:       d.designation || '',
         industry:          d.industry || '',
-        work_location:     d.work_location || d.work_city || '',
+        work_location:     d.work_location || '',
         experience_years:  d.experience_years != null ? String(d.experience_years) : '',
+        functional_area:   d.functional_area || '',
+        employment_type:   d.employment_type || '',
+        seniority_level:   d.seniority_level || '',
+        work_country:      d.country || '',
+        work_city:         d.work_city || d.city || '',
+        work_mode:         d.work_mode || '',
         skills:            d.skills || '',
         achievements:      d.achievements || '',
         bio:               d.bio || '',
@@ -151,9 +241,16 @@ function AlumniEditProfile() {
       setSaving(true);
       const fd = new FormData();
       Object.keys(formData).forEach(k => {
-        if (k !== 'photo' && formData[k] !== undefined && formData[k] !== null)
-          fd.append(k, formData[k]);
+        if (k === 'photo') return;
+        // map work_country → country, work_city stays as work_city
+        const backendKey = k === 'work_country' ? 'country' : k;
+        if (formData[k] !== undefined && formData[k] !== null)
+          fd.append(backendKey, formData[k]);
       });
+      // Auto-derive fields to match registration behaviour
+      fd.set('batch', formData.completion_year || '');
+      fd.set('department', formData.education_level || '');
+      fd.set('higher_education', formData.education_level || '');
       fd.append('social_links', JSON.stringify(socialLinks));
       if (selectedImage) {
         fd.append('photo', selectedImage);
@@ -374,45 +471,33 @@ function AlumniEditProfile() {
           {activeTab === 'personal' && (
             <div>
               <SectionTitle icon="bi-person-fill" title="Personal Information" />
-              <div className="row g-3 mt-1">
-                <div className="col-md-6">
-                  <Field label="Full Name" required>
-                    <input className="form-control" name="name" value={formData.name} onChange={onChange} placeholder="Full name" />
-                  </Field>
-                </div>
-                <div className="col-md-6">
-                  <Field label="Email Address" required>
-                    <input className="form-control" type="email" name="email" value={formData.email} onChange={onChange} placeholder="Email" />
-                  </Field>
-                </div>
-                <div className="col-md-6">
-                  <Field label="Phone Number">
-                    <input className="form-control" type="tel" name="phone" value={formData.phone} onChange={onChange} placeholder="Phone" />
-                  </Field>
-                </div>
-                <div className="col-md-6">
-                  <Field label="Gender">
-                    <select className="form-select" name="gender" value={formData.gender} onChange={onChange}>
-                      <option value="">Select gender</option>
-                      <option>Male</option>
-                      <option>Female</option>
-                      <option>Other</option>
-                    </select>
-                  </Field>
-                </div>
-                <div className="col-md-6">
-                  <Field label="Date of Birth">
-                    <input className="form-control" type="date" name="dob" value={formData.dob} onChange={onChange} />
-                  </Field>
-                </div>
-                <div className="col-md-6">
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginTop: 16 }}>
+                <Field label="Full Name" required>
+                  <input className="form-control" name="name" value={formData.name} onChange={onChange} placeholder="Enter your full name" />
+                </Field>
+                <Field label="Email Address" required>
+                  <input className="form-control" type="email" name="email" value={formData.email} onChange={onChange} placeholder="you@example.com" />
+                </Field>
+                <Field label="Phone Number">
+                  <input className="form-control" type="tel" name="phone" value={formData.phone} onChange={onChange} placeholder="+91 9876543210" />
+                </Field>
+                <Field label="Parent / Guardian Name">
+                  <input className="form-control" name="parent_name" value={formData.parent_name} onChange={onChange} placeholder="Parent or guardian name" />
+                </Field>
+                <Field label="Gender">
+                  <select name="gender" value={formData.gender} onChange={onChange} style={selectStyle}>
+                    <option value="">Select gender</option>
+                    <option>Male</option>
+                    <option>Female</option>
+                    <option>Other</option>
+                  </select>
+                </Field>
+                <Field label="Date of Birth">
+                  <input className="form-control" type="date" name="dob" value={formData.dob} onChange={onChange} />
+                </Field>
+                <div style={{ gridColumn: '1 / -1' }}>
                   <Field label="Current Address / Location">
                     <input className="form-control" name="address" value={formData.address} onChange={onChange} placeholder="City, State, Country" />
-                  </Field>
-                </div>
-                <div className="col-md-6">
-                  <Field label="Parent / Guardian Name">
-                    <input className="form-control" name="parent_name" value={formData.parent_name} onChange={onChange} placeholder="Parent or guardian name" />
                   </Field>
                 </div>
               </div>
@@ -423,73 +508,46 @@ function AlumniEditProfile() {
           {activeTab === 'education' && (
             <div>
               <SectionTitle icon="bi-mortarboard-fill" title="Education Details" />
-              <div className="row g-3 mt-1">
-                <div className="col-md-8">
-                  <Field label="Institution / School / University" required>
-                    <input className="form-control" name="institution" value={formData.institution} onChange={onChange} placeholder="Name of institution" />
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginTop: 16 }}>
+                <div style={{ gridColumn: '1 / -1' }}>
+                  <Field label="Institution / School / University">
+                    <input className="form-control" name="institution" value={formData.institution} onChange={onChange} placeholder="e.g. KAL School, Anna University" />
                   </Field>
                 </div>
-                <div className="col-md-4">
-                  <Field label="Batch / Passout Year" required>
-                    <select className="form-select" name="batch" value={formData.batch} onChange={onChange}>
-                      <option value="">Select year</option>
-                      {years.map(y => <option key={y}>{y}</option>)}
-                    </select>
+                <Field label="Attended Program">
+                  <select name="attended_program" value={formData.attended_program} onChange={onChange} style={selectStyle}>
+                    <option value="">Select class attended</option>
+                    {ATTENDED_PROGRAMS.map(p => <option key={p}>{p}</option>)}
+                  </select>
+                </Field>
+                <Field label="Enrollment No.">
+                  <input className="form-control" name="enrollment_number" value={formData.enrollment_number} onChange={onChange} placeholder="e.g. 2020CS001" />
+                </Field>
+                <Field label="Completion / Passout Year">
+                  <select name="completion_year" value={formData.completion_year} onChange={onChange} style={selectStyle}>
+                    <option value="">Select year</option>
+                    {years.map(y => <option key={y}>{y}</option>)}
+                  </select>
+                </Field>
+                <Field label="Education Level">
+                  <ComboBox name="education_level" value={formData.education_level} onChange={onChange}
+                    options={EDUCATION_LEVELS} placeholder="Select or type level" />
+                </Field>
+                {['Undergraduate (B.Tech/B.Sc/BA/B.Com)', 'Postgraduate (MBA/M.Tech/M.Sc)', 'Doctoral (PhD)'].includes(formData.education_level) && (
+                  <Field label="UG College Name">
+                    <input className="form-control" name="ug_college" value={formData.ug_college} onChange={onChange} placeholder="Undergraduate college name" />
                   </Field>
-                </div>
-                <div className="col-md-6">
-                  <Field label="Department / Stream">
-                    <select className="form-select" name="department" value={formData.department} onChange={onChange}>
-                      <option value="">Select department</option>
-                      {departments.map(d => <option key={d}>{d}</option>)}
-                    </select>
-                  </Field>
-                </div>
-                <div className="col-md-6">
-                  <Field label="Education Level">
-                    <select className="form-select" name="education_level" value={formData.education_level} onChange={onChange}>
-                      <option value="">Select level</option>
-                      <option>High School</option>
-                      <option>Diploma</option>
-                      <option>Under Graduate (UG)</option>
-                      <option>Post Graduate (PG)</option>
-                      <option>Doctorate / PhD</option>
-                    </select>
-                  </Field>
-                </div>
-                {(formData.education_level === 'Post Graduate (PG)' || formData.education_level === 'Doctorate / PhD') && (
-                  <div className="col-md-6">
-                    <Field label="UG College Name">
-                      <input className="form-control" name="ug_college" value={formData.ug_college} onChange={onChange} placeholder="Undergraduate college name" />
-                    </Field>
-                  </div>
                 )}
-                {formData.education_level === 'Post Graduate (PG)' && (
-                  <div className="col-md-6">
-                    <Field label="PG College Name">
-                      <input className="form-control" name="pg_college" value={formData.pg_college} onChange={onChange} placeholder="Postgraduate college name" />
-                    </Field>
-                  </div>
-                )}
-                {formData.education_level === 'Doctorate / PhD' && (
-                  <div className="col-md-6">
-                    <Field label="PG College Name">
-                      <input className="form-control" name="pg_college" value={formData.pg_college} onChange={onChange} placeholder="Postgraduate college name" />
-                    </Field>
-                  </div>
-                )}
-                {formData.education_level === 'Doctorate / PhD' && (
-                  <div className="col-md-6">
-                    <Field label="Doctorate Institution">
-                      <input className="form-control" name="doctorate_name" value={formData.doctorate_name} onChange={onChange} placeholder="Doctorate institution name" />
-                    </Field>
-                  </div>
-                )}
-                <div className="col-md-6">
-                  <Field label="Higher Education">
-                    <input className="form-control" name="higher_education" value={formData.higher_education} onChange={onChange} placeholder="e.g. MBA from XYZ University" />
+                {['Postgraduate (MBA/M.Tech/M.Sc)', 'Doctoral (PhD)'].includes(formData.education_level) && (
+                  <Field label="PG College Name">
+                    <input className="form-control" name="pg_college" value={formData.pg_college} onChange={onChange} placeholder="Postgraduate college name" />
                   </Field>
-                </div>
+                )}
+                {formData.education_level === 'Doctoral (PhD)' && (
+                  <Field label="Doctorate Institution">
+                    <input className="form-control" name="doctorate_name" value={formData.doctorate_name} onChange={onChange} placeholder="Doctorate institution name" />
+                  </Field>
+                )}
               </div>
             </div>
           )}
@@ -498,47 +556,75 @@ function AlumniEditProfile() {
           {activeTab === 'work' && (
             <div>
               <SectionTitle icon="bi-briefcase-fill" title="Work Experience" />
-              <div className="row g-3 mt-1">
-                <div className="col-md-6">
-                  <Field label="Current Status">
-                    <select className="form-select" name="current_status" value={formData.current_status} onChange={onChange}>
-                      <option value="">Select status</option>
-                      <option>Employed</option>
-                      <option>Self-Employed</option>
-                      <option>Studying</option>
-                      <option>Not Working</option>
-                    </select>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginTop: 16 }}>
+                <Field label="Current Status">
+                  <select name="current_status" value={formData.current_status} onChange={onChange} style={selectStyle}>
+                    <option value="">Select status</option>
+                    <option>Employed</option>
+                    <option>Self-Employed</option>
+                    <option>Studying</option>
+                    <option>Not Working</option>
+                  </select>
+                </Field>
+                <Field label="Organisation / Company Name">
+                  <input className="form-control" name="organization_name" value={formData.organization_name} onChange={onChange} placeholder="Company or organization name" />
+                </Field>
+                <Field label="Designation / Job Title">
+                  <input className="form-control" name="designation" value={formData.designation} onChange={onChange} placeholder="e.g. Software Engineer" />
+                </Field>
+                <Field label="Industry">
+                  <ComboBox name="industry" value={formData.industry} onChange={onChange}
+                    options={industries} placeholder="Select or type industry" />
+                </Field>
+                <Field label="Functional Area">
+                  <ComboBox name="functional_area" value={formData.functional_area} onChange={onChange}
+                    options={FUNCTIONAL_AREAS} placeholder="Select or type area" />
+                </Field>
+                <Field label="Employment Type">
+                  <ComboBox name="employment_type" value={formData.employment_type} onChange={onChange}
+                    options={EMPLOYMENT_TYPES} placeholder="Select employment type" />
+                </Field>
+                <Field label="Seniority Level">
+                  <ComboBox name="seniority_level" value={formData.seniority_level} onChange={onChange}
+                    options={SENIORITY_LEVELS} placeholder="Select seniority level" />
+                </Field>
+                <Field label="Years of Experience">
+                  <select name="experience_years" value={formData.experience_years} onChange={onChange} style={selectStyle}>
+                    <option value="">Select experience</option>
+                    {experienceYears.map(e => <option key={e} value={e}>{e === '0' ? 'Fresher (0 yrs)' : `${e} year${e !== '1' ? 's' : ''}`}</option>)}
+                  </select>
+                </Field>
+                <Field label="Working Country">
+                  <ComboBox name="work_country" value={formData.work_country} onChange={onChange}
+                    options={['India', 'United States', 'United Kingdom', 'Canada', 'Australia', 'Germany', 'Singapore', 'UAE', 'Other']}
+                    placeholder="e.g. India, United States" />
+                </Field>
+                <Field label="Working City">
+                  <ComboBox name="work_city" value={formData.work_city} onChange={onChange}
+                    options={['Bangalore', 'Mumbai', 'Delhi', 'Chennai', 'Hyderabad', 'Pune', 'Kolkata', 'Ahmedabad', 'Other']}
+                    placeholder="e.g. Bangalore, Mumbai" />
+                </Field>
+                <div style={{ gridColumn: '1 / -1' }}>
+                  <Field label="Work Mode">
+                    <div style={{ display: 'flex', gap: 12, marginTop: 6 }}>
+                      {['Office', 'Remote', 'Hybrid'].map(mode => (
+                        <label key={mode} style={{
+                          flex: 1, border: `2px solid ${formData.work_mode === mode ? NAV_COLOR : '#e5e7eb'}`,
+                          borderRadius: 10, padding: '12px 16px', cursor: 'pointer',
+                          background: formData.work_mode === mode ? NAV_COLOR + '10' : '#fff',
+                          display: 'flex', alignItems: 'center', gap: 8, transition: 'all 0.15s'
+                        }}>
+                          <input type="radio" name="work_mode" value={mode} checked={formData.work_mode === mode}
+                            onChange={onChange} style={{ accentColor: NAV_COLOR, width: 15, height: 15 }} />
+                          <span style={{ fontSize: 14, fontWeight: 600, color: formData.work_mode === mode ? NAV_COLOR : '#555' }}>{mode}</span>
+                        </label>
+                      ))}
+                    </div>
                   </Field>
                 </div>
-                <div className="col-md-6">
-                  <Field label="Organisation / Company Name">
-                    <input className="form-control" name="organization_name" value={formData.organization_name} onChange={onChange} placeholder="Company name" />
-                  </Field>
-                </div>
-                <div className="col-md-6">
-                  <Field label="Designation / Job Title">
-                    <input className="form-control" name="designation" value={formData.designation} onChange={onChange} placeholder="e.g. Software Engineer" />
-                  </Field>
-                </div>
-                <div className="col-md-6">
-                  <Field label="Industry">
-                    <select className="form-select" name="industry" value={formData.industry} onChange={onChange}>
-                      <option value="">Select industry</option>
-                      {industries.map(i => <option key={i}>{i}</option>)}
-                    </select>
-                  </Field>
-                </div>
-                <div className="col-md-6">
-                  <Field label="Work Location">
-                    <input className="form-control" name="work_location" value={formData.work_location} onChange={onChange} placeholder="City, Country or Remote" />
-                  </Field>
-                </div>
-                <div className="col-md-6">
-                  <Field label="Years of Experience">
-                    <select className="form-select" name="experience_years" value={formData.experience_years} onChange={onChange}>
-                      <option value="">Select experience</option>
-                      {experienceYears.map(e => <option key={e} value={e}>{e === '0' ? 'Fresher (0 yrs)' : `${e} year${e !== '1' ? 's' : ''}`}</option>)}
-                    </select>
+                <div style={{ gridColumn: '1 / -1' }}>
+                  <Field label="Work Location / Full Address">
+                    <input className="form-control" name="work_location" value={formData.work_location} onChange={onChange} placeholder="Full work address or Remote" />
                   </Field>
                 </div>
               </div>
@@ -549,42 +635,28 @@ function AlumniEditProfile() {
           {activeTab === 'skills' && (
             <div>
               <SectionTitle icon="bi-stars" title="Skills & Bio" />
-              <div className="row g-3 mt-1">
-                <div className="col-12">
-                  <Field label="Skills">
-                    <input className="form-control" name="skills" value={formData.skills} onChange={onChange}
-                      placeholder="e.g. JavaScript, React, Leadership, Public Speaking" />
-                    <div style={{ fontSize: 12, color: '#9ca3af', marginTop: 5 }}>Separate skills with commas</div>
-                  </Field>
-                </div>
-                <div className="col-12">
-                  <Field label="Achievements">
-                    <textarea className="form-control" rows={3} name="achievements" value={formData.achievements} onChange={onChange}
-                      placeholder="List your notable achievements, awards, certifications..." />
-                  </Field>
-                </div>
-                <div className="col-12">
-                  <Field label="Brief Bio / About Me">
-                    <textarea className="form-control" rows={4} name="bio" value={formData.bio} onChange={onChange}
-                      placeholder="Write a short professional biography about yourself..." />
-                  </Field>
-                </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 16, marginTop: 16 }}>
+                <Field label="Skills">
+                  <input className="form-control" name="skills" value={formData.skills} onChange={onChange}
+                    placeholder="e.g. JavaScript, React, Leadership, Public Speaking" />
+                  <div style={{ fontSize: 12, color: '#9ca3af', marginTop: 5 }}>Separate skills with commas</div>
+                  {formData.skills && (
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 7, marginTop: 10 }}>
+                      {formData.skills.split(',').map(s => s.trim()).filter(Boolean).map((s, i) => (
+                        <span key={i} style={{ background: NAV_COLOR + '12', color: NAV_COLOR, padding: '4px 12px', borderRadius: 20, fontSize: 12, fontWeight: 500 }}>{s}</span>
+                      ))}
+                    </div>
+                  )}
+                </Field>
+                <Field label="Achievements">
+                  <textarea className="form-control" rows={3} name="achievements" value={formData.achievements} onChange={onChange}
+                    placeholder="List your notable achievements, awards, certifications..." />
+                </Field>
+                <Field label="Brief Bio / About Me">
+                  <textarea className="form-control" rows={5} name="bio" value={formData.bio} onChange={onChange}
+                    placeholder="Write a short professional biography about yourself..." />
+                </Field>
               </div>
-
-              {/* Skills preview */}
-              {formData.skills && (
-                <div style={{ marginTop: 20 }}>
-                  <div style={{ fontSize: 13, fontWeight: 600, color: '#374151', marginBottom: 10 }}>Skills Preview</div>
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-                    {formData.skills.split(',').map(s => s.trim()).filter(Boolean).map((s, i) => (
-                      <span key={i} style={{
-                        background: NAV_COLOR + '12', color: NAV_COLOR,
-                        padding: '5px 14px', borderRadius: 20, fontSize: 13, fontWeight: 500
-                      }}>{s}</span>
-                    ))}
-                  </div>
-                </div>
-              )}
             </div>
           )}
 
@@ -592,28 +664,33 @@ function AlumniEditProfile() {
           {activeTab === 'social' && (
             <div>
               <SectionTitle icon="bi-share-fill" title="Social & Online Presence" />
-
-              {/* Dynamic social links */}
               <div style={{ marginTop: 16, display: 'flex', flexDirection: 'column', gap: 10 }}>
-                {socialLinks.map((link, i) => (
-                  <div key={i} style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                    <select value={link.platform} onChange={e => changeSocialLink(i, 'platform', e.target.value)}
-                      style={{ width: 160, padding: '10px 12px', border: '1.5px solid #e5e7eb', borderRadius: 8, fontSize: 13, flexShrink: 0 }}>
-                      {['LinkedIn','Facebook','Twitter','Instagram','GitHub','YouTube','Website','Other'].map(p => (
-                        <option key={p}>{p}</option>
-                      ))}
-                    </select>
-                    <input type="url" value={link.url} onChange={e => changeSocialLink(i, 'url', e.target.value)}
-                      placeholder="https://"
-                      style={{ flex: 1, padding: '10px 12px', border: '1.5px solid #e5e7eb', borderRadius: 8, fontSize: 13 }} />
-                    <button type="button" onClick={() => removeSocialLink(i)}
-                      style={{ background: '#fff1f1', border: 'none', borderRadius: 8, padding: '10px 12px', cursor: 'pointer', color: '#dc3545', flexShrink: 0 }}>
-                      <i className="bi bi-trash3-fill"></i>
-                    </button>
-                  </div>
-                ))}
+                {socialLinks.map((link, i) => {
+                  const ICONS = { LinkedIn:'bi-linkedin', Facebook:'bi-facebook', Instagram:'bi-instagram', 'Twitter/X':'bi-twitter-x', YouTube:'bi-youtube', GitHub:'bi-github', Website:'bi-globe', Other:'bi-link-45deg' };
+                  const COLORS = { LinkedIn:'#0a66c2', Facebook:'#1877f2', Instagram:'#e1306c', 'Twitter/X':'#000', YouTube:'#ff0000', GitHub:'#333', Website:'#555', Other:'#888' };
+                  const icon = ICONS[link.platform] || 'bi-link-45deg';
+                  const color = COLORS[link.platform] || '#888';
+                  return (
+                    <div key={i} style={{ display: 'flex', gap: 8, alignItems: 'center', border: '1px solid #e5e7eb', borderRadius: 10, overflow: 'hidden' }}>
+                      <span style={{ background: color, color: '#fff', padding: '10px 14px', flexShrink: 0 }}>
+                        <i className={`bi ${icon}`}></i>
+                      </span>
+                      <select value={link.platform} onChange={e => changeSocialLink(i, 'platform', e.target.value)}
+                        style={{ border: 'none', borderRight: '1px solid #e5e7eb', padding: '10px 8px', fontSize: 13, flexShrink: 0, background: '#f8f9fa', outline: 'none', minWidth: 130 }}>
+                        {['LinkedIn','Facebook','Twitter/X','Instagram','GitHub','YouTube','Website','Other'].map(p => <option key={p}>{p}</option>)}
+                      </select>
+                      <input type="url" value={link.url} onChange={e => changeSocialLink(i, 'url', e.target.value)}
+                        placeholder="https://..."
+                        style={{ flex: 1, border: 'none', padding: '10px 12px', fontSize: 13, outline: 'none' }} />
+                      <button type="button" onClick={() => removeSocialLink(i)}
+                        style={{ background: '#fff1f1', border: 'none', borderLeft: '1px solid #e5e7eb', padding: '10px 14px', cursor: 'pointer', color: '#dc3545', flexShrink: 0 }}>
+                        <i className="bi bi-trash3"></i>
+                      </button>
+                    </div>
+                  );
+                })}
                 <button type="button" onClick={addSocialLink}
-                  style={{ alignSelf: 'flex-start', background: 'var(--color-primary-light)', border: '1.5px dashed var(--color-primary)', color: 'var(--color-primary)', borderRadius: 8, padding: '8px 18px', fontSize: 13, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 7, marginTop: 4 }}>
+                  style={{ alignSelf: 'flex-start', background: 'var(--color-primary-light)', border: '1.5px dashed var(--color-primary)', color: 'var(--color-primary)', borderRadius: 8, padding: '9px 20px', fontSize: 13, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 7, marginTop: 4 }}>
                   <i className="bi bi-plus-circle-fill"></i> Add Social Link
                 </button>
               </div>
