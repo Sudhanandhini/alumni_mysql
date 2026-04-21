@@ -88,10 +88,22 @@ async function runMigrations() {
         message TEXT NOT NULL,
         sent_count INT DEFAULT 0,
         failed_count INT DEFAULT 0,
+        attachment VARCHAR(500) DEFAULT NULL,
+        attachment_name VARCHAR(255) DEFAULT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
       )
     `);
+    // Add attachment columns if table already existed without them
+    const [bmCols] = await db.query(`
+      SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS
+      WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'broadcast_messages'
+    `);
+    const bmColNames = new Set(bmCols.map(c => c.COLUMN_NAME));
+    if (!bmColNames.has('attachment'))
+      await db.query("ALTER TABLE broadcast_messages ADD COLUMN attachment VARCHAR(500) DEFAULT NULL");
+    if (!bmColNames.has('attachment_name'))
+      await db.query("ALTER TABLE broadcast_messages ADD COLUMN attachment_name VARCHAR(255) DEFAULT NULL");
 
     console.log('✅ All database migrations complete');
   } catch (err) {

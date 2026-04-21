@@ -3,7 +3,10 @@ const router = express.Router();
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
+const path = require('path');
+const fs   = require('fs');
 const { requireDb, getDb } = require('../config/db');
+const { upload, runMulter, uploadDir } = require('../middleware/upload');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-here-change-in-production';
 
@@ -205,7 +208,7 @@ router.put('/admin/alumni/:id/reject', async (req, res) => {
 
 // ── Broadcast Messages ────────────────────────────────────────────────────────
 
-async function sendBroadcastEmails(db, subject, message) {
+async function sendBroadcastEmails(db, subject, message, attachmentInfo = null) {
   const [alumniList] = await db.query(
     "SELECT name, email FROM alumni WHERE approval_status = 'approved' AND is_deleted = 0 AND email IS NOT NULL AND email != ''"
   );
@@ -220,6 +223,20 @@ async function sendBroadcastEmails(db, subject, message) {
   });
 
   const htmlMessage = message.replace(/\n/g, '<br/>');
+
+  // Build inline image block if attachment exists
+  const imageBlock = attachmentInfo
+    ? `<div style="text-align:center;margin:20px 0;">
+        <img src="cid:broadcastimage" style="max-width:100%;border-radius:10px;" alt="Attachment"/>
+       </div>`
+    : '';
+
+  const attachments = attachmentInfo ? [{
+    filename: attachmentInfo.name,
+    path: attachmentInfo.path,
+    cid: 'broadcastimage'
+  }] : [];
+
   let sent = 0, failed = 0;
 
   for (const alumni of alumniList) {
@@ -228,6 +245,7 @@ async function sendBroadcastEmails(db, subject, message) {
         from: `"Alumni Portal" <${process.env.EMAIL_FROM || process.env.SMTP_USER}>`,
         to: alumni.email,
         subject,
+        attachments,
         html: `
           <div style="font-family:Inter,Arial,sans-serif;max-width:600px;margin:0 auto;background:#f4f6fa;padding:32px 16px;">
             <div style="background:#197fe6;border-radius:16px 16px 0 0;padding:32px 40px;text-align:center;">
@@ -236,7 +254,8 @@ async function sendBroadcastEmails(db, subject, message) {
             </div>
             <div style="background:#fff;border-radius:0 0 16px 16px;padding:36px 40px;">
               <p style="font-size:16px;color:#1a2744;font-weight:700;margin:0 0 8px;">Dear ${alumni.name},</p>
-              <div style="font-size:15px;color:#374151;line-height:1.8;margin:16px 0 28px;">${htmlMessage}</div>
+              <div style="font-size:15px;color:#374151;line-height:1.8;margin:16px 0;">${htmlMessage}</div>
+              ${imageBlock}
               <hr style="border:none;border-top:1px solid #e5e7eb;margin:24px 0;"/>
               <p style="font-size:12px;color:#9ca3af;text-align:center;margin:0;">
                 This message was sent by the Alumni Portal administration team.
@@ -301,8 +320,27 @@ router.get('/admin/broadcasts', async (req, res) => {
   }
 });
 
-// Send new broadcast
-router.post('/admin/broadcast', async (req, res) => {
+// Helper: insert broadcast record, falling back to base columns if attachment columns missing
+async function insertBroadcast(db, subject, message, sent, failed, attachmentRelPath, attachmentName) {
+  try {
+    const [result] = await db.query(
+      'INSERT INTO broadcast_messages (subject, message, sent_count, failed_count, attachment, attachment_name) VALUES (?, ?, ?, ?, ?, ?)',
+      [subject, message, sent, failed, attachmentRelPath, attachmentName]
+    );
+    return result.insertId;
+  } catch (e) {
+    // Fallback: attachment columns may not exist yet (restart backend to run migration)
+    const [result] = await db.query(
+      'INSERT INTO broadcast_messages (subject, message, sent_count, failed_count) VALUES (?, ?, ?, ?)',
+      [subject, message, sent, failed]
+    );
+    console.warn('⚠️  Saved broadcast without attachment columns — restart server to apply migration');
+    return result.insertId;
+  }
+}
+
+// Send new broadcast (with optional image attachment)
+router.post('/admin/broadcast', runMulter(upload.single('attachment')), async (req, res) => {
   try {
     const db = getDb();
     if (!requireDb(res)) return;
@@ -311,27 +349,64 @@ router.post('/admin/broadcast', async (req, res) => {
     if (!process.env.SMTP_HOST || !process.env.SMTP_USER || !process.env.SMTP_PASS) {
       return res.status(500).json({ message: 'Email service is not configured' });
     }
-    const { sent, failed, total } = await sendBroadcastEmails(db, subject, message);
+
+    const attachmentInfo    = req.file ? { path: req.file.path, name: req.file.originalname } : null;
+    const attachmentRelPath = req.file ? `/uploads/${req.file.filename}` : null;
+    const attachmentName    = req.file ? req.file.originalname : null;
+
+    const { sent, failed, total } = await sendBroadcastEmails(db, subject, message, attachmentInfo);
     if (total === 0) return res.status(404).json({ message: 'No approved alumni found to send email' });
-    const [result] = await db.query(
-      'INSERT INTO broadcast_messages (subject, message, sent_count, failed_count) VALUES (?, ?, ?, ?)',
-      [subject, message, sent, failed]
-    );
-    res.json({ message: `Email sent to ${sent} alumni${failed > 0 ? `, ${failed} failed` : ''}`, sent, failed, total, id: result.insertId });
+
+    const insertedId = await insertBroadcast(db, subject, message, sent, failed, attachmentRelPath, attachmentName);
+    res.json({ message: `Email sent to ${sent} alumni${failed > 0 ? `, ${failed} failed` : ''}`, sent, failed, total, id: insertedId });
   } catch (err) {
     console.error('Error sending broadcast email:', err);
     res.status(500).json({ error: 'Failed to send broadcast email', message: err.message });
   }
 });
 
-// Update broadcast (subject/message only — does not resend)
-router.put('/admin/broadcasts/:id', async (req, res) => {
+// Update broadcast — subject/message/attachment (does not resend)
+router.put('/admin/broadcasts/:id', runMulter(upload.single('attachment')), async (req, res) => {
   try {
     const db = getDb();
     if (!requireDb(res)) return;
-    const { subject, message } = req.body;
+    const { subject, message, remove_attachment } = req.body;
     if (!subject || !message) return res.status(400).json({ message: 'Subject and message are required' });
-    await db.query('UPDATE broadcast_messages SET subject = ?, message = ? WHERE id = ?', [subject, message, req.params.id]);
+
+    const [[existing]] = await db.query('SELECT attachment FROM broadcast_messages WHERE id = ?', [req.params.id]);
+
+    let attachmentRelPath = existing ? existing.attachment : null;
+    let attachmentName    = existing ? existing.attachment_name : null;
+
+    if (remove_attachment === 'true' && attachmentRelPath) {
+      const oldFile = path.join(uploadDir, path.basename(attachmentRelPath));
+      if (fs.existsSync(oldFile)) fs.unlinkSync(oldFile);
+      attachmentRelPath = null;
+      attachmentName    = null;
+    }
+
+    if (req.file) {
+      // Delete old file
+      if (attachmentRelPath) {
+        const oldFile = path.join(uploadDir, path.basename(attachmentRelPath));
+        if (fs.existsSync(oldFile)) fs.unlinkSync(oldFile);
+      }
+      attachmentRelPath = `/uploads/${req.file.filename}`;
+      attachmentName    = req.file.originalname;
+    }
+
+    try {
+      await db.query(
+        'UPDATE broadcast_messages SET subject = ?, message = ?, attachment = ?, attachment_name = ? WHERE id = ?',
+        [subject, message, attachmentRelPath, attachmentName, req.params.id]
+      );
+    } catch (e) {
+      // Fallback if attachment columns don't exist yet
+      await db.query(
+        'UPDATE broadcast_messages SET subject = ?, message = ? WHERE id = ?',
+        [subject, message, req.params.id]
+      );
+    }
     res.json({ message: 'Broadcast updated successfully' });
   } catch (err) {
     console.error('Error updating broadcast:', err);
@@ -339,7 +414,7 @@ router.put('/admin/broadcasts/:id', async (req, res) => {
   }
 });
 
-// Resend an existing broadcast
+// Resend an existing broadcast (reuses stored attachment)
 router.post('/admin/broadcasts/:id/resend', async (req, res) => {
   try {
     const db = getDb();
@@ -349,7 +424,12 @@ router.post('/admin/broadcasts/:id/resend', async (req, res) => {
     }
     const [[broadcast]] = await db.query('SELECT * FROM broadcast_messages WHERE id = ?', [req.params.id]);
     if (!broadcast) return res.status(404).json({ message: 'Broadcast not found' });
-    const { sent, failed, total } = await sendBroadcastEmails(db, broadcast.subject, broadcast.message);
+
+    const attachmentInfo = broadcast.attachment
+      ? { path: path.join(uploadDir, path.basename(broadcast.attachment)), name: broadcast.attachment_name }
+      : null;
+
+    const { sent, failed, total } = await sendBroadcastEmails(db, broadcast.subject, broadcast.message, attachmentInfo);
     if (total === 0) return res.status(404).json({ message: 'No approved alumni found to send email' });
     await db.query('UPDATE broadcast_messages SET sent_count = ?, failed_count = ? WHERE id = ?', [sent, failed, req.params.id]);
     res.json({ message: `Resent to ${sent} alumni${failed > 0 ? `, ${failed} failed` : ''}`, sent, failed, total });

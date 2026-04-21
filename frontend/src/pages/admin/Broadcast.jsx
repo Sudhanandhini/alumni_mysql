@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const API_URL  = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const API_BASE = API_URL.replace(/\/api\/?$/, '');
 
 const NAV = [
   { key: '/admin',            icon: 'bi-grid-fill',        label: 'Dashboard'         },
@@ -12,13 +13,14 @@ const NAV = [
   { key: '/admin/broadcast',  icon: 'bi-megaphone-fill',   label: 'Broadcast'         },
 ];
 
-const EMPTY = { subject: '', message: '' };
+const EMPTY = { subject: '', message: '', file: null, preview: null, removeAttachment: false };
 
 function Broadcast() {
   const navigate  = useNavigate();
   const location  = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [pendingCount, setPendingCount] = useState(0);
+  const fileRef = useRef(null);
 
   const [broadcasts, setBroadcasts] = useState([]);
   const [form, setForm]             = useState(EMPTY);
@@ -59,19 +61,40 @@ function Broadcast() {
     navigate('/login');
   };
 
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const preview = URL.createObjectURL(file);
+    setForm(p => ({ ...p, file, preview, removeAttachment: false }));
+  };
+
+  const handleRemoveFile = () => {
+    setForm(p => ({ ...p, file: null, preview: null, removeAttachment: true }));
+    if (fileRef.current) fileRef.current.value = '';
+  };
+
   const handleSend = async () => {
     if (!form.subject.trim() || !form.message.trim()) return;
     setStatus('sending');
     try {
+      const fd = new FormData();
+      fd.append('subject', form.subject);
+      fd.append('message', form.message);
+      if (form.file) fd.append('attachment', form.file);
+      if (form.removeAttachment) fd.append('remove_attachment', 'true');
+
+      const cfg = { ...authHeader(), headers: { ...authHeader().headers, 'Content-Type': 'multipart/form-data' } };
+
       if (editId) {
-        await axios.put(`${API_URL}/admin/broadcasts/${editId}`, form, authHeader());
+        await axios.put(`${API_URL}/admin/broadcasts/${editId}`, fd, cfg);
         setStatus({ ok: true, text: 'Broadcast updated successfully.' });
       } else {
-        const res = await axios.post(`${API_URL}/admin/broadcast`, form, authHeader());
+        const res = await axios.post(`${API_URL}/admin/broadcast`, fd, cfg);
         setStatus({ ok: true, text: res.data.message });
       }
       setForm(EMPTY);
       setEditId(null);
+      if (fileRef.current) fileRef.current.value = '';
       fetchBroadcasts();
     } catch (e) {
       setStatus({ ok: false, text: e.response?.data?.message || 'Failed to send email' });
@@ -80,8 +103,9 @@ function Broadcast() {
 
   const handleEdit = (b) => {
     setEditId(b.id);
-    setForm({ subject: b.subject, message: b.message });
+    setForm({ subject: b.subject, message: b.message, file: null, preview: null, removeAttachment: false });
     setStatus(null);
+    if (fileRef.current) fileRef.current.value = '';
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -247,6 +271,53 @@ function Broadcast() {
                 />
               </div>
 
+              {/* Image Attachment */}
+              <div style={{ marginBottom: 18 }}>
+                <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#374151', marginBottom: 6 }}>
+                  <i className="bi bi-image-fill" style={{ color: 'var(--color-primary)', marginRight: 5 }}></i>
+                  Attach Image <span style={{ color: '#9ca3af', fontWeight: 400 }}>(optional · jpg/png/gif · max 5MB)</span>
+                </label>
+
+                {/* Show existing attachment when editing */}
+                {editId && !form.file && !form.removeAttachment && (() => {
+                  const b = broadcasts.find(x => x.id === editId);
+                  return b?.attachment ? (
+                    <div style={{ marginBottom: 10, display: 'flex', alignItems: 'center', gap: 10 }}>
+                      <img src={`${API_BASE}${b.attachment}`} alt="current" style={{ width: 80, height: 60, objectFit: 'cover', borderRadius: 8, border: '1.5px solid #e5e7eb' }} />
+                      <div>
+                        <div style={{ fontSize: 13, color: '#374151', fontWeight: 500 }}>{b.attachment_name}</div>
+                        <button type="button" onClick={handleRemoveFile} style={{ fontSize: 12, color: '#dc2626', background: 'none', border: 'none', cursor: 'pointer', padding: 0, marginTop: 3 }}>
+                          <i className="bi bi-trash-fill me-1"></i>Remove
+                        </button>
+                      </div>
+                    </div>
+                  ) : null;
+                })()}
+
+                {/* New file preview */}
+                {form.preview && (
+                  <div style={{ marginBottom: 10, display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <img src={form.preview} alt="preview" style={{ width: 80, height: 60, objectFit: 'cover', borderRadius: 8, border: '1.5px solid #e5e7eb' }} />
+                    <div>
+                      <div style={{ fontSize: 13, color: '#374151', fontWeight: 500 }}>{form.file?.name}</div>
+                      <button type="button" onClick={handleRemoveFile} style={{ fontSize: 12, color: '#dc2626', background: 'none', border: 'none', cursor: 'pointer', padding: 0, marginTop: 3 }}>
+                        <i className="bi bi-trash-fill me-1"></i>Remove
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                <label style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 8, cursor: 'pointer',
+                  padding: '9px 18px', borderRadius: 8, fontSize: 13, fontWeight: 600,
+                  border: '1.5px dashed #d1d5db', color: '#6b7280', background: '#f9fafb'
+                }}>
+                  <i className="bi bi-upload" style={{ fontSize: 15 }}></i>
+                  {form.file ? 'Change Image' : 'Choose Image'}
+                  <input ref={fileRef} type="file" accept="image/jpeg,image/jpg,image/png,image/gif" style={{ display: 'none' }} onChange={handleFileChange} />
+                </label>
+              </div>
+
               {status && status !== 'sending' && (
                 <div style={{
                   marginBottom: 14, padding: '10px 16px', borderRadius: 8, fontSize: 13, fontWeight: 600,
@@ -305,7 +376,7 @@ function Broadcast() {
                 <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 14 }}>
                   <thead>
                     <tr style={{ background: '#f9fafb' }}>
-                      {['Subject', 'Message', 'Sent', 'Failed', 'Date', 'Actions'].map(h => (
+                      {['Subject', 'Message', 'Image', 'Sent', 'Failed', 'Date', 'Actions'].map(h => (
                         <th key={h} style={{ padding: '12px 18px', textAlign: 'left', fontWeight: 600, color: '#6b7280', fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.05em', whiteSpace: 'nowrap' }}>{h}</th>
                       ))}
                     </tr>
@@ -321,6 +392,15 @@ function Broadcast() {
                         </td>
                         <td style={{ padding: '14px 18px', color: '#374151', maxWidth: 280 }}>
                           <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: '#6b7280' }}>{b.message}</div>
+                        </td>
+                        <td style={{ padding: '14px 18px' }}>
+                          {b.attachment
+                            ? <img src={`${API_BASE}${b.attachment}`} alt={b.attachment_name} title={b.attachment_name}
+                                style={{ width: 52, height: 40, objectFit: 'cover', borderRadius: 6, border: '1.5px solid #e5e7eb', cursor: 'pointer' }}
+                                onClick={() => window.open(`${API_BASE}${b.attachment}`, '_blank')}
+                              />
+                            : <span style={{ color: '#d1d5db', fontSize: 18 }}><i className="bi bi-image"></i></span>
+                          }
                         </td>
                         <td style={{ padding: '14px 18px' }}>
                           <span style={{ background: '#dcfce7', color: '#16a34a', borderRadius: 20, padding: '3px 10px', fontSize: 12, fontWeight: 700 }}>
