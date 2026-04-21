@@ -33,6 +33,7 @@ function ManageAlumni() {
   const [toast, setToast]                 = useState(null);
   const [showFilters, setShowFilters]     = useState(true);
   const [filters, setFilters]             = useState({ searchTerm: '', batch: '', department: '', status: '', location: '' });
+  const [viewAlumni, setViewAlumni]       = useState(null);
 
   const showToast = (type, msg) => { setToast({ type, msg }); setTimeout(() => setToast(null), 4000); };
 
@@ -290,6 +291,9 @@ function ManageAlumni() {
                       <td style={{ padding: '13px 16px' }}>
                         {activeTab === 'active' ? (
                           <div style={{ display: 'flex', gap: 6 }}>
+                            <button onClick={() => setViewAlumni(a)} style={{ background: '#f0fdf4', color: '#16a34a', border: 'none', borderRadius: 8, padding: '6px 12px', cursor: 'pointer', fontWeight: 600, fontSize: 12, display: 'flex', alignItems: 'center', gap: 4 }}>
+                              <i className="bi bi-eye"></i>View
+                            </button>
                             <button onClick={() => navigate(`/admin/edit/${a.id}`)} style={{ background: '#eff6ff', color: '#2563eb', border: 'none', borderRadius: 8, padding: '6px 12px', cursor: 'pointer', fontWeight: 600, fontSize: 12, display: 'flex', alignItems: 'center', gap: 4 }}>
                               <i className="bi bi-pencil"></i>Edit
                             </button>
@@ -316,6 +320,160 @@ function ManageAlumni() {
           </div>
         )}
       </div>
+      {/* ── View Profile Drawer ── */}
+      {viewAlumni && (() => {
+        const a = viewAlumni;
+        const sc = statusStyle(a.current_status);
+        const Row = ({ icon, label, value }) => value ? (
+          <div style={{ display: 'flex', gap: 12, padding: '10px 0', borderBottom: '1px solid #f3f4f6', alignItems: 'flex-start' }}>
+            <i className={`bi ${icon}`} style={{ color: 'var(--color-primary)', fontSize: 15, marginTop: 2, flexShrink: 0, width: 18 }}></i>
+            <div style={{ minWidth: 110, fontSize: 12, color: '#9ca3af', fontWeight: 600, paddingTop: 1 }}>{label}</div>
+            <div style={{ fontSize: 13, color: '#111827', fontWeight: 500, flex: 1 }}>{value}</div>
+          </div>
+        ) : null;
+
+        return (
+          <>
+            {/* Backdrop */}
+            <div onClick={() => setViewAlumni(null)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', zIndex: 1000, backdropFilter: 'blur(2px)' }} />
+
+            {/* Drawer */}
+            <div style={{
+              position: 'fixed', top: 0, right: 0, bottom: 0, width: 480, maxWidth: '95vw',
+              background: '#fff', zIndex: 1001, display: 'flex', flexDirection: 'column',
+              boxShadow: '-4px 0 32px rgba(0,0,0,0.18)', fontFamily: 'Inter, sans-serif',
+              animation: 'slideIn 0.25s ease'
+            }}>
+              <style>{`@keyframes slideIn{from{transform:translateX(100%)}to{transform:translateX(0)}}`}</style>
+
+              {/* Header */}
+              <div style={{ padding: '20px 24px', borderBottom: '1px solid #f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#fff', flexShrink: 0 }}>
+                <div style={{ fontWeight: 800, fontSize: 16, color: 'var(--color-secondary)', display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <i className="bi bi-person-badge-fill" style={{ color: 'var(--color-primary)' }}></i> Alumni Profile
+                </div>
+                <div style={{ display: 'flex', gap: 8 }}>
+                  <button onClick={() => { setViewAlumni(null); navigate(`/admin/edit/${a.id}`); }} style={{ background: '#eff6ff', color: '#2563eb', border: 'none', borderRadius: 8, padding: '7px 14px', fontWeight: 700, fontSize: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 5 }}>
+                    <i className="bi bi-pencil"></i>Edit
+                  </button>
+                  <button onClick={() => setViewAlumni(null)} style={{ background: '#f3f4f6', color: '#6b7280', border: 'none', borderRadius: 8, padding: '7px 10px', cursor: 'pointer', fontSize: 16 }}>
+                    <i className="bi bi-x-lg"></i>
+                  </button>
+                </div>
+              </div>
+
+              {/* Scrollable body */}
+              <div style={{ flex: 1, overflowY: 'auto', padding: '0 0 24px' }}>
+
+                {/* Hero banner */}
+                <div style={{ background: 'linear-gradient(135deg,var(--color-primary-dark),var(--color-primary))', padding: '28px 24px 50px', position: 'relative' }}>
+                  <div style={{ position: 'absolute', bottom: -44, left: 24, display: 'flex', alignItems: 'flex-end', gap: 16 }}>
+                    {a.photo
+                      ? <img src={`${API_BASE}${a.photo}`} alt={a.name} style={{ width: 88, height: 88, borderRadius: '50%', objectFit: 'cover', border: '4px solid #fff', boxShadow: '0 2px 12px rgba(0,0,0,0.18)' }} />
+                      : <div style={{ width: 88, height: 88, borderRadius: '50%', background: 'linear-gradient(135deg,#1e3a5f,#2563eb)', border: '4px solid #fff', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 800, fontSize: 28, boxShadow: '0 2px 12px rgba(0,0,0,0.18)' }}>
+                          {a.name?.split(' ').map(n => n[0]).join('').slice(0,2).toUpperCase()}
+                        </div>
+                    }
+                  </div>
+                </div>
+
+                {/* Name block */}
+                <div style={{ padding: '56px 24px 16px' }}>
+                  <div style={{ fontWeight: 800, fontSize: 20, color: 'var(--color-secondary)', marginBottom: 4 }}>{a.name}</div>
+                  <div style={{ fontSize: 13, color: '#6b7280', marginBottom: 10 }}>{a.designation}{a.designation && a.organization_name ? ' · ' : ''}{a.organization_name}</div>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                    {a.current_status && <span style={{ background: sc.bg, color: sc.text, borderRadius: 20, padding: '4px 12px', fontSize: 12, fontWeight: 700 }}>{a.current_status}</span>}
+                    {a.batch && <span style={{ background: '#eff6ff', color: '#2563eb', borderRadius: 20, padding: '4px 12px', fontSize: 12, fontWeight: 600 }}>{a.batch}</span>}
+                    <span style={{
+                      background: a.approval_status === 'approved' ? '#dcfce7' : a.approval_status === 'rejected' ? '#fee2e2' : '#fef9c3',
+                      color: a.approval_status === 'approved' ? '#16a34a' : a.approval_status === 'rejected' ? '#dc2626' : '#92400e',
+                      borderRadius: 20, padding: '4px 12px', fontSize: 12, fontWeight: 600, textTransform: 'capitalize'
+                    }}>{a.approval_status || 'approved'}</span>
+                  </div>
+                </div>
+
+                {/* Sections */}
+                {[
+                  {
+                    title: 'Contact', icon: 'bi-envelope-fill',
+                    rows: [
+                      { icon: 'bi-envelope',     label: 'Email',   value: a.email },
+                      { icon: 'bi-telephone',    label: 'Phone',   value: a.phone },
+                      { icon: 'bi-geo-alt-fill', label: 'Address', value: a.address },
+                      { icon: 'bi-globe',        label: 'Country', value: a.country },
+                      { icon: 'bi-building',     label: 'City',    value: a.city },
+                    ]
+                  },
+                  {
+                    title: 'Personal', icon: 'bi-person-fill',
+                    rows: [
+                      { icon: 'bi-gender-ambiguous', label: 'Gender',      value: a.gender },
+                      { icon: 'bi-calendar3',        label: 'Date of Birth', value: a.dob ? new Date(a.dob).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : null },
+                      { icon: 'bi-person',           label: 'Parent Name', value: a.parent_name },
+                    ]
+                  },
+                  {
+                    title: 'Education', icon: 'bi-mortarboard-fill',
+                    rows: [
+                      { icon: 'bi-bank',          label: 'Institution',      value: a.institution },
+                      { icon: 'bi-journal-text',  label: 'Department',       value: a.department },
+                      { icon: 'bi-award',         label: 'Education Level',  value: a.education_level },
+                      { icon: 'bi-mortarboard',   label: 'Program',          value: a.attended_program },
+                      { icon: 'bi-hash',          label: 'Enroll No.',       value: a.enrollment_number },
+                      { icon: 'bi-calendar-check','label': 'Completion Year', value: a.completion_year },
+                      { icon: 'bi-building2',     label: 'UG College',       value: a.ug_college },
+                      { icon: 'bi-building2',     label: 'PG College',       value: a.pg_college },
+                      { icon: 'bi-patch-check',   label: 'Doctorate',        value: a.doctorate_name },
+                    ]
+                  },
+                  {
+                    title: 'Employment', icon: 'bi-briefcase-fill',
+                    rows: [
+                      { icon: 'bi-building',        label: 'Organization',     value: a.organization_name },
+                      { icon: 'bi-person-badge',    label: 'Designation',      value: a.designation },
+                      { icon: 'bi-diagram-3',       label: 'Industry',         value: a.industry },
+                      { icon: 'bi-geo',             label: 'Work Location',    value: a.work_location },
+                      { icon: 'bi-geo-alt',         label: 'Work City',        value: a.work_city },
+                      { icon: 'bi-clock-history',   label: 'Experience',       value: a.experience_years ? `${a.experience_years} year(s)` : null },
+                      { icon: 'bi-briefcase',       label: 'Employment Type',  value: a.employment_type },
+                      { icon: 'bi-bar-chart',       label: 'Seniority',        value: a.seniority_level },
+                      { icon: 'bi-tools',           label: 'Functional Area',  value: a.functional_area },
+                    ]
+                  },
+                  {
+                    title: 'Skills & Bio', icon: 'bi-star-fill',
+                    rows: [
+                      { icon: 'bi-tools',      label: 'Skills',       value: a.skills },
+                      { icon: 'bi-trophy',     label: 'Achievements', value: a.achievements },
+                      { icon: 'bi-chat-quote', label: 'Bio',          value: a.bio },
+                    ]
+                  },
+                  {
+                    title: 'Social Links', icon: 'bi-share-fill',
+                    rows: [
+                      { icon: 'bi-linkedin',  label: 'LinkedIn', value: a.linkedin },
+                      { icon: 'bi-facebook',  label: 'Facebook', value: a.facebook },
+                    ]
+                  },
+                ].map(section => {
+                  const visibleRows = section.rows.filter(r => r.value);
+                  if (visibleRows.length === 0) return null;
+                  return (
+                    <div key={section.title} style={{ padding: '0 24px', marginBottom: 8 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 2, paddingTop: 16 }}>
+                        <i className={`bi ${section.icon}`} style={{ color: 'var(--color-primary)', fontSize: 13 }}></i>
+                        <span style={{ fontWeight: 700, fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.06em', color: '#6b7280' }}>{section.title}</span>
+                      </div>
+                      {visibleRows.map(r => (
+                        <Row key={r.label} icon={r.icon} label={r.label} value={r.value} />
+                      ))}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </>
+        );
+      })()}
     </AdminLayout>
   );
 }

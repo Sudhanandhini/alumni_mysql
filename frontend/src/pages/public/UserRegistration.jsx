@@ -920,6 +920,65 @@ const RIGHT_PANEL_INFO = {
 
 const STEP_LABELS = ['Account Setup', 'Academic Info', 'Professional Info'];
 
+// ── OTP Input Component ───────────────────────────────────────────────────────
+function OtpInput({ value, onChange }) {
+  const inputs = useRef([]);
+  const digits = value.split('');
+
+  const arr6 = () => Array.from({ length: 6 }, (_, i) => digits[i] || '');
+
+  const handleKey = (e, idx) => {
+    if (e.key === 'Backspace') {
+      const arr = arr6();
+      if (arr[idx]) {
+        arr[idx] = '';
+        onChange(arr.join(''));
+      } else if (idx > 0) {
+        inputs.current[idx - 1]?.focus();
+      }
+    }
+  };
+
+  const handleChange = (e, idx) => {
+    const val = e.target.value.replace(/\D/g, '').slice(-1);
+    const arr = arr6();
+    arr[idx] = val;
+    onChange(arr.join(''));
+    if (val && idx < 5) inputs.current[idx + 1]?.focus();
+  };
+
+  const handlePaste = (e) => {
+    const text = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, 6);
+    if (text.length === 6) { onChange(text); inputs.current[5]?.focus(); }
+    e.preventDefault();
+  };
+
+  return (
+    <div style={{ display: 'flex', gap: 10, justifyContent: 'center' }}>
+      {Array.from({ length: 6 }, (_, i) => (
+        <input
+          key={i}
+          ref={el => inputs.current[i] = el}
+          type="text"
+          inputMode="numeric"
+          maxLength={1}
+          value={digits[i] || ''}
+          onChange={e => handleChange(e, i)}
+          onKeyDown={e => handleKey(e, i)}
+          onPaste={handlePaste}
+          style={{
+            width: 48, height: 54, textAlign: 'center', fontSize: 22, fontWeight: 700,
+            border: `2px solid ${digits[i] ? '#197fe6' : '#d1d5db'}`,
+            borderRadius: 10, outline: 'none', color: '#111827',
+            background: digits[i] ? '#eff6ff' : '#fff',
+            transition: 'all 0.15s'
+          }}
+        />
+      ))}
+    </div>
+  );
+}
+
 // â"€â"€â"€ Main Component â"€â"€â"€â"€â"€â"€â"
 function UserRegistration() {
   const navigate = useNavigate();
@@ -930,6 +989,16 @@ function UserRegistration() {
   const [selectedImage, setSelectedImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [errors, setErrors] = useState({});
+
+  // OTP state
+  const [otpPhase, setOtpPhase]       = useState(false);   // showing OTP input?
+  const [otpVerified, setOtpVerified] = useState(false);   // email verified?
+  const [otp, setOtp]                 = useState('');
+  const [otpLoading, setOtpLoading]   = useState(false);
+  const [otpError, setOtpError]       = useState('');
+  const [otpSuccess, setOtpSuccess]   = useState('');
+  const [resendTimer, setResendTimer] = useState(0);
+  const timerRef = useRef(null);
 
   const [formData, setFormData] = useState({
     firstName: '', lastName: '', email: '', countryCode: '+91', phone: '',
@@ -946,6 +1015,43 @@ function UserRegistration() {
     skills: '', bio: '', achievements: '',
   });
   const [socialLinks, setSocialLinks] = useState([]);
+
+  const startTimer = (secs = 60) => {
+    setResendTimer(secs);
+    clearInterval(timerRef.current);
+    timerRef.current = setInterval(() => {
+      setResendTimer(t => { if (t <= 1) { clearInterval(timerRef.current); return 0; } return t - 1; });
+    }, 1000);
+  };
+
+  const sendOtp = async () => {
+    setOtpLoading(true); setOtpError(''); setOtpSuccess('');
+    try {
+      await axios.post(`${API_URL}/alumni/send-otp`, { email: formData.email });
+      setOtpPhase(true);
+      setOtp('');
+      setOtpSuccess('OTP sent! Check your email.');
+      startTimer(60);
+    } catch (e) {
+      setOtpError(e.response?.data?.message || 'Failed to send OTP');
+    } finally { setOtpLoading(false); }
+  };
+
+  const verifyOtp = async () => {
+    if (otp.length !== 6) { setOtpError('Enter the 6-digit OTP'); return; }
+    setOtpLoading(true); setOtpError('');
+    try {
+      await axios.post(`${API_URL}/alumni/verify-otp`, { email: formData.email, otp });
+      setOtpVerified(true);
+      setOtpPhase(false);
+      clearInterval(timerRef.current);
+      setErrors({});
+      setStep(s => s + 1);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } catch (e) {
+      setOtpError(e.response?.data?.message || 'Verification failed');
+    } finally { setOtpLoading(false); }
+  };
 
   const addSocialLink = () => setSocialLinks(prev => [...prev, { platform: 'LinkedIn', url: '' }]);
   const removeSocialLink = (idx) => setSocialLinks(prev => prev.filter((_, i) => i !== idx));
@@ -1002,6 +1108,10 @@ function UserRegistration() {
     const errs = validate(step);
     if (Object.keys(errs).length > 0) { setErrors(errs); return; }
     setErrors({});
+    if (step === 1 && !otpVerified) {
+      sendOtp();
+      return;
+    }
     setStep(s => s + 1);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -1137,9 +1247,74 @@ function UserRegistration() {
 
           {/* Form */}
           <div style={{ background: '#fff', borderRadius: 16, padding: '28px 28px', boxShadow: '0 1px 12px rgba(0,0,0,0.06)' }}>
-            {step === 1 && (
+            {step === 1 && !otpPhase && (
               <Step1 formData={formData} onChange={handleChange} errors={errors} />
             )}
+
+            {/* OTP Verification Panel */}
+            {step === 1 && otpPhase && (
+              <div style={{ textAlign: 'center', padding: '8px 0' }}>
+                <div style={{ width: 72, height: 72, borderRadius: '50%', background: '#eff6ff', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
+                  <i className="bi bi-shield-lock-fill" style={{ fontSize: 32, color: '#197fe6' }}></i>
+                </div>
+                <h4 style={{ fontWeight: 800, fontSize: 18, color: '#111827', marginBottom: 6 }}>Verify Your Email</h4>
+                <p style={{ fontSize: 13, color: '#6b7280', marginBottom: 6 }}>
+                  We sent a 6-digit OTP to
+                </p>
+                <p style={{ fontSize: 14, fontWeight: 700, color: '#197fe6', marginBottom: 24 }}>{formData.email}</p>
+
+                <OtpInput value={otp} onChange={v => { setOtp(v); setOtpError(''); }} />
+
+                {otpError && (
+                  <div style={{ marginTop: 14, padding: '10px 16px', background: '#fee2e2', color: '#dc2626', borderRadius: 8, fontSize: 13, fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7 }}>
+                    <i className="bi bi-x-circle-fill"></i> {otpError}
+                  </div>
+                )}
+                {otpSuccess && !otpError && (
+                  <div style={{ marginTop: 14, padding: '10px 16px', background: '#dcfce7', color: '#16a34a', borderRadius: 8, fontSize: 13, fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7 }}>
+                    <i className="bi bi-check-circle-fill"></i> {otpSuccess}
+                  </div>
+                )}
+
+                <button
+                  onClick={verifyOtp}
+                  disabled={otpLoading || otp.length !== 6}
+                  style={{
+                    marginTop: 22, width: '100%', padding: '13px', borderRadius: 10, border: 'none',
+                    background: otp.length === 6 ? 'linear-gradient(135deg,var(--color-primary),var(--color-primary-dark))' : '#e5e7eb',
+                    color: otp.length === 6 ? '#fff' : '#9ca3af',
+                    fontWeight: 700, fontSize: 15, cursor: otp.length === 6 ? 'pointer' : 'not-allowed',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                    boxShadow: otp.length === 6 ? '0 4px 12px rgba(25,127,230,0.35)' : 'none',
+                    transition: 'all 0.2s'
+                  }}
+                >
+                  {otpLoading
+                    ? <><span className="spinner-border spinner-border-sm"></span> Verifying...</>
+                    : <><i className="bi bi-check-circle-fill"></i> Verify OTP</>
+                  }
+                </button>
+
+                <div style={{ marginTop: 18, fontSize: 13, color: '#6b7280' }}>
+                  {resendTimer > 0
+                    ? <>Resend OTP in <strong style={{ color: '#197fe6' }}>{resendTimer}s</strong></>
+                    : <>Didn't receive it?{' '}
+                        <button onClick={sendOtp} disabled={otpLoading} style={{ background: 'none', border: 'none', color: '#197fe6', fontWeight: 700, cursor: 'pointer', fontSize: 13, padding: 0 }}>
+                          Resend OTP
+                        </button>
+                      </>
+                  }
+                </div>
+
+                <button
+                  onClick={() => { setOtpPhase(false); setOtpError(''); setOtp(''); clearInterval(timerRef.current); }}
+                  style={{ marginTop: 12, background: 'none', border: 'none', color: '#9ca3af', fontSize: 12, cursor: 'pointer', textDecoration: 'underline' }}
+                >
+                  ← Change email address
+                </button>
+              </div>
+            )}
+
             {step === 2 && (
               <Step2 formData={formData} onChange={handleChange} errors={errors} years={years}
                 socialLinks={socialLinks} onAddSocialLink={addSocialLink}

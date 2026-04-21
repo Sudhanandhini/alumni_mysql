@@ -11,6 +11,78 @@ const { verifyAlumniToken } = require('../middleware/auth');
 
 const ALUMNI_JWT_SECRET = process.env.ALUMNI_JWT_SECRET || 'your-alumni-secret-key-here-change-in-production';
 
+// ── OTP Store (in-memory, 10-min expiry) ──────────────────────────────────────
+const otpStore = new Map(); // email -> { otp, expiresAt }
+
+function createTransporter() {
+  return nodemailer.createTransport({
+    host: process.env.SMTP_HOST,
+    port: parseInt(process.env.SMTP_PORT) || 587,
+    secure: process.env.SMTP_SECURE === 'true',
+    auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS },
+    tls: { rejectUnauthorized: false }
+  });
+}
+
+// Send OTP
+router.post('/alumni/send-otp', async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return res.status(400).json({ message: 'Valid email is required' });
+    }
+    if (!process.env.SMTP_HOST || !process.env.SMTP_USER || !process.env.SMTP_PASS) {
+      return res.status(500).json({ message: 'Email service not configured' });
+    }
+
+    const otp = String(Math.floor(100000 + Math.random() * 900000));
+    otpStore.set(email, { otp, expiresAt: Date.now() + 10 * 60 * 1000 });
+
+    const transporter = createTransporter();
+    await transporter.sendMail({
+      from: `"Alumni Portal" <${process.env.EMAIL_FROM || process.env.SMTP_USER}>`,
+      to: email,
+      subject: 'Your OTP for Alumni Portal Registration',
+      html: `
+        <div style="font-family:Inter,Arial,sans-serif;max-width:480px;margin:0 auto;background:#f4f6fa;padding:32px 16px;">
+          <div style="background:#197fe6;border-radius:16px 16px 0 0;padding:28px 36px;text-align:center;">
+            <h2 style="color:#fff;font-size:20px;font-weight:800;margin:0;">Email Verification</h2>
+            <p style="color:rgba(255,255,255,0.8);font-size:13px;margin:6px 0 0;">Alumni Portal Registration</p>
+          </div>
+          <div style="background:#fff;border-radius:0 0 16px 16px;padding:32px 36px;text-align:center;">
+            <p style="font-size:14px;color:#374151;margin:0 0 20px;">Use the OTP below to verify your email address. It expires in <strong>10 minutes</strong>.</p>
+            <div style="background:#f0f7ff;border:2px dashed #93c5fd;border-radius:12px;padding:24px;margin-bottom:24px;">
+              <span style="font-size:38px;font-weight:900;letter-spacing:12px;color:#1d4ed8;">${otp}</span>
+            </div>
+            <p style="font-size:12px;color:#9ca3af;margin:0;">Do not share this OTP with anyone. If you did not request this, please ignore.</p>
+          </div>
+        </div>
+      `
+    });
+    res.json({ message: 'OTP sent successfully' });
+  } catch (err) {
+    console.error('Error sending OTP:', err);
+    res.status(500).json({ message: 'Failed to send OTP', error: err.message });
+  }
+});
+
+// Verify OTP
+router.post('/alumni/verify-otp', (req, res) => {
+  const { email, otp } = req.body;
+  if (!email || !otp) return res.status(400).json({ message: 'Email and OTP are required' });
+
+  const record = otpStore.get(email);
+  if (!record) return res.status(400).json({ message: 'OTP not found. Please request a new one.' });
+  if (Date.now() > record.expiresAt) {
+    otpStore.delete(email);
+    return res.status(400).json({ message: 'OTP has expired. Please request a new one.' });
+  }
+  if (record.otp !== String(otp)) return res.status(400).json({ message: 'Invalid OTP. Please try again.' });
+
+  otpStore.delete(email);
+  res.json({ message: 'Email verified successfully' });
+});
+
 // ── Password Reset ────────────────────────────────────────────────────────────
 
 router.post('/alumni/forgot-password', async (req, res) => {
