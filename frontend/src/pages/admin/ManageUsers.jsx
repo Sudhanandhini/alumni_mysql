@@ -14,7 +14,13 @@ function ManageUsers() {
   const [usernameAvailable, setUsernameAvailable] = useState(null);
   const [checkingUsername, setCheckingUsername] = useState(false);
   const [filter, setFilter] = useState('all');
-  
+  const [pwModal, setPwModal]   = useState(null);  // null | user object
+  const [pwForm, setPwForm]     = useState({ password: '', confirm: '' });
+  const [showPw, setShowPw]     = useState(false);
+  const [showPwConfirm, setShowPwConfirm] = useState(false);
+  const [pwSaving, setPwSaving] = useState(false);
+  const [pwError, setPwError]   = useState('');
+
   const [formData, setFormData] = useState({
     name: '',
     username: '',
@@ -225,6 +231,41 @@ function ManageUsers() {
     }
   };
 
+  const openPwModal = (user) => {
+    setPwModal(user);
+    setPwForm({ password: '', confirm: '' });
+    setShowPw(false);
+    setShowPwConfirm(false);
+    setPwError('');
+  };
+
+  const generatePassword = () => {
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789@#$!';
+    const pwd = Array.from({ length: 10 }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+    setPwForm({ password: pwd, confirm: pwd });
+    setShowPw(true);
+    setPwError('');
+  };
+
+  const handleChangePassword = async () => {
+    if (!pwForm.password) { setPwError('Password is required'); return; }
+    if (pwForm.password.length < 6) { setPwError('Minimum 6 characters'); return; }
+    if (pwForm.password !== pwForm.confirm) { setPwError('Passwords do not match'); return; }
+    setPwSaving(true);
+    setPwError('');
+    try {
+      await axios.put(
+        `${API_URL}/admin/change-password/${pwModal.source}/${pwModal.id}`,
+        { password: pwForm.password }
+      );
+      setPwModal(null);
+    } catch (e) {
+      setPwError(e.response?.data?.message || 'Failed to update password');
+    } finally {
+      setPwSaving(false);
+    }
+  };
+
   const getPasswordStrength = (password) => {
     if (!password) return { strength: 0, text: '', color: '' };
     
@@ -399,13 +440,20 @@ function ManageUsers() {
                         </td>
                         <td className="text-center pe-4">
                           <div className="btn-group">
-                            {/* <button
+                            <button
                               onClick={() => openEditModal(user)}
                               className="btn btn-sm btn-outline-primary"
                               title="Edit User"
                             >
                               <i className="bi bi-pencil-square"></i> Edit
-                            </button> */}
+                            </button>
+                            <button
+                              onClick={() => openPwModal(user)}
+                              className="btn btn-sm btn-outline-warning"
+                              title="Change Password"
+                            >
+                              <i className="bi bi-key-fill"></i> Password
+                            </button>
                             <button
                               onClick={() => handleDelete(user)}
                               className="btn btn-sm btn-outline-secondary"
@@ -687,6 +735,112 @@ function ManageUsers() {
         </div>
       )}
     </div>
+      {/* Change Password Modal */}
+      {pwModal && (
+        <div className="modal show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
+          <div className="modal-dialog modal-dialog-centered">
+            <div className="modal-content">
+              <div className="modal-header" style={{ background: '#f59e0b' }}>
+                <h5 className="modal-title text-white fw-bold">
+                  <i className="bi bi-key-fill me-2"></i>
+                  Change Password
+                </h5>
+                <button type="button" className="btn-close btn-close-white" onClick={() => setPwModal(null)}></button>
+              </div>
+              <div className="modal-body">
+                <div className="alert alert-light border mb-3 d-flex align-items-center gap-2">
+                  <i className="bi bi-person-circle text-primary fs-4"></i>
+                  <div>
+                    <div className="fw-bold">{pwModal.name}</div>
+                    <small className="text-muted">@{pwModal.username} · {pwModal.type}</small>
+                  </div>
+                </div>
+
+                <div className="mb-3">
+                  <label className="form-label fw-semibold">
+                    <i className="bi bi-lock-fill me-1 text-warning"></i>
+                    New Password <span className="text-danger">*</span>
+                  </label>
+                  <div className="input-group">
+                    <input
+                      type={showPw ? 'text' : 'password'}
+                      className="form-control form-control-lg"
+                      placeholder="Enter new password"
+                      value={pwForm.password}
+                      onChange={e => { setPwForm(p => ({ ...p, password: e.target.value })); setPwError(''); }}
+                    />
+                    <button type="button" className="btn btn-outline-secondary" onClick={() => setShowPw(p => !p)}>
+                      <i className={`bi ${showPw ? 'bi-eye-slash' : 'bi-eye'}`}></i>
+                    </button>
+                  </div>
+                  {pwForm.password && (() => {
+                    const s = getPasswordStrength(pwForm.password);
+                    return (
+                      <div className="mt-2">
+                        <div className="progress" style={{ height: 6 }}>
+                          <div className={`progress-bar bg-${s.color}`} style={{ width: `${(s.strength / 5) * 100}%` }}></div>
+                        </div>
+                        <small className={`text-${s.color}`}>{s.text}</small>
+                      </div>
+                    );
+                  })()}
+                </div>
+
+                <div className="mb-3">
+                  <label className="form-label fw-semibold">
+                    <i className="bi bi-lock-fill me-1 text-warning"></i>
+                    Confirm Password <span className="text-danger">*</span>
+                  </label>
+                  <div className="input-group">
+                    <input
+                      type={showPwConfirm ? 'text' : 'password'}
+                      className="form-control form-control-lg"
+                      placeholder="Re-enter new password"
+                      value={pwForm.confirm}
+                      onChange={e => { setPwForm(p => ({ ...p, confirm: e.target.value })); setPwError(''); }}
+                    />
+                    <button type="button" className="btn btn-outline-secondary" onClick={() => setShowPwConfirm(p => !p)}>
+                      <i className={`bi ${showPwConfirm ? 'bi-eye-slash' : 'bi-eye'}`}></i>
+                    </button>
+                  </div>
+                  {pwForm.confirm && pwForm.password !== pwForm.confirm && (
+                    <small className="text-danger"><i className="bi bi-x-circle-fill me-1"></i>Passwords do not match</small>
+                  )}
+                  {pwForm.confirm && pwForm.password === pwForm.confirm && pwForm.password && (
+                    <small className="text-success"><i className="bi bi-check-circle-fill me-1"></i>Passwords match</small>
+                  )}
+                </div>
+
+                <button type="button" className="btn btn-outline-secondary btn-sm w-100 mb-2" onClick={generatePassword}>
+                  <i className="bi bi-shuffle me-2"></i>Auto-Generate Strong Password
+                </button>
+
+                {pwError && (
+                  <div className="alert alert-danger py-2 mb-0">
+                    <i className="bi bi-exclamation-triangle-fill me-2"></i>{pwError}
+                  </div>
+                )}
+              </div>
+              <div className="modal-footer">
+                <button type="button" className="btn btn-secondary" onClick={() => setPwModal(null)}>
+                  <i className="bi bi-x-circle me-2"></i>Cancel
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-warning text-white fw-bold"
+                  onClick={handleChangePassword}
+                  disabled={pwSaving}
+                >
+                  {pwSaving
+                    ? <><span className="spinner-border spinner-border-sm me-2"></span>Saving...</>
+                    : <><i className="bi bi-check-circle-fill me-2"></i>Update Password</>
+                  }
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </AdminLayout>
   );
 }

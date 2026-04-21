@@ -80,6 +80,19 @@ async function runMigrations() {
     await makeNullable('current_status', "ENUM('Employed','Self-Employed','Studying','Not Working')");
     await makeNullable('password', 'VARCHAR(255)');
 
+    // broadcast_messages table
+    await db.query(`
+      CREATE TABLE IF NOT EXISTS broadcast_messages (
+        id INT PRIMARY KEY AUTO_INCREMENT,
+        subject VARCHAR(255) NOT NULL,
+        message TEXT NOT NULL,
+        sent_count INT DEFAULT 0,
+        failed_count INT DEFAULT 0,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+      )
+    `);
+
     console.log('✅ All database migrations complete');
   } catch (err) {
     console.error('❌ Migration error:', err.message);

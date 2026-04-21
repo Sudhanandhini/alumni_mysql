@@ -203,6 +203,175 @@ router.put('/admin/alumni/:id/reject', async (req, res) => {
   }
 });
 
+// ── Broadcast Messages ────────────────────────────────────────────────────────
+
+async function sendBroadcastEmails(db, subject, message) {
+  const [alumniList] = await db.query(
+    "SELECT name, email FROM alumni WHERE approval_status = 'approved' AND is_deleted = 0 AND email IS NOT NULL AND email != ''"
+  );
+  if (!alumniList || alumniList.length === 0) return { sent: 0, failed: 0, total: 0 };
+
+  const transporter = nodemailer.createTransport({
+    host: process.env.SMTP_HOST,
+    port: parseInt(process.env.SMTP_PORT) || 587,
+    secure: process.env.SMTP_SECURE === 'true',
+    auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS },
+    tls: { rejectUnauthorized: false }
+  });
+
+  const htmlMessage = message.replace(/\n/g, '<br/>');
+  let sent = 0, failed = 0;
+
+  for (const alumni of alumniList) {
+    try {
+      await transporter.sendMail({
+        from: `"Alumni Portal" <${process.env.EMAIL_FROM || process.env.SMTP_USER}>`,
+        to: alumni.email,
+        subject,
+        html: `
+          <div style="font-family:Inter,Arial,sans-serif;max-width:600px;margin:0 auto;background:#f4f6fa;padding:32px 16px;">
+            <div style="background:#197fe6;border-radius:16px 16px 0 0;padding:32px 40px;text-align:center;">
+              <h1 style="color:#fff;font-size:22px;font-weight:800;margin:0 0 6px;">Alumni Portal</h1>
+              <p style="color:rgba(255,255,255,0.8);font-size:14px;margin:0;">Message from Admin</p>
+            </div>
+            <div style="background:#fff;border-radius:0 0 16px 16px;padding:36px 40px;">
+              <p style="font-size:16px;color:#1a2744;font-weight:700;margin:0 0 8px;">Dear ${alumni.name},</p>
+              <div style="font-size:15px;color:#374151;line-height:1.8;margin:16px 0 28px;">${htmlMessage}</div>
+              <hr style="border:none;border-top:1px solid #e5e7eb;margin:24px 0;"/>
+              <p style="font-size:12px;color:#9ca3af;text-align:center;margin:0;">
+                This message was sent by the Alumni Portal administration team.
+              </p>
+            </div>
+          </div>
+        `
+      });
+      sent++;
+    } catch (err) {
+      console.error(`Failed to send to ${alumni.email}:`, err.message);
+      failed++;
+    }
+  }
+  return { sent, failed, total: alumniList.length };
+}
+
+// ── Admin Change Password for Any User ───────────────────────────────────────
+
+router.put('/admin/change-password/:source/:id', async (req, res) => {
+  try {
+    const db = getDb();
+    if (!requireDb(res)) return;
+    const { source, id } = req.params;
+    const { password } = req.body;
+    if (!password || password.length < 6) {
+      return res.status(400).json({ message: 'Password must be at least 6 characters' });
+    }
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    if (source === 'admin') {
+      // Update users table and sync to alumni table
+      const [[user]] = await db.query('SELECT username FROM users WHERE id = ?', [id]);
+      if (!user) return res.status(404).json({ message: 'User not found' });
+      await db.query('UPDATE users SET password = ? WHERE id = ?', [hashedPassword, id]);
+      await db.query('UPDATE alumni SET password = ? WHERE username = ?', [hashedPassword, user.username]);
+    } else {
+      // Update alumni table and sync to users table
+      const [[alumni]] = await db.query('SELECT username FROM alumni WHERE id = ?', [id]);
+      if (!alumni) return res.status(404).json({ message: 'Alumni not found' });
+      await db.query('UPDATE alumni SET password = ? WHERE id = ?', [hashedPassword, id]);
+      await db.query('UPDATE users SET password = ? WHERE username = ?', [hashedPassword, alumni.username]);
+    }
+
+    res.json({ message: 'Password updated successfully' });
+  } catch (err) {
+    console.error('Error changing password:', err);
+    res.status(500).json({ error: 'Failed to update password', message: err.message });
+  }
+});
+
+// List all broadcasts
+router.get('/admin/broadcasts', async (req, res) => {
+  try {
+    const db = getDb();
+    if (!requireDb(res)) return;
+    const [rows] = await db.query('SELECT * FROM broadcast_messages ORDER BY created_at DESC');
+    res.json(rows);
+  } catch (err) {
+    console.error('Error fetching broadcasts:', err);
+    res.status(500).json({ error: 'Database error', message: err.message });
+  }
+});
+
+// Send new broadcast
+router.post('/admin/broadcast', async (req, res) => {
+  try {
+    const db = getDb();
+    if (!requireDb(res)) return;
+    const { subject, message } = req.body;
+    if (!subject || !message) return res.status(400).json({ message: 'Subject and message are required' });
+    if (!process.env.SMTP_HOST || !process.env.SMTP_USER || !process.env.SMTP_PASS) {
+      return res.status(500).json({ message: 'Email service is not configured' });
+    }
+    const { sent, failed, total } = await sendBroadcastEmails(db, subject, message);
+    if (total === 0) return res.status(404).json({ message: 'No approved alumni found to send email' });
+    const [result] = await db.query(
+      'INSERT INTO broadcast_messages (subject, message, sent_count, failed_count) VALUES (?, ?, ?, ?)',
+      [subject, message, sent, failed]
+    );
+    res.json({ message: `Email sent to ${sent} alumni${failed > 0 ? `, ${failed} failed` : ''}`, sent, failed, total, id: result.insertId });
+  } catch (err) {
+    console.error('Error sending broadcast email:', err);
+    res.status(500).json({ error: 'Failed to send broadcast email', message: err.message });
+  }
+});
+
+// Update broadcast (subject/message only — does not resend)
+router.put('/admin/broadcasts/:id', async (req, res) => {
+  try {
+    const db = getDb();
+    if (!requireDb(res)) return;
+    const { subject, message } = req.body;
+    if (!subject || !message) return res.status(400).json({ message: 'Subject and message are required' });
+    await db.query('UPDATE broadcast_messages SET subject = ?, message = ? WHERE id = ?', [subject, message, req.params.id]);
+    res.json({ message: 'Broadcast updated successfully' });
+  } catch (err) {
+    console.error('Error updating broadcast:', err);
+    res.status(500).json({ error: 'Database error', message: err.message });
+  }
+});
+
+// Resend an existing broadcast
+router.post('/admin/broadcasts/:id/resend', async (req, res) => {
+  try {
+    const db = getDb();
+    if (!requireDb(res)) return;
+    if (!process.env.SMTP_HOST || !process.env.SMTP_USER || !process.env.SMTP_PASS) {
+      return res.status(500).json({ message: 'Email service is not configured' });
+    }
+    const [[broadcast]] = await db.query('SELECT * FROM broadcast_messages WHERE id = ?', [req.params.id]);
+    if (!broadcast) return res.status(404).json({ message: 'Broadcast not found' });
+    const { sent, failed, total } = await sendBroadcastEmails(db, broadcast.subject, broadcast.message);
+    if (total === 0) return res.status(404).json({ message: 'No approved alumni found to send email' });
+    await db.query('UPDATE broadcast_messages SET sent_count = ?, failed_count = ? WHERE id = ?', [sent, failed, req.params.id]);
+    res.json({ message: `Resent to ${sent} alumni${failed > 0 ? `, ${failed} failed` : ''}`, sent, failed, total });
+  } catch (err) {
+    console.error('Error resending broadcast:', err);
+    res.status(500).json({ error: 'Failed to resend broadcast', message: err.message });
+  }
+});
+
+// Delete broadcast
+router.delete('/admin/broadcasts/:id', async (req, res) => {
+  try {
+    const db = getDb();
+    if (!requireDb(res)) return;
+    await db.query('DELETE FROM broadcast_messages WHERE id = ?', [req.params.id]);
+    res.json({ message: 'Broadcast deleted successfully' });
+  } catch (err) {
+    console.error('Error deleting broadcast:', err);
+    res.status(500).json({ error: 'Database error', message: err.message });
+  }
+});
+
 router.get('/admin/alumni/pending-count', async (req, res) => {
   try {
     const db = getDb();
