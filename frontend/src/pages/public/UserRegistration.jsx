@@ -443,17 +443,19 @@ function Step1({ formData, onChange, errors }) {
             <span style={{ fontSize: 13, color: '#555', lineHeight: 1.5 }}>
   I agree to the{" "}
   
-  <Link 
-    to="/terms" 
+  <Link
+    to="/terms"
+    target="_blank" rel="noopener noreferrer"
     style={{ color: 'var(--color-primary)', cursor: 'pointer', textDecoration: 'none' }}
   >
     Terms & Conditions
   </Link>
-  
+
   {" "}and{" "}
-  
-  <Link 
-    to="/privacy" 
+
+  <Link
+    to="/privacy"
+    target="_blank" rel="noopener noreferrer"
     style={{ color: 'var(--color-primary)', cursor: 'pointer', textDecoration: 'none' }}
   >
     Privacy Policy

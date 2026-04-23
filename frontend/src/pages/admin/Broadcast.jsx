@@ -6,11 +6,12 @@ const API_URL  = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 const API_BASE = API_URL.replace(/\/api\/?$/, '');
 
 const NAV = [
-  { key: '/admin',            icon: 'bi-grid-fill',        label: 'Dashboard'         },
-  { key: '/admin/add',        icon: 'bi-person-plus-fill', label: 'Add Alumni'        },
-  { key: '/admin/manage',     icon: 'bi-people-fill',      label: 'Manage Alumni'     },
-  { key: '/admin/pending',    icon: 'bi-hourglass-split',  label: 'Pending Approvals', badge: true },
-  { key: '/admin/broadcast',  icon: 'bi-megaphone-fill',   label: 'Broadcast'         },
+  { key: '/admin',            icon: 'bi-grid-fill',           label: 'Dashboard'         },
+  { key: '/admin/add',        icon: 'bi-person-plus-fill',    label: 'Add Alumni'        },
+  { key: '/admin/manage',     icon: 'bi-people-fill',         label: 'Manage Alumni'     },
+  { key: '/admin/pending',    icon: 'bi-hourglass-split',     label: 'Pending Approvals', badge: true },
+  { key: '/admin/events',     icon: 'bi-calendar-event-fill', label: 'Events'            },
+  { key: '/admin/broadcast',  icon: 'bi-megaphone-fill',      label: 'Broadcast'         },
 ];
 
 const EMPTY = { subject: '', message: '', file: null, preview: null, removeAttachment: false };

@@ -14,6 +14,7 @@ import ManageAlumni from './pages/admin/ManageAlumni';
 import ManageUsers from './pages/admin/ManageUsers';
 import PendingApprovals from './pages/admin/PendingApprovals';
 import Broadcast from './pages/admin/Broadcast';
+import Events from './pages/admin/Events';
 import ViewAlumni from './pages/user/ViewAlumni';
 import AlumniEditProfile from './pages/alumni/AlumniEditProfile';
 import 'bootstrap-icons/font/bootstrap-icons.css';
@@ -61,6 +62,7 @@ function Layout() {
           <Route path="/admin/manage" element={<AdminProtectedRoute><ManageAlumni /></AdminProtectedRoute>} />
           <Route path="/admin/manage-users" element={<AdminProtectedRoute><ManageUsers /></AdminProtectedRoute>} />
           <Route path="/admin/pending" element={<AdminProtectedRoute><PendingApprovals /></AdminProtectedRoute>} />
+          <Route path="/admin/events" element={<AdminProtectedRoute><Events /></AdminProtectedRoute>} />
           <Route path="/admin/broadcast" element={<AdminProtectedRoute><Broadcast /></AdminProtectedRoute>} />
 
           {/* Alumni edit profile */}

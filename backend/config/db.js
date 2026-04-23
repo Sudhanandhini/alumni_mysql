@@ -80,6 +80,22 @@ async function runMigrations() {
     await makeNullable('current_status', "ENUM('Employed','Self-Employed','Studying','Not Working')");
     await makeNullable('password', 'VARCHAR(255)');
 
+    // events table
+    await db.query(`
+      CREATE TABLE IF NOT EXISTS events (
+        id INT PRIMARY KEY AUTO_INCREMENT,
+        title VARCHAR(255) NOT NULL,
+        category VARCHAR(50) NOT NULL DEFAULT 'other',
+        description TEXT,
+        image VARCHAR(500) DEFAULT NULL,
+        event_date DATETIME DEFAULT NULL,
+        location VARCHAR(255) DEFAULT NULL,
+        is_published TINYINT(1) NOT NULL DEFAULT 0,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+      )
+    `);
+
     // broadcast_messages table
     await db.query(`
       CREATE TABLE IF NOT EXISTS broadcast_messages (

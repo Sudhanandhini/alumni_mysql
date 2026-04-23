@@ -420,7 +420,7 @@ function Step1({ formData, onChange, errors, isEdit }) {
             <label style={{ display: 'flex', alignItems: 'flex-start', gap: 10, cursor: 'pointer', marginBottom: 12 }}>
               <input type="checkbox" name="terms" checked={formData.terms} onChange={onChange}
                 style={{ marginTop: 2, accentColor: 'var(--color-primary)', width: 16, height: 16, flexShrink: 0 }} />
-              <span style={{ fontSize: 13, color: '#555', lineHeight: 1.5 }}>
+              <span style={{ fontSize: 13, color: '#555', lineHeight: 1.5 }}  target="_blank">
                 I agree to the <span style={{ color: 'var(--color-primary)', cursor: 'pointer' }}>Terms &amp; Conditions</span> and{' '}
                 <span style={{ color: 'var(--color-primary)', cursor: 'pointer' }}>Privacy Policy</span>
                 <span style={{ color: '#dc3545' }}> *</span>

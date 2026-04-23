@@ -5,11 +5,39 @@ import axios from 'axios';
 const API_URL  = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 const API_BASE = API_URL.replace(/\/api\/?$/, '');
 
+const EVT_CAT_COLORS = {
+  reunion:      { bg: '#ede9fe', text: '#7c3aed' },
+  webinar:      { bg: '#e0f2fe', text: '#0891b2' },
+  hackathon:    { bg: '#dcfce7', text: '#16a34a' },
+  campus_event: { bg: '#fff7ed', text: '#c2410c' },
+  other:        { bg: '#f3f4f6', text: '#6b7280' },
+};
+const EVT_CAT_LABELS = { reunion: 'Reunion', webinar: 'Webinar', hackathon: 'Hackathon', campus_event: 'Campus Event', other: 'Other' };
+const evtCatColor = v => EVT_CAT_COLORS[v] || EVT_CAT_COLORS.other;
+const evtCatLabel = v => EVT_CAT_LABELS[v] || v;
+
+function sortEvents(list) {
+  const now = new Date();
+  return [...list].sort((a, b) => {
+    const da = a.event_date ? new Date(a.event_date) : null;
+    const db = b.event_date ? new Date(b.event_date) : null;
+    const upA = da && da >= now;
+    const upB = db && db >= now;
+    if (!da && !db) return 0;
+    if (!da) return 1;
+    if (!db) return -1;
+    if (upA && !upB) return -1;
+    if (!upA && upB) return 1;
+    return da - db;
+  });
+}
+
 const NAV = [
   { key: '/admin',             icon: 'bi-grid-fill',        label: 'Dashboard'          },
   { key: '/admin/add',         icon: 'bi-person-plus-fill', label: 'Add Alumni'         },
   { key: '/admin/manage',      icon: 'bi-people-fill',      label: 'Manage Alumni'      },
   { key: '/admin/pending',     icon: 'bi-hourglass-split',  label: 'Pending Approvals', badge: true },
+  { key: '/admin/events',      icon: 'bi-calendar-event-fill', label: 'Events'           },
   { key: '/admin/broadcast',   icon: 'bi-megaphone-fill',   label: 'Broadcast'          },
 ];
 
@@ -20,11 +48,16 @@ function AdminDashboard() {
   const [loading, setLoading]           = useState(false);
   const [pendingCount, setPendingCount] = useState(0);
   const [sidebarOpen, setSidebarOpen]   = useState(true);
+  const [events, setEvents]             = useState([]);
+  const [eventsLoading, setEventsLoading] = useState(true);
 
 
   useEffect(() => {
     fetchAlumni();
     fetchPendingCount();
+    axios.get(`${API_URL}/admin/events`, {
+      headers: { Authorization: `Bearer ${localStorage.getItem('adminToken')}` }
+    }).then(r => setEvents(Array.isArray(r.data) ? r.data : [])).catch(() => {}).finally(() => setEventsLoading(false));
   }, []);
 
   const fetchAlumni = async () => {
@@ -343,6 +376,97 @@ function AdminDashboard() {
                     })}
                   </tbody>
                 </table>
+              </div>
+            )}
+          </div>
+          {/* ── Events Preview ── */}
+          <div style={{ background: '#fff', borderRadius: 14, boxShadow: '0 1px 4px rgba(0,0,0,0.07)', overflow: 'hidden', marginTop: 24 }}>
+            <div style={{ padding: '18px 24px', borderBottom: '1px solid #f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div style={{ fontWeight: 700, fontSize: 15, color: '#111827', display: 'flex', alignItems: 'center', gap: 8 }}>
+                <i className="bi bi-calendar-event-fill" style={{ color: 'var(--color-primary)' }}></i> Events
+                <span style={{ background: '#f3f4f6', color: '#6b7280', borderRadius: 20, padding: '2px 10px', fontSize: 12, fontWeight: 600 }}>{events.length}</span>
+              </div>
+              <button onClick={() => navigate('/admin/events')} style={{
+                background: 'none', border: '1.5px solid var(--color-primary)', color: 'var(--color-primary)',
+                borderRadius: 8, padding: '6px 16px', fontWeight: 600, fontSize: 13, cursor: 'pointer'
+              }}>Manage Events</button>
+            </div>
+
+            {eventsLoading ? (
+              <div style={{ textAlign: 'center', padding: 40 }}>
+                <div className="spinner-border text-primary" style={{ width: '1.8rem', height: '1.8rem' }}></div>
+              </div>
+            ) : events.length === 0 ? (
+              <div style={{ textAlign: 'center', padding: '40px 24px', color: '#9ca3af' }}>
+                <i className="bi bi-calendar-x" style={{ fontSize: 36 }}></i>
+                <p style={{ marginTop: 10, fontWeight: 500 }}>No events yet.</p>
+                <button onClick={() => navigate('/admin/events')} style={{
+                  marginTop: 12, background: 'var(--color-primary)', color: '#fff', border: 'none',
+                  borderRadius: 8, padding: '8px 20px', fontWeight: 700, fontSize: 13, cursor: 'pointer'
+                }}>
+                  <i className="bi bi-calendar-plus-fill me-2"></i>Create First Event
+                </button>
+              </div>
+            ) : (
+              <div style={{ overflowX: 'auto' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 14 }}>
+                  <thead>
+                    <tr style={{ background: '#f9fafb' }}>
+                      {['Event', 'Category', 'Date', 'Location', 'Status'].map(h => (
+                        <th key={h} style={{ padding: '11px 18px', textAlign: 'left', fontWeight: 600, color: '#6b7280', fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.05em', whiteSpace: 'nowrap' }}>{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {events.slice(0, 5).map(ev => {
+                      const cc = evtCatColor(ev.category);
+                      return (
+                        <tr key={ev.id} style={{ borderTop: '1px solid #f3f4f6', transition: 'background 0.1s', cursor: 'pointer' }}
+                          onClick={() => navigate('/admin/events')}
+                          onMouseEnter={e => e.currentTarget.style.background = '#f9fafb'}
+                          onMouseLeave={e => e.currentTarget.style.background = ''}
+                        >
+                          <td style={{ padding: '13px 18px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                              {ev.image
+                                ? <img src={`${API_BASE}${ev.image}`} alt={ev.title} style={{ width: 44, height: 34, objectFit: 'cover', borderRadius: 6, flexShrink: 0, border: '1px solid #e5e7eb' }} />
+                                : <div style={{ width: 44, height: 34, borderRadius: 6, background: '#f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                                    <i className="bi bi-image" style={{ color: '#d1d5db', fontSize: 14 }}></i>
+                                  </div>
+                              }
+                              <span style={{ fontWeight: 600, color: '#111827', maxWidth: 220, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{ev.title}</span>
+                            </div>
+                          </td>
+                          <td style={{ padding: '13px 18px' }}>
+                            <span style={{ background: cc.bg, color: cc.text, borderRadius: 20, padding: '3px 10px', fontSize: 11, fontWeight: 600 }}>{evtCatLabel(ev.category)}</span>
+                          </td>
+                          <td style={{ padding: '13px 18px', color: '#374151', whiteSpace: 'nowrap' }}>
+                            {ev.event_date ? new Date(ev.event_date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}
+                          </td>
+                          <td style={{ padding: '13px 18px', color: '#374151', maxWidth: 140, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{ev.location || '—'}</td>
+                          <td style={{ padding: '13px 18px' }}>
+                            <span style={{
+                              background: ev.is_published ? '#dcfce7' : '#fef9c3',
+                              color:      ev.is_published ? '#16a34a' : '#92400e',
+                              borderRadius: 20, padding: '3px 10px', fontSize: 11, fontWeight: 700
+                            }}>
+                              {ev.is_published ? 'Published' : 'Draft'}
+                            </span>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+                {events.length > 5 && (
+                  <div style={{ padding: '12px 18px', borderTop: '1px solid #f3f4f6', textAlign: 'center' }}>
+                    <button onClick={() => navigate('/admin/events')} style={{
+                      background: 'none', border: 'none', color: 'var(--color-primary)', fontWeight: 700, fontSize: 13, cursor: 'pointer'
+                    }}>
+                      View all {events.length} events →
+                    </button>
+                  </div>
+                )}
               </div>
             )}
           </div>

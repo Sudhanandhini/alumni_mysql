@@ -29,7 +29,7 @@
 @layer base {
   *, *::before, *::after { box-sizing: border-box; }
   body {
-    font-family: 'Inter', system-ui, sans-serif;
+    font-family: 'Poppins', system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
     margin: 0;
     padding: 0;

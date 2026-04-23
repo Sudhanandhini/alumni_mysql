@@ -452,6 +452,132 @@ router.delete('/admin/broadcasts/:id', async (req, res) => {
   }
 });
 
+// ── Events ────────────────────────────────────────────────────────────────────
+
+// Public: get published events
+router.get('/events', async (req, res) => {
+  try {
+    const db = getDb();
+    if (!requireDb(res)) return;
+    const [rows] = await db.query(`
+      SELECT * FROM events WHERE is_published = 1
+      ORDER BY
+        CASE
+          WHEN event_date IS NULL THEN 2
+          WHEN event_date >= NOW() THEN 0
+          ELSE 1
+        END ASC,
+        event_date ASC
+    `);
+    res.json(rows);
+  } catch (err) {
+    console.error('Error fetching events:', err);
+    res.status(500).json({ error: 'Database error', message: err.message });
+  }
+});
+
+// Admin: get all events
+router.get('/admin/events', async (req, res) => {
+  try {
+    const db = getDb();
+    if (!requireDb(res)) return;
+    const [rows] = await db.query('SELECT * FROM events ORDER BY created_at DESC');
+    res.json(rows);
+  } catch (err) {
+    console.error('Error fetching events:', err);
+    res.status(500).json({ error: 'Database error', message: err.message });
+  }
+});
+
+// Admin: create event
+router.post('/admin/events', runMulter(upload.single('image')), async (req, res) => {
+  try {
+    const db = getDb();
+    if (!requireDb(res)) return;
+    const { title, category, description, event_date, location, is_published } = req.body;
+    if (!title) return res.status(400).json({ message: 'Title is required' });
+    const imageRelPath = req.file ? `/uploads/${req.file.filename}` : null;
+    const [result] = await db.query(
+      'INSERT INTO events (title, category, description, image, event_date, location, is_published) VALUES (?, ?, ?, ?, ?, ?, ?)',
+      [title, category || 'other', description || null, imageRelPath, event_date || null, location || null, is_published === 'true' || is_published === true ? 1 : 0]
+    );
+    res.status(201).json({ message: 'Event created', id: result.insertId });
+  } catch (err) {
+    console.error('Error creating event:', err);
+    res.status(500).json({ error: 'Database error', message: err.message });
+  }
+});
+
+// Admin: update event
+router.put('/admin/events/:id', runMulter(upload.single('image')), async (req, res) => {
+  try {
+    const db = getDb();
+    if (!requireDb(res)) return;
+    const { title, category, description, event_date, location, is_published, remove_image } = req.body;
+    if (!title) return res.status(400).json({ message: 'Title is required' });
+
+    const [[existing]] = await db.query('SELECT image FROM events WHERE id = ?', [req.params.id]);
+    if (!existing) return res.status(404).json({ message: 'Event not found' });
+
+    let imageRelPath = existing.image;
+    if (remove_image === 'true' && imageRelPath) {
+      const oldFile = path.join(uploadDir, path.basename(imageRelPath));
+      if (fs.existsSync(oldFile)) fs.unlinkSync(oldFile);
+      imageRelPath = null;
+    }
+    if (req.file) {
+      if (imageRelPath) {
+        const oldFile = path.join(uploadDir, path.basename(imageRelPath));
+        if (fs.existsSync(oldFile)) fs.unlinkSync(oldFile);
+      }
+      imageRelPath = `/uploads/${req.file.filename}`;
+    }
+
+    await db.query(
+      'UPDATE events SET title=?, category=?, description=?, image=?, event_date=?, location=?, is_published=? WHERE id=?',
+      [title, category || 'other', description || null, imageRelPath, event_date || null, location || null, is_published === 'true' || is_published === true ? 1 : 0, req.params.id]
+    );
+    res.json({ message: 'Event updated' });
+  } catch (err) {
+    console.error('Error updating event:', err);
+    res.status(500).json({ error: 'Database error', message: err.message });
+  }
+});
+
+// Admin: toggle publish
+router.put('/admin/events/:id/toggle-publish', async (req, res) => {
+  try {
+    const db = getDb();
+    if (!requireDb(res)) return;
+    const [[event]] = await db.query('SELECT is_published FROM events WHERE id = ?', [req.params.id]);
+    if (!event) return res.status(404).json({ message: 'Event not found' });
+    const newStatus = event.is_published ? 0 : 1;
+    await db.query('UPDATE events SET is_published = ? WHERE id = ?', [newStatus, req.params.id]);
+    res.json({ message: newStatus ? 'Event published' : 'Event unpublished', is_published: newStatus });
+  } catch (err) {
+    console.error('Error toggling event publish:', err);
+    res.status(500).json({ error: 'Database error', message: err.message });
+  }
+});
+
+// Admin: delete event
+router.delete('/admin/events/:id', async (req, res) => {
+  try {
+    const db = getDb();
+    if (!requireDb(res)) return;
+    const [[event]] = await db.query('SELECT image FROM events WHERE id = ?', [req.params.id]);
+    if (event?.image) {
+      const filePath = path.join(uploadDir, path.basename(event.image));
+      if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+    }
+    await db.query('DELETE FROM events WHERE id = ?', [req.params.id]);
+    res.json({ message: 'Event deleted' });
+  } catch (err) {
+    console.error('Error deleting event:', err);
+    res.status(500).json({ error: 'Database error', message: err.message });
+  }
+});
+
 router.get('/admin/alumni/pending-count', async (req, res) => {
   try {
     const db = getDb();

@@ -6,9 +6,44 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 const API_BASE = API_URL.replace(/\/api\/?$/, '');
 
 const NAV = [
-  { key: 'dashboard', icon: 'bi-grid-fill',   label: 'Dashboard' },
-  { key: 'connect',   icon: 'bi-people-fill', label: 'Connect'   },
+  { key: 'dashboard', icon: 'bi-grid-fill',           label: 'Dashboard' },
+  { key: 'events',    icon: 'bi-calendar-event-fill', label: 'Events'    },
+  { key: 'connect',   icon: 'bi-people-fill',         label: 'Connect'   },
 ];
+
+const EVT_CAT_COLORS = {
+  reunion:      { bg: '#ede9fe', text: '#7c3aed' },
+  webinar:      { bg: '#e0f2fe', text: '#0891b2' },
+  hackathon:    { bg: '#dcfce7', text: '#16a34a' },
+  campus_event: { bg: '#fff7ed', text: '#c2410c' },
+  other:        { bg: '#f3f4f6', text: '#6b7280' },
+};
+const EVT_TABS = [
+  { value: 'all', label: 'All' },
+  { value: 'reunion', label: 'Reunions' },
+  { value: 'webinar', label: 'Webinars' },
+  { value: 'hackathon', label: 'Hackathons' },
+  { value: 'campus_event', label: 'Campus Events' },
+  { value: 'other', label: 'Other' },
+];
+const evtCatLabel = v => EVT_TABS.find(t => t.value === v)?.label || v;
+const evtCatColor = v => EVT_CAT_COLORS[v] || EVT_CAT_COLORS.other;
+
+function sortEvents(list) {
+  const now = new Date();
+  return [...list].sort((a, b) => {
+    const da = a.event_date ? new Date(a.event_date) : null;
+    const db = b.event_date ? new Date(b.event_date) : null;
+    const upA = da && da >= now;
+    const upB = db && db >= now;
+    if (!da && !db) return 0;
+    if (!da) return 1;
+    if (!db) return -1;
+    if (upA && !upB) return -1;
+    if (!upA && upB) return 1;
+    return da - db;
+  });
+}
 
 function ViewAlumni() {
   const navigate = useNavigate();
@@ -19,6 +54,10 @@ function ViewAlumni() {
   const [selectedAlumni, setSelectedAlumni] = useState(null);
   const [showFilters, setShowFilters]     = useState(false);
   const [sidebarOpen, setSidebarOpen]     = useState(true);
+  const [events, setEvents]               = useState([]);
+  const [eventsLoading, setEventsLoading] = useState(true);
+  const [activeEvtTab, setActiveEvtTab]   = useState('all');
+  const [selectedEvent, setSelectedEvent] = useState(null);
 
   const [filters, setFilters] = useState({
     searchTerm: '', batch: '', department: '', status: '', location: ''
@@ -47,6 +86,10 @@ function ViewAlumni() {
     const token = localStorage.getItem('userToken') || localStorage.getItem('alumniToken');
     if (!token) { navigate('/user/login'); return; }
     fetchAlumni();
+    axios.get(`${API_URL}/events`)
+      .then(r => setEvents(Array.isArray(r.data) ? r.data : []))
+      .catch(() => {})
+      .finally(() => setEventsLoading(false));
   }, []);
 
   useEffect(() => { applyFilters(); }, [alumni, filters]);
@@ -127,7 +170,7 @@ function ViewAlumni() {
           {NAV.map(n => {
             const active = activeTab === n.key;
             return (
-              <button key={n.key} onClick={() => setActiveTab(n.key)} style={{
+              <button key={n.key} onClick={() => { setActiveTab(n.key); setSelectedEvent(null); }} style={{
                 width: '100%', display: 'flex', alignItems: 'center', gap: 12,
                 padding: '11px 12px', borderRadius: 10, border: 'none', cursor: 'pointer',
                 marginBottom: 4, background: active ? 'rgba(25,127,230,0.18)' : 'transparent',
@@ -186,7 +229,7 @@ function ViewAlumni() {
               <i className="bi bi-list"></i>
             </button>
             <h1 style={{ fontWeight: 700, fontSize: 18, color: 'var(--color-secondary)', margin: 0 }}>
-              {activeTab === 'dashboard' ? 'My Dashboard' : 'Connect'}
+              {activeTab === 'dashboard' ? 'My Dashboard' : activeTab === 'events' ? 'Events' : 'Connect'}
             </h1>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
@@ -304,7 +347,8 @@ function ViewAlumni() {
                 <div style={{
                   background: 'linear-gradient(135deg,#eff6ff,#fff)',
                   border: '1.5px solid #bfdbfe', borderRadius: 14, padding: '20px 24px',
-                  display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 14
+                  display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 14,
+                  marginBottom: 28
                 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
                     <i className="bi bi-person-badge-fill" style={{ color: 'var(--color-primary)', fontSize: 26 }}></i>
@@ -319,6 +363,251 @@ function ViewAlumni() {
                   }}>
                     <i className="bi bi-box-arrow-in-right me-2"></i>Alumni Sign In
                   </button>
+                </div>
+              )}
+
+              {/* Events — compact preview on dashboard */}
+              <div style={{ background: '#fff', borderRadius: 16, padding: '22px 24px', boxShadow: '0 1px 4px rgba(0,0,0,0.07)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+                  <div style={{ fontWeight: 700, fontSize: 15, color: 'var(--color-secondary)', display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <i className="bi bi-calendar-event-fill" style={{ color: 'var(--color-primary)' }}></i> Upcoming Events
+                  </div>
+                  {events.length > 0 && (
+                    <button onClick={() => setActiveTab('events')} style={{ background: 'none', border: '1.5px solid var(--color-primary)', color: 'var(--color-primary)', borderRadius: 8, padding: '5px 14px', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>
+                      View All
+                    </button>
+                  )}
+                </div>
+                {eventsLoading ? (
+                  <div style={{ textAlign: 'center', padding: '20px 0' }}>
+                    <div className="spinner-border" style={{ width: '1.5rem', height: '1.5rem', color: 'var(--color-primary)' }}></div>
+                  </div>
+                ) : events.length === 0 ? (
+                  <div style={{ textAlign: 'center', padding: '20px 0', color: '#9ca3af' }}>
+                    <i className="bi bi-calendar-x" style={{ fontSize: 30 }}></i>
+                    <p style={{ marginTop: 8, fontSize: 13 }}>No events published yet.</p>
+                  </div>
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                    {sortEvents(events).slice(0, 3).map(ev => {
+                      const cc = evtCatColor(ev.category);
+                      return (
+                        <div key={ev.id} onClick={() => { setSelectedEvent(ev); setActiveTab('events'); }}
+                          style={{ display: 'flex', gap: 14, alignItems: 'center', padding: '10px 12px', borderRadius: 10, border: '1px solid #f3f4f6', cursor: 'pointer', transition: 'background 0.15s' }}
+                          onMouseEnter={e => e.currentTarget.style.background = '#f9fafb'}
+                          onMouseLeave={e => e.currentTarget.style.background = ''}
+                        >
+                          {ev.image
+                            ? <img src={`${API_BASE}${ev.image}`} alt={ev.title} style={{ width: 52, height: 40, objectFit: 'cover', borderRadius: 8, flexShrink: 0 }} />
+                            : <div style={{ width: 52, height: 40, borderRadius: 8, background: 'linear-gradient(135deg,#eef4ff,#ddeaff)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                                <i className="bi bi-calendar-event-fill" style={{ fontSize: 18, color: 'rgba(25,127,230,0.35)' }}></i>
+                              </div>
+                          }
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <div style={{ fontWeight: 600, fontSize: 13, color: '#111827', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{ev.title}</div>
+                            <div style={{ display: 'flex', gap: 8, marginTop: 4, alignItems: 'center', flexWrap: 'wrap' }}>
+                              <span style={{ background: cc.bg, color: cc.text, borderRadius: 20, padding: '1px 8px', fontSize: 10, fontWeight: 700 }}>{evtCatLabel(ev.category)}</span>
+                              {ev.event_date && <span style={{ fontSize: 11, color: '#9ca3af' }}>{new Date(ev.event_date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</span>}
+                            </div>
+                          </div>
+                          <i className="bi bi-chevron-right" style={{ color: '#d1d5db', fontSize: 13, flexShrink: 0 }}></i>
+                        </div>
+                      );
+                    })}
+                    {events.length > 3 && (
+                      <button onClick={() => setActiveTab('events')} style={{ background: '#f9fafb', border: '1px dashed #d1d5db', borderRadius: 10, padding: '9px', fontSize: 13, color: 'var(--color-primary)', fontWeight: 600, cursor: 'pointer' }}>
+                        +{events.length - 3} more events →
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* ══════ EVENTS TAB ══════ */}
+          {activeTab === 'events' && (
+            <div>
+              {selectedEvent ? (
+                /* ── Event Detail View ── */
+                <div>
+                  {/* Back button */}
+                  <button onClick={() => setSelectedEvent(null)} style={{
+                    display: 'inline-flex', alignItems: 'center', gap: 8,
+                    background: 'none', border: 'none', cursor: 'pointer',
+                    color: 'var(--color-primary)', fontWeight: 700, fontSize: 14, marginBottom: 24, padding: 0
+                  }}>
+                    <i className="bi bi-arrow-left"></i> All Events
+                  </button>
+
+                  <div style={{ background: '#fff', borderRadius: 20, boxShadow: '0 2px 16px rgba(0,0,0,0.08)', overflow: 'hidden' }}>
+                    {/* Hero image */}
+                    {selectedEvent.image ? (
+                      <img src={`${API_BASE}${selectedEvent.image}`} alt={selectedEvent.title}
+                        style={{ width: '100%', height: 320, objectFit: 'cover', display: 'block' }} />
+                    ) : (
+                      <div style={{ height: 200, background: 'linear-gradient(135deg,#eef4ff,#ddeaff)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <i className="bi bi-calendar-event-fill" style={{ fontSize: 72, color: 'rgba(25,127,230,0.18)' }}></i>
+                      </div>
+                    )}
+
+                    <div style={{ padding: '32px 40px' }}>
+                      {/* Category + past badge */}
+                      {(() => {
+                        const cc = evtCatColor(selectedEvent.category);
+                        const isPast = selectedEvent.event_date && new Date(selectedEvent.event_date) < new Date();
+                        return (
+                          <div style={{ display: 'flex', gap: 8, marginBottom: 16, flexWrap: 'wrap' }}>
+                            <span style={{ background: cc.bg, color: cc.text, borderRadius: 20, padding: '4px 14px', fontSize: 12, fontWeight: 700 }}>
+                              {evtCatLabel(selectedEvent.category)}
+                            </span>
+                            {isPast && <span style={{ background: '#f3f4f6', color: '#6b7280', borderRadius: 20, padding: '4px 14px', fontSize: 12, fontWeight: 600 }}>Past Event</span>}
+                          </div>
+                        );
+                      })()}
+
+                      {/* Title */}
+                      <h1 style={{ fontWeight: 900, fontSize: '1.7rem', color: '#111827', marginBottom: 24, lineHeight: 1.2 }}>
+                        {selectedEvent.title}
+                      </h1>
+
+                      {/* Meta row */}
+                      <div style={{ display: 'flex', gap: 32, flexWrap: 'wrap', marginBottom: 32, padding: '20px 24px', background: '#f9fafb', borderRadius: 14 }}>
+                        {selectedEvent.event_date && (
+                          <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
+                            <div style={{ width: 36, height: 36, borderRadius: 8, background: '#eff6ff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                              <i className="bi bi-calendar3" style={{ color: 'var(--color-primary)', fontSize: 16 }}></i>
+                            </div>
+                            <div>
+                              <div style={{ fontSize: 11, fontWeight: 600, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 3 }}>Date & Time</div>
+                              <div style={{ fontWeight: 700, fontSize: 14, color: '#111827' }}>
+                                {new Date(selectedEvent.event_date).toLocaleString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+                              </div>
+                              <div style={{ fontSize: 13, color: '#6b7280' }}>
+                                {new Date(selectedEvent.event_date).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                        {selectedEvent.location && (
+                          <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
+                            <div style={{ width: 36, height: 36, borderRadius: 8, background: '#fff7ed', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                              <i className="bi bi-geo-alt-fill" style={{ color: '#c2410c', fontSize: 16 }}></i>
+                            </div>
+                            <div>
+                              <div style={{ fontSize: 11, fontWeight: 600, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 3 }}>Venue</div>
+                              <div style={{ fontWeight: 700, fontSize: 14, color: '#111827' }}>{selectedEvent.location}</div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Description */}
+                      {selectedEvent.description && (
+                        <div>
+                          <h3 style={{ fontWeight: 700, fontSize: 16, color: '#111827', marginBottom: 14 }}>About this Event</h3>
+                          <div style={{ fontSize: 15, color: '#374151', lineHeight: 1.85, whiteSpace: 'pre-wrap' }}>
+                            {selectedEvent.description}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                /* ── Events List View ── */
+                <div>
+                  <div style={{ marginBottom: 24 }}>
+                    <h2 style={{ fontWeight: 800, fontSize: '1.3rem', color: '#111827', marginBottom: 4 }}>All Events</h2>
+                    <p style={{ color: '#6b7280', fontSize: 13 }}>{events.length} event{events.length !== 1 ? 's' : ''} published</p>
+                  </div>
+
+                  {/* Category filter tabs */}
+                  <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 24 }}>
+                    {EVT_TABS.map(t => (
+                      <button key={t.value} onClick={() => setActiveEvtTab(t.value)} style={{
+                        padding: '7px 18px', borderRadius: 24, border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 600,
+                        background: activeEvtTab === t.value ? 'var(--color-primary)' : '#fff',
+                        color:      activeEvtTab === t.value ? '#fff' : '#374151',
+                        boxShadow:  activeEvtTab === t.value ? '0 2px 8px rgba(25,127,230,0.25)' : '0 1px 3px rgba(0,0,0,0.07)',
+                        transition: 'all 0.15s'
+                      }}>
+                        {t.label}
+                      </button>
+                    ))}
+                  </div>
+
+                  {eventsLoading ? (
+                    <div style={{ textAlign: 'center', padding: 60 }}>
+                      <div className="spinner-border" style={{ width: '2rem', height: '2rem', color: 'var(--color-primary)' }}></div>
+                    </div>
+                  ) : (() => {
+                    const filtered = sortEvents(activeEvtTab === 'all' ? events : events.filter(e => e.category === activeEvtTab));
+                    if (filtered.length === 0) return (
+                      <div style={{ textAlign: 'center', padding: '60px 0', color: '#9ca3af' }}>
+                        <i className="bi bi-calendar-x" style={{ fontSize: 48 }}></i>
+                        <p style={{ marginTop: 14, fontWeight: 500 }}>No events in this category.</p>
+                      </div>
+                    );
+                    return (
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(280px,1fr))', gap: 20 }}>
+                        {filtered.map(ev => {
+                          const cc = evtCatColor(ev.category);
+                          const isPast = ev.event_date && new Date(ev.event_date) < new Date();
+                          return (
+                            <div key={ev.id} onClick={() => setSelectedEvent(ev)} style={{
+                              background: '#fff', borderRadius: 16, overflow: 'hidden',
+                              boxShadow: '0 2px 10px rgba(0,0,0,0.07)', border: '1px solid #e5e7eb',
+                              cursor: 'pointer', transition: 'all 0.2s', display: 'flex', flexDirection: 'column'
+                            }}
+                              onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-4px)'; e.currentTarget.style.boxShadow = '0 8px 24px rgba(0,0,0,0.13)'; }}
+                              onMouseLeave={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = '0 2px 10px rgba(0,0,0,0.07)'; }}
+                            >
+                              {ev.image ? (
+                                <div style={{ height: 160, overflow: 'hidden' }}>
+                                  <img src={`${API_BASE}${ev.image}`} alt={ev.title} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                                </div>
+                              ) : (
+                                <div style={{ height: 160, background: 'linear-gradient(135deg,#eef4ff,#ddeaff)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                  <i className="bi bi-calendar-event-fill" style={{ fontSize: 52, color: 'rgba(25,127,230,0.2)' }}></i>
+                                </div>
+                              )}
+                              <div style={{ padding: '18px 20px', flex: 1, display: 'flex', flexDirection: 'column' }}>
+                                <div style={{ display: 'flex', gap: 6, marginBottom: 10, flexWrap: 'wrap' }}>
+                                  <span style={{ background: cc.bg, color: cc.text, borderRadius: 20, padding: '3px 10px', fontSize: 11, fontWeight: 700 }}>{evtCatLabel(ev.category)}</span>
+                                  {isPast && <span style={{ background: '#f3f4f6', color: '#6b7280', borderRadius: 20, padding: '3px 10px', fontSize: 11, fontWeight: 600 }}>Past Event</span>}
+                                </div>
+                                <h3 style={{ fontWeight: 800, fontSize: '1rem', color: '#111827', marginBottom: 8, lineHeight: 1.35 }}>{ev.title}</h3>
+                                {ev.description && (
+                                  <p style={{ fontSize: '0.82rem', color: '#6b7280', lineHeight: 1.6, marginBottom: 12, flex: 1,
+                                    display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                                    {ev.description}
+                                  </p>
+                                )}
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: 5, marginTop: 'auto' }}>
+                                  {ev.event_date && (
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: 7, fontSize: '0.8rem', color: '#6b7280' }}>
+                                      <i className="bi bi-calendar3" style={{ color: 'var(--color-primary)', flexShrink: 0 }}></i>
+                                      {new Date(ev.event_date).toLocaleString('en-IN', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                                    </div>
+                                  )}
+                                  {ev.location && (
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: 7, fontSize: '0.8rem', color: '#6b7280' }}>
+                                      <i className="bi bi-geo-alt-fill" style={{ color: 'var(--color-primary)', flexShrink: 0 }}></i>
+                                      {ev.location}
+                                    </div>
+                                  )}
+                                </div>
+                                <div style={{ marginTop: 14, display: 'flex', alignItems: 'center', gap: 6, color: 'var(--color-primary)', fontSize: 13, fontWeight: 700 }}>
+                                  View Details <i className="bi bi-arrow-right"></i>
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    );
+                  })()}
                 </div>
               )}
             </div>
