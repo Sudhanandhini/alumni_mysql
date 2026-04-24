@@ -21,6 +21,7 @@ import 'bootstrap-icons/font/bootstrap-icons.css';
 import './App.css';
 import Terms from './pages/public/Terms';
 import Privacy from './pages/public/Privacy';
+import FeaturedAlumniEmbed from './pages/embed/FeaturedAlumniEmbed';
 
 // Protected Route Component for Admin
 const AdminProtectedRoute = ({ children }) => {
@@ -39,7 +40,8 @@ function Layout() {
   const location = useLocation();
   const hideShell = location.pathname.startsWith('/admin') ||
                     location.pathname.startsWith('/user/') ||
-                    location.pathname.startsWith('/alumni/');
+                    location.pathname.startsWith('/alumni/') ||
+                    location.pathname.startsWith('/embed/');
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
@@ -67,6 +69,9 @@ function Layout() {
 
           {/* Alumni edit profile */}
           <Route path="/alumni/edit-profile" element={<UserProtectedRoute><AlumniEditProfile /></UserProtectedRoute>} />
+
+          {/* Embed routes — no navbar/footer, open to external iframes */}
+          <Route path="/embed/featured-alumni" element={<FeaturedAlumniEmbed />} />
 
           {/* User routes */}
           <Route path="/user/login" element={<UserLogin />} />

@@ -66,6 +66,8 @@ async function runMigrations() {
     await addIfMissing('pg_college', 'VARCHAR(255) DEFAULT NULL');
     await addIfMissing('doctorate_name', 'VARCHAR(255) DEFAULT NULL');
     await addIfMissing('social_links', 'TEXT DEFAULT NULL');
+    await addIfMissing('show_contact', 'TINYINT(1) NOT NULL DEFAULT 0');
+    await addIfMissing('is_featured',  'TINYINT(1) NOT NULL DEFAULT 1');
 
     // Make previously NOT NULL columns nullable (no longer required in new form)
     const makeNullable = async (col, type) => {

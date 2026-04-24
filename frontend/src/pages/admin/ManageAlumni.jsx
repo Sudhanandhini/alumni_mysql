@@ -34,6 +34,7 @@ function ManageAlumni() {
   const [showFilters, setShowFilters]     = useState(true);
   const [filters, setFilters]             = useState({ searchTerm: '', batch: '', department: '', status: '', location: '' });
   const [viewAlumni, setViewAlumni]       = useState(null);
+  const [copiedKey, setCopiedKey]         = useState(null);
 
   const showToast = (type, msg) => { setToast({ type, msg }); setTimeout(() => setToast(null), 4000); };
 
@@ -48,6 +49,15 @@ function ManageAlumni() {
       setAlumni(res.data);
     } catch { showToast('danger', 'Failed to fetch alumni data.'); }
     finally { setLoading(false); }
+  };
+
+  const handleToggleFeature = async (id, name, currentVal) => {
+    try {
+      const token = localStorage.getItem('adminToken');
+      const res = await axios.put(`${API_URL}/admin/alumni/${id}/toggle-feature`, {}, { headers: { Authorization: `Bearer ${token}` } });
+      setAlumni(prev => prev.map(a => a.id === id ? { ...a, is_featured: res.data.is_featured } : a));
+      showToast('success', `"${name}" ${res.data.is_featured ? 'added to' : 'removed from'} Featured Alumni.`);
+    } catch { showToast('danger', 'Failed to update featured status.'); }
   };
 
   const applyFilters = () => {
@@ -105,7 +115,7 @@ function ManageAlumni() {
       )}
 
       {/* Page header */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24, flexWrap: 'wrap', gap: 14 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16, flexWrap: 'wrap', gap: 14 }}>
         <div>
           <h2 style={{ fontWeight: 800, fontSize: 22, color: 'var(--color-secondary)', margin: 0, marginBottom: 4 }}>Manage Alumni</h2>
           <p style={{ color: '#9ca3af', fontSize: 14, margin: 0 }}>View, filter, edit and manage alumni profiles</p>
@@ -114,6 +124,68 @@ function ManageAlumni() {
           <i className="bi bi-plus-circle-fill"></i>Add New Alumni
         </button>
       </div>
+
+      {/* Featured Alumni Embed Info */}
+      {(() => {
+        const siteOrigin = window.location.origin;
+        const basePath   = '/alumni_app';
+        const embedUrl   = `${siteOrigin}${basePath}/embed/featured-alumni`;
+        const apiUrl     = `${API_URL}/featured-alumni`;
+        const iframeCode = `<iframe\n  src="${embedUrl}"\n  width="100%"\n  height="480"\n  frameborder="0"\n  scrolling="no"\n  style="border:none;border-radius:12px;"\n  title="Featured Alumni"\n></iframe>`;
+        const copy = (text, key) => {
+          navigator.clipboard.writeText(text);
+          setCopiedKey(key);
+          setTimeout(() => setCopiedKey(null), 2000);
+          showToast('success', 'Copied to clipboard!');
+        };
+        return (
+          <div style={{ background: '#fffbeb', border: '1.5px solid #fde68a', borderRadius: 14, padding: '18px 20px', marginBottom: 20 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
+              <i className="bi bi-star-fill" style={{ color: '#f59e0b', fontSize: 16 }}></i>
+              <span style={{ fontWeight: 800, fontSize: 14, color: '#92400e' }}>Embed Featured Alumni on Another Website</span>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+
+              {/* iframe embed */}
+              <div style={{ background: '#fff', border: '1px solid #fde68a', borderRadius: 10, padding: '12px 14px' }}>
+                <div style={{ fontSize: 11, fontWeight: 700, color: '#92400e', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <i className="bi bi-code-slash"></i> Step 1 — Paste this iframe code into your website's HTML
+                </div>
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
+                  <pre style={{ flex: 1, background: '#1e293b', color: '#93c5fd', borderRadius: 8, padding: '10px 14px', fontSize: 12, margin: 0, overflow: 'auto', fontFamily: 'monospace', lineHeight: 1.6 }}>{iframeCode}</pre>
+                  <button onClick={() => copy(iframeCode, 'iframe')}
+                    style={{ background: copiedKey === 'iframe' ? '#16a34a' : '#f59e0b', color: '#fff', border: 'none', borderRadius: 8, padding: '8px 14px', fontWeight: 700, fontSize: 12, cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0 }}>
+                    <i className={`bi ${copiedKey === 'iframe' ? 'bi-check-lg' : 'bi-clipboard'} me-1`}></i>
+                    {copiedKey === 'iframe' ? 'Copied!' : 'Copy'}
+                  </button>
+                </div>
+                <div style={{ fontSize: 11, color: '#9ca3af', marginTop: 6 }}>
+                  Supports: <code style={{ background: '#f3f4f6', padding: '1px 5px', borderRadius: 4 }}>?limit=12</code> &nbsp;
+                  <code style={{ background: '#f3f4f6', padding: '1px 5px', borderRadius: 4 }}>?cols=4</code> &nbsp;
+                  <code style={{ background: '#f3f4f6', padding: '1px 5px', borderRadius: 4 }}>?theme=dark</code>
+                </div>
+              </div>
+
+              {/* JSON API URL */}
+              <div style={{ background: '#fff', border: '1px solid #fde68a', borderRadius: 10, padding: '12px 14px' }}>
+                <div style={{ fontSize: 11, fontWeight: 700, color: '#92400e', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <i className="bi bi-braces"></i> JSON API — For developers who want to build their own display
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <code style={{ flex: 1, background: '#1e293b', color: '#6ee7b7', borderRadius: 8, padding: '8px 14px', fontSize: 12, fontFamily: 'monospace', display: 'block' }}>{apiUrl}</code>
+                  <button onClick={() => copy(apiUrl, 'api')}
+                    style={{ background: copiedKey === 'api' ? '#16a34a' : '#f59e0b', color: '#fff', border: 'none', borderRadius: 8, padding: '8px 14px', fontWeight: 700, fontSize: 12, cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0 }}>
+                    <i className={`bi ${copiedKey === 'api' ? 'bi-check-lg' : 'bi-clipboard'} me-1`}></i>
+                    {copiedKey === 'api' ? 'Copied!' : 'Copy'}
+                  </button>
+                </div>
+                <div style={{ fontSize: 11, color: '#9ca3af', marginTop: 6 }}>Open in browser to preview JSON · Accessible from any domain (CORS enabled)</div>
+              </div>
+
+            </div>
+          </div>
+        );
+      })()}
 
       {/* Tabs */}
       <div style={{ display: 'flex', gap: 4, background: '#f0f0f0', padding: 4, borderRadius: 12, width: 'fit-content', marginBottom: 20 }}>
@@ -238,7 +310,7 @@ function ManageAlumni() {
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 14 }}>
               <thead>
                 <tr style={{ background: '#f9fafb' }}>
-                  {['Alumni','Designation','Organization','Batch','Dept','Status','Location', activeTab === 'active' ? 'Approval' : '', 'Actions'].filter(Boolean).map(h => (
+                  {['Alumni','Designation','Organization','Batch','Dept','Status','Location', activeTab === 'active' ? 'Approval' : '', activeTab === 'active' ? 'Featured' : '', 'Actions'].filter(Boolean).map(h => (
                     <th key={h} style={{ padding: '12px 16px', textAlign: 'left', fontWeight: 600, color: '#6b7280', fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.05em', whiteSpace: 'nowrap' }}>{h}</th>
                   ))}
                 </tr>
@@ -286,6 +358,15 @@ function ManageAlumni() {
                             color: a.approval_status === 'approved' ? '#16a34a' : a.approval_status === 'rejected' ? '#dc2626' : '#92400e',
                             borderRadius: 20, padding: '3px 10px', fontSize: 11, fontWeight: 600, textTransform: 'capitalize'
                           }}>{a.approval_status || 'approved'}</span>
+                        </td>
+                      )}
+                      {activeTab === 'active' && (
+                        <td style={{ padding: '13px 16px', textAlign: 'center' }}>
+                          <button onClick={() => handleToggleFeature(a.id, a.name, a.is_featured)}
+                            title={a.is_featured ? 'Remove from Featured' : 'Add to Featured'}
+                            style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 18, padding: 2 }}>
+                            <i className={`bi bi-star${a.is_featured ? '-fill' : ''}`} style={{ color: a.is_featured ? '#f59e0b' : '#d1d5db' }}></i>
+                          </button>
                         </td>
                       )}
                       <td style={{ padding: '13px 16px' }}>

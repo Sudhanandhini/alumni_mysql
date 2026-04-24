@@ -18,7 +18,8 @@ const clientOrigin = process.env.CLIENT_URL
   ? new URL(process.env.CLIENT_URL).origin
   : null;
 
-const allowedOrigins = [clientOrigin, 'http://localhost:5173'].filter(Boolean);
+const extraOrigins = (process.env.EXTRA_ORIGINS || '').split(',').map(s => s.trim()).filter(Boolean);
+const allowedOrigins = [clientOrigin, 'http://localhost:5173', 'http://localhost:5174', ...extraOrigins].filter(Boolean);
 
 app.use(cors({
   origin: allowedOrigins,

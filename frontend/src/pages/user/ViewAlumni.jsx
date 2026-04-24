@@ -132,7 +132,6 @@ function ViewAlumni() {
 
   const ownAlumnus = alumni.find(a => a.id === loggedInAlumniId);
 
-  // ── colour helpers
   const statusBg = s => {
     if (!s) return '#6b7280';
     const v = s.toLowerCase();
@@ -140,6 +139,36 @@ function ViewAlumni() {
     if (v.includes('study') || v.includes('student')) return '#2563eb';
     if (v.includes('self')) return '#d97706';
     return '#6b7280';
+  };
+
+  const statusStyle = s => {
+    if (s === 'Employed')      return { bg: '#dcfce7', text: '#16a34a' };
+    if (s === 'Self-Employed') return { bg: '#ede9fe', text: '#7c3aed' };
+    if (s === 'Studying')      return { bg: '#e0f2fe', text: '#0891b2' };
+    return { bg: '#f3f4f6', text: '#6b7280' };
+  };
+
+  const maskEmail = e => {
+    if (!e) return '';
+    const [local, domain] = e.split('@');
+    if (!domain) return e;
+    return `${local.slice(0, 3)}***@${domain}`;
+  };
+
+  const maskPhone = p => {
+    if (!p) return '';
+    const digits = p.replace(/\D/g, '');
+    if (digits.length < 5) return p;
+    return `${digits.slice(0, 2)}${'*'.repeat(digits.length - 4)}${digits.slice(-2)}`;
+  };
+
+  const toggleContactPrivacy = async (newVal) => {
+    const token = localStorage.getItem('alumniToken');
+    if (!token) return;
+    try {
+      await axios.put(`${API_URL}/alumni/me/privacy`, { show_contact: newVal }, { headers: { Authorization: `Bearer ${token}` } });
+      setAlumni(prev => prev.map(a => a.id === loggedInAlumniId ? { ...a, show_contact: newVal ? 1 : 0 } : a));
+    } catch { alert('Failed to update privacy setting'); }
   };
 
   return (
@@ -338,6 +367,37 @@ function ViewAlumni() {
                     }}>
                       <i className="bi bi-pencil-square me-2"></i>Edit Profile
                     </button>
+                  </div>
+
+                  {/* Privacy toggle */}
+                  <div style={{ marginTop: 18, paddingTop: 18, borderTop: '1px solid #f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
+                    <div>
+                      <div style={{ fontWeight: 700, fontSize: 14, color: 'var(--color-secondary)', marginBottom: 3 }}>
+                        <i className="bi bi-shield-lock-fill" style={{ color: 'var(--color-primary)', marginRight: 6 }}></i>
+                        Contact Visibility
+                      </div>
+                      <div style={{ fontSize: 12, color: '#9ca3af' }}>
+                        {ownAlumnus.show_contact ? 'Others can see your full email & phone.' : 'Your email & phone are hidden from others.'}
+                      </div>
+                    </div>
+                    <div onClick={() => toggleContactPrivacy(!ownAlumnus.show_contact)} style={{
+                      display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer', userSelect: 'none'
+                    }}>
+                      <div style={{
+                        width: 46, height: 26, borderRadius: 13,
+                        background: ownAlumnus.show_contact ? 'var(--color-primary)' : '#d1d5db',
+                        position: 'relative', transition: 'background 0.2s', flexShrink: 0
+                      }}>
+                        <div style={{
+                          position: 'absolute', top: 3, left: ownAlumnus.show_contact ? 23 : 3,
+                          width: 20, height: 20, borderRadius: '50%', background: '#fff',
+                          boxShadow: '0 1px 4px rgba(0,0,0,0.2)', transition: 'left 0.2s'
+                        }} />
+                      </div>
+                      <span style={{ fontSize: 13, fontWeight: 600, color: ownAlumnus.show_contact ? 'var(--color-primary)' : '#6b7280' }}>
+                        {ownAlumnus.show_contact ? 'Visible' : 'Hidden'}
+                      </span>
+                    </div>
                   </div>
                 </div>
               )}
@@ -783,69 +843,158 @@ function ViewAlumni() {
         </main>
       </div>
 
-      {/* ── Alumni Detail Modal ── */}
-      {selectedAlumni && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}
-          onClick={() => setSelectedAlumni(null)}>
-          <div style={{ background: '#fff', borderRadius: 18, width: '100%', maxWidth: 640, maxHeight: '90vh', overflow: 'auto', boxShadow: '0 20px 60px rgba(0,0,0,0.25)' }}
-            onClick={e => e.stopPropagation()}>
-            {/* Header strip */}
-            <div style={{ height: 90, background: 'linear-gradient(135deg,var(--color-primary),var(--color-primary-dark))', borderRadius: '18px 18px 0 0', position: 'relative' }}>
-              <button onClick={() => setSelectedAlumni(null)} style={{
-                position: 'absolute', top: 14, right: 14, background: 'rgba(255,255,255,0.15)',
-                border: 'none', borderRadius: '50%', width: 34, height: 34,
-                color: '#fff', fontSize: 18, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center'
-              }}><i className="bi bi-x"></i></button>
-            </div>
-            <div style={{ padding: '0 28px 28px' }}>
-              {/* Photo */}
-              <div style={{ marginTop: 20, display: 'flex', justifyContent: 'center' }}>
-                {selectedAlumni.photo
-                  ? <img src={`${API_BASE}${selectedAlumni.photo}`} alt={selectedAlumni.name} style={{ width: 88, height: 88, borderRadius: '50%', objectFit: 'cover', border: '4px solid #fff', boxShadow: '0 2px 10px rgba(0,0,0,0.15)' }} />
-                  : <div style={{ width: 88, height: 88, borderRadius: '50%', border: '4px solid #fff', background: 'linear-gradient(135deg,var(--color-primary),var(--color-primary-dark))', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 800, fontSize: 28, boxShadow: '0 2px 10px rgba(0,0,0,0.15)' }}>
-                      {selectedAlumni.name?.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
-                    </div>
-                }
+      {/* ── Alumni Profile Drawer ── */}
+      {selectedAlumni && (() => {
+        const a = selectedAlumni;
+        const sc = statusStyle(a.current_status);
+        const isOwn = loggedInAlumniId && a.id === loggedInAlumniId;
+        const Row = ({ icon, label, value }) => value ? (
+          <div style={{ display: 'flex', gap: 12, padding: '10px 0', borderBottom: '1px solid #f3f4f6', alignItems: 'flex-start' }}>
+            <i className={`bi ${icon}`} style={{ color: 'var(--color-primary)', fontSize: 15, marginTop: 2, flexShrink: 0, width: 18 }}></i>
+            <div style={{ minWidth: 110, fontSize: 12, color: '#9ca3af', fontWeight: 600, paddingTop: 1 }}>{label}</div>
+            <div style={{ fontSize: 13, color: '#111827', fontWeight: 500, flex: 1 }}>{value}</div>
+          </div>
+        ) : null;
+        return (
+          <>
+            <div onClick={() => setSelectedAlumni(null)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', zIndex: 1000, backdropFilter: 'blur(2px)' }} />
+            <div style={{
+              position: 'fixed', top: 0, right: 0, bottom: 0, width: 480, maxWidth: '95vw',
+              background: '#fff', zIndex: 1001, display: 'flex', flexDirection: 'column',
+              boxShadow: '-4px 0 32px rgba(0,0,0,0.18)', fontFamily: 'Inter, sans-serif',
+              animation: 'slideIn 0.25s ease'
+            }}>
+              <style>{`@keyframes slideIn{from{transform:translateX(100%)}to{transform:translateX(0)}}`}</style>
+
+              {/* Header */}
+              <div style={{ padding: '20px 24px', borderBottom: '1px solid #f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
+                <div style={{ fontWeight: 800, fontSize: 16, color: 'var(--color-secondary)', display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <i className="bi bi-person-badge-fill" style={{ color: 'var(--color-primary)' }}></i> Alumni Profile
+                </div>
+                <div style={{ display: 'flex', gap: 8 }}>
+                  {isOwn && (
+                    <button onClick={() => { setSelectedAlumni(null); navigate('/alumni/edit-profile'); }} style={{ background: '#eff6ff', color: '#2563eb', border: 'none', borderRadius: 8, padding: '7px 14px', fontWeight: 700, fontSize: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 5 }}>
+                      <i className="bi bi-pencil"></i>Edit
+                    </button>
+                  )}
+                  <button onClick={() => setSelectedAlumni(null)} style={{ background: '#f3f4f6', color: '#6b7280', border: 'none', borderRadius: 8, padding: '7px 10px', cursor: 'pointer', fontSize: 16 }}>
+                    <i className="bi bi-x-lg"></i>
+                  </button>
+                </div>
               </div>
-              <div style={{ fontWeight: 800, fontSize: 22, color: 'var(--color-secondary)', marginBottom: 4 }}>{selectedAlumni.name}</div>
-              <div style={{ fontSize: 14, color: '#6b7280', marginBottom: 14 }}>
-                {selectedAlumni.designation}{selectedAlumni.organization_name ? ` @ ${selectedAlumni.organization_name}` : ''}
-              </div>
-              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 22 }}>
-                {selectedAlumni.batch && <span style={{ background: '#eff6ff', color: '#2563eb', borderRadius: 20, padding: '4px 14px', fontSize: 13, fontWeight: 600 }}>Batch {selectedAlumni.batch}</span>}
-                {selectedAlumni.current_status && <span style={{ background: statusBg(selectedAlumni.current_status) + '18', color: statusBg(selectedAlumni.current_status), borderRadius: 20, padding: '4px 14px', fontSize: 13, fontWeight: 600 }}>{selectedAlumni.current_status}</span>}
-                {selectedAlumni.department && <span style={{ background: '#f9fafb', color: '#374151', borderRadius: 20, padding: '4px 14px', fontSize: 13, fontWeight: 600, border: '1px solid #e5e7eb' }}>{selectedAlumni.department}</span>}
-              </div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
-                {[
-                  { label: 'Email', value: selectedAlumni.email, href: `mailto:${selectedAlumni.email}` },
-                  { label: 'Phone', value: selectedAlumni.phone },
-                  { label: 'Location', value: selectedAlumni.work_location || selectedAlumni.address },
-                  { label: 'Experience', value: selectedAlumni.experience_years != null ? `${selectedAlumni.experience_years} yrs` : null },
-                  { label: 'Skills', value: selectedAlumni.skills, full: true },
-                  { label: 'Bio', value: selectedAlumni.bio, full: true },
-                ].filter(r => r.value).map((r, i) => (
-                  <div key={i} style={{ gridColumn: r.full ? '1/-1' : 'auto', background: '#f9fafb', borderRadius: 10, padding: '12px 14px' }}>
-                    <div style={{ fontSize: 11, fontWeight: 700, color: '#9ca3af', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{r.label}</div>
-                    {r.href
-                      ? <a href={r.href} style={{ fontSize: 14, color: '#2563eb', fontWeight: 600 }}>{r.value}</a>
-                      : <div style={{ fontSize: 14, color: '#374151', fontWeight: 500 }}>{r.value}</div>
+
+              {/* Scrollable body */}
+              <div style={{ flex: 1, overflowY: 'auto', padding: '0 0 24px' }}>
+
+                {/* Hero banner */}
+                <div style={{ background: 'linear-gradient(135deg,var(--color-primary-dark),var(--color-primary))', padding: '28px 24px 50px', position: 'relative' }}>
+                  <div style={{ position: 'absolute', bottom: -44, left: 24 }}>
+                    {a.photo
+                      ? <img src={`${API_BASE}${a.photo}`} alt={a.name} style={{ width: 88, height: 88, borderRadius: '50%', objectFit: 'cover', border: '4px solid #fff', boxShadow: '0 2px 12px rgba(0,0,0,0.18)' }} />
+                      : <div style={{ width: 88, height: 88, borderRadius: '50%', background: 'linear-gradient(135deg,#1e3a5f,#2563eb)', border: '4px solid #fff', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 800, fontSize: 28, boxShadow: '0 2px 12px rgba(0,0,0,0.18)' }}>
+                          {a.name?.split(' ').map(n => n[0]).join('').slice(0,2).toUpperCase()}
+                        </div>
                     }
                   </div>
-                ))}
-                {selectedAlumni.linkedin && (
-                  <div style={{ gridColumn: '1/-1', background: '#f9fafb', borderRadius: 10, padding: '12px 14px' }}>
-                    <div style={{ fontSize: 11, fontWeight: 700, color: '#9ca3af', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.06em' }}>LinkedIn</div>
-                    <a href={selectedAlumni.linkedin} target="_blank" rel="noopener noreferrer" style={{ fontSize: 14, color: '#0a66c2', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 6 }}>
-                      <i className="bi bi-linkedin"></i> View LinkedIn Profile
-                    </a>
+                </div>
+
+                {/* Name block */}
+                <div style={{ padding: '56px 24px 16px' }}>
+                  <div style={{ fontWeight: 800, fontSize: 20, color: 'var(--color-secondary)', marginBottom: 4 }}>{a.name}</div>
+                  <div style={{ fontSize: 13, color: '#6b7280', marginBottom: 10 }}>{a.designation}{a.designation && a.organization_name ? ' · ' : ''}{a.organization_name}</div>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                    {a.current_status && <span style={{ background: sc.bg, color: sc.text, borderRadius: 20, padding: '4px 12px', fontSize: 12, fontWeight: 700 }}>{a.current_status}</span>}
+                    {a.batch && <span style={{ background: '#eff6ff', color: '#2563eb', borderRadius: 20, padding: '4px 12px', fontSize: 12, fontWeight: 600 }}>{a.batch}</span>}
                   </div>
-                )}
+                  {!isOwn && !a.show_contact && (
+                    <div style={{ marginTop: 12, display: 'flex', alignItems: 'center', gap: 7, background: '#fef9c3', border: '1px solid #fde68a', borderRadius: 8, padding: '8px 12px', fontSize: 12, color: '#92400e' }}>
+                      <i className="bi bi-shield-lock-fill"></i>
+                      Contact details are partially hidden by this member's privacy settings.
+                    </div>
+                  )}
+                </div>
+
+                {/* Sections */}
+                {[
+                  {
+                    title: 'Contact', icon: 'bi-envelope-fill',
+                    rows: [
+                      { icon: 'bi-envelope',     label: 'Email',   value: isOwn || a.show_contact ? a.email  : (a.email  ? maskEmail(a.email)  : null) },
+                      { icon: 'bi-telephone',    label: 'Phone',   value: isOwn || a.show_contact ? a.phone  : (a.phone  ? maskPhone(a.phone)  : null) },
+                      { icon: 'bi-geo-alt-fill', label: 'Address', value: a.address },
+                      { icon: 'bi-globe',        label: 'Country', value: a.country },
+                      { icon: 'bi-building',     label: 'City',    value: a.city },
+                    ]
+                  },
+                  {
+                    title: 'Personal', icon: 'bi-person-fill',
+                    rows: [
+                      { icon: 'bi-gender-ambiguous', label: 'Gender',        value: a.gender },
+                      { icon: 'bi-calendar3',        label: 'Date of Birth', value: a.dob ? new Date(a.dob).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : null },
+                      { icon: 'bi-person',           label: 'Parent Name',   value: a.parent_name },
+                    ]
+                  },
+                  {
+                    title: 'Education', icon: 'bi-mortarboard-fill',
+                    rows: [
+                      { icon: 'bi-bank',           label: 'Institution',      value: a.institution },
+                      { icon: 'bi-journal-text',   label: 'Department',       value: a.department },
+                      { icon: 'bi-award',          label: 'Education Level',  value: a.education_level },
+                      { icon: 'bi-mortarboard',    label: 'Program',          value: a.attended_program },
+                      { icon: 'bi-hash',           label: 'Enroll No.',       value: a.enrollment_number },
+                      { icon: 'bi-calendar-check', label: 'Completion Year',  value: a.completion_year },
+                      { icon: 'bi-building2',      label: 'UG College',       value: a.ug_college },
+                      { icon: 'bi-building2',      label: 'PG College',       value: a.pg_college },
+                      { icon: 'bi-patch-check',    label: 'Doctorate',        value: a.doctorate_name },
+                    ]
+                  },
+                  {
+                    title: 'Employment', icon: 'bi-briefcase-fill',
+                    rows: [
+                      { icon: 'bi-building',      label: 'Organization',    value: a.organization_name },
+                      { icon: 'bi-person-badge',  label: 'Designation',     value: a.designation },
+                      { icon: 'bi-diagram-3',     label: 'Industry',        value: a.industry },
+                      { icon: 'bi-geo',           label: 'Work Location',   value: a.work_location },
+                      { icon: 'bi-geo-alt',       label: 'Work City',       value: a.work_city },
+                      { icon: 'bi-clock-history', label: 'Experience',      value: a.experience_years ? `${a.experience_years} year(s)` : null },
+                      { icon: 'bi-briefcase',     label: 'Employment Type', value: a.employment_type },
+                      { icon: 'bi-bar-chart',     label: 'Seniority',       value: a.seniority_level },
+                      { icon: 'bi-tools',         label: 'Functional Area', value: a.functional_area },
+                    ]
+                  },
+                  {
+                    title: 'Skills & Bio', icon: 'bi-star-fill',
+                    rows: [
+                      { icon: 'bi-tools',      label: 'Skills',       value: a.skills },
+                      { icon: 'bi-trophy',     label: 'Achievements', value: a.achievements },
+                      { icon: 'bi-chat-quote', label: 'Bio',          value: a.bio },
+                    ]
+                  },
+                  {
+                    title: 'Social Links', icon: 'bi-share-fill',
+                    rows: [
+                      { icon: 'bi-linkedin', label: 'LinkedIn', value: a.linkedin },
+                      { icon: 'bi-facebook', label: 'Facebook', value: a.facebook },
+                    ]
+                  },
+                ].map(section => {
+                  const visibleRows = section.rows.filter(r => r.value);
+                  if (visibleRows.length === 0) return null;
+                  return (
+                    <div key={section.title} style={{ padding: '0 24px', marginBottom: 8 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 2, paddingTop: 16 }}>
+                        <i className={`bi ${section.icon}`} style={{ color: 'var(--color-primary)', fontSize: 13 }}></i>
+                        <span style={{ fontWeight: 700, fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.06em', color: '#6b7280' }}>{section.title}</span>
+                      </div>
+                      {visibleRows.map(r => <Row key={r.label} icon={r.icon} label={r.label} value={r.value} />)}
+                    </div>
+                  );
+                })}
               </div>
             </div>
-          </div>
-        </div>
-      )}
+          </>
+        );
+      })()}
     </div>
   );
 }

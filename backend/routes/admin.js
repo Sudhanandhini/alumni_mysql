@@ -545,6 +545,21 @@ router.put('/admin/events/:id', runMulter(upload.single('image')), async (req, r
 });
 
 // Admin: toggle publish
+router.put('/admin/alumni/:id/toggle-feature', async (req, res) => {
+  try {
+    const db = getDb();
+    if (!requireDb(res)) return;
+    const [[alumni]] = await db.query('SELECT is_featured FROM alumni WHERE id = ?', [req.params.id]);
+    if (!alumni) return res.status(404).json({ message: 'Alumni not found' });
+    const newVal = alumni.is_featured ? 0 : 1;
+    await db.query('UPDATE alumni SET is_featured = ? WHERE id = ?', [newVal, req.params.id]);
+    res.json({ is_featured: newVal });
+  } catch (err) {
+    console.error('Error toggling featured:', err);
+    res.status(500).json({ error: 'Database error', message: err.message });
+  }
+});
+
 router.put('/admin/events/:id/toggle-publish', async (req, res) => {
   try {
     const db = getDb();

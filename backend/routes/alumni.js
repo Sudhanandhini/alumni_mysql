@@ -176,6 +176,41 @@ router.post('/alumni/reset-password', async (req, res) => {
   }
 });
 
+// ── Featured Alumni (public, open CORS) ──────────────────────────────────────
+
+router.options('/featured-alumni', (req, res) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type');
+  res.sendStatus(204);
+});
+
+router.get('/featured-alumni', async (req, res) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  try {
+    const db = getDb();
+    if (!requireDb(res)) return;
+    const limit = Math.min(parseInt(req.query.limit) || 20, 50);
+    const [rows] = await db.query(
+      `SELECT id, name, photo, current_status, institution, batch,
+              work_location, designation, organization_name, department
+       FROM alumni
+       WHERE approval_status = 'approved' AND is_deleted = 0 AND is_featured = 1
+       ORDER BY id DESC
+       LIMIT ?`,
+      [limit]
+    );
+    const apiBase = `${req.protocol}://${req.get('host')}`;
+    res.json(rows.map(a => ({
+      ...a,
+      photo: a.photo ? (a.photo.startsWith('http') ? a.photo : `${apiBase}${a.photo}`) : null
+    })));
+  } catch (err) {
+    console.error('Error fetching featured alumni:', err);
+    res.status(500).json({ error: 'Database error' });
+  }
+});
+
 // ── Alumni CRUD ───────────────────────────────────────────────────────────────
 
 router.get('/alumni', async (req, res) => {
@@ -201,7 +236,7 @@ router.get('/alumni', async (req, res) => {
         approval_status, is_deleted, attended_program, program_type, facebook, enrollment_number,
         completion_year, functional_area, employment_type, seniority_level,
         country, city, education_level, work_city, created_at,
-        parent_name, ug_college, pg_college, doctorate_name, social_links, username
+        parent_name, ug_college, pg_college, doctorate_name, social_links, username, show_contact
        FROM alumni ${whereClause} ORDER BY id DESC`
     );
     res.json(results);
@@ -279,6 +314,19 @@ router.put('/alumni/me', verifyAlumniToken, runMulter(upload.single('photo')), a
     res.json({ message: 'Profile updated successfully' });
   } catch (err) {
     console.error('Error updating own profile:', err);
+    res.status(500).json({ error: 'Database error', message: err.message });
+  }
+});
+
+router.put('/alumni/me/privacy', verifyAlumniToken, async (req, res) => {
+  try {
+    const db = getDb();
+    if (!requireDb(res)) return;
+    const { show_contact } = req.body;
+    await db.query('UPDATE alumni SET show_contact = ? WHERE id = ?', [show_contact ? 1 : 0, req.alumniId]);
+    res.json({ success: true, show_contact: show_contact ? 1 : 0 });
+  } catch (err) {
+    console.error('Error updating privacy:', err);
     res.status(500).json({ error: 'Database error', message: err.message });
   }
 });

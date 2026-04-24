@@ -135,7 +135,7 @@ function Home() {
     let mounted = true;
     const fetchAlumni = async () => {
       setLoading(true);
-      const url = `${API_URL.replace(/\/$/, '')}/alumni`;
+      const url = `${API_URL.replace(/\/$/, '')}/featured-alumni?limit=50`;
       try {
         const res = await axios.get(url);
         if (mounted) setAlumni(Array.isArray(res.data) ? res.data : []);
