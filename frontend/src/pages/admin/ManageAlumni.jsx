@@ -130,7 +130,8 @@ function ManageAlumni() {
         const siteOrigin = window.location.origin;
         const basePath   = '/alumni_app';
         const embedUrl   = `${siteOrigin}${basePath}/embed/featured-alumni`;
-        const apiUrl     = `${API_URL}/featured-alumni`;
+        const apiBase    = API_URL.startsWith('http') ? API_URL : `${siteOrigin}${API_URL.startsWith('/') ? '' : '/'}${API_URL}`;
+        const apiUrl     = `${apiBase}/featured-alumni`;
         const iframeCode = `<iframe\n  src="${embedUrl}"\n  width="100%"\n  height="480"\n  frameborder="0"\n  scrolling="no"\n  style="border:none;border-radius:12px;"\n  title="Featured Alumni"\n></iframe>`;
         const copy = (text, key) => {
           navigator.clipboard.writeText(text);

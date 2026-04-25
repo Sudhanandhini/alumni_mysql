@@ -5,7 +5,12 @@
       "Bash(npx vite *)",
       "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:5174/embassypreschool/)",
       "Bash(curl -s \"http://localhost:5000/api/featured-alumni?limit=3\")",
-      "Bash(curl -s -I -H \"Origin: http://localhost:5174\" \"http://localhost:5000/api/featured-alumni\")"
+      "Bash(curl -s -I -H \"Origin: http://localhost:5174\" \"http://localhost:5000/api/featured-alumni\")",
+      "Read(//f/sudha/react-alumni/**)"
+    ],
+    "additionalDirectories": [
+      "f:\\sudha\\react-alumni\\src",
+      "f:\\sudha\\react-alumni"
     ]
   }
 }

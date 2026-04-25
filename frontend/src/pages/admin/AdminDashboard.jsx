@@ -50,6 +50,11 @@ function AdminDashboard() {
   const [sidebarOpen, setSidebarOpen]   = useState(true);
   const [events, setEvents]             = useState([]);
   const [eventsLoading, setEventsLoading] = useState(true);
+  const [embedLimit, setEmbedLimit]     = useState(12);
+  const [embedCols,  setEmbedCols]      = useState(4);
+  const [embedTheme, setEmbedTheme]     = useState('light');
+  const [copiedIframe, setCopiedIframe] = useState(false);
+  const [copiedApi,    setCopiedApi]    = useState(false);
 
 
   useEffect(() => {
@@ -470,6 +475,127 @@ function AdminDashboard() {
               </div>
             )}
           </div>
+          {/* ── Featured Alumni Embed ── */}
+          {(() => {
+            const origin = window.location.origin;
+            const basePath = import.meta.env.BASE_URL?.replace(/\/$/, '') || '/alumni_app';
+            const embedUrl  = `${origin}${basePath}/embed/featured-alumni?limit=${embedLimit}&cols=${embedCols}&theme=${embedTheme}`;
+            const apiBase   = API_URL.startsWith('http') ? API_URL : `${origin}${API_URL.startsWith('/') ? '' : '/'}${API_URL}`;
+            const apiUrl    = `${apiBase}/featured-alumni?limit=${embedLimit}`;
+            const iframeCode = `<iframe\n  src="${embedUrl}"\n  width="100%"\n  height="500"\n  frameborder="0"\n  style="border:none;border-radius:12px;"\n  title="Featured Alumni"\n></iframe>`;
+
+            const copy = (text, setDone) => {
+              navigator.clipboard.writeText(text).then(() => {
+                setDone(true);
+                setTimeout(() => setDone(false), 2000);
+              });
+            };
+
+            return (
+              <div style={{ background: '#fff', borderRadius: 14, boxShadow: '0 1px 4px rgba(0,0,0,0.07)', overflow: 'hidden', marginTop: 24 }}>
+                <div style={{ padding: '18px 24px', borderBottom: '1px solid #f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 10 }}>
+                  <div style={{ fontWeight: 700, fontSize: 15, color: '#111827', display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <i className="bi bi-code-slash" style={{ color: 'var(--color-primary)' }}></i> Featured Alumni — Embed & API Link
+                  </div>
+                  <a href={embedUrl} target="_blank" rel="noreferrer" style={{
+                    display: 'inline-flex', alignItems: 'center', gap: 6,
+                    background: 'none', border: '1.5px solid var(--color-primary)', color: 'var(--color-primary)',
+                    borderRadius: 8, padding: '6px 16px', fontWeight: 600, fontSize: 13, cursor: 'pointer', textDecoration: 'none'
+                  }}>
+                    <i className="bi bi-box-arrow-up-right"></i> Preview
+                  </a>
+                </div>
+
+                <div style={{ padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: 20 }}>
+
+                  {/* Customise controls */}
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 14, alignItems: 'flex-end' }}>
+                    {[
+                      { label: 'Limit', value: embedLimit, min: 1, max: 50, onChange: v => setEmbedLimit(Number(v)) },
+                      { label: 'Columns', value: embedCols, min: 1, max: 6, onChange: v => setEmbedCols(Number(v)) },
+                    ].map(f => (
+                      <div key={f.label}>
+                        <div style={{ fontSize: 11, color: '#6b7280', fontWeight: 600, marginBottom: 4 }}>{f.label}</div>
+                        <input type="number" min={f.min} max={f.max} value={f.value}
+                          onChange={e => f.onChange(e.target.value)}
+                          style={{ width: 70, padding: '6px 10px', border: '1.5px solid #e5e7eb', borderRadius: 8, fontSize: 13, fontWeight: 600, color: '#111827' }} />
+                      </div>
+                    ))}
+                    <div>
+                      <div style={{ fontSize: 11, color: '#6b7280', fontWeight: 600, marginBottom: 4 }}>Theme</div>
+                      <div style={{ display: 'flex', gap: 6 }}>
+                        {['light', 'dark'].map(t => (
+                          <button key={t} onClick={() => setEmbedTheme(t)} style={{
+                            padding: '6px 16px', borderRadius: 8, border: '1.5px solid',
+                            borderColor: embedTheme === t ? 'var(--color-primary)' : '#e5e7eb',
+                            background: embedTheme === t ? '#eff6ff' : '#fff',
+                            color: embedTheme === t ? 'var(--color-primary)' : '#6b7280',
+                            fontWeight: 600, fontSize: 13, cursor: 'pointer', textTransform: 'capitalize'
+                          }}>{t}</button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* iFrame code */}
+                  <div>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: '#374151', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <i className="bi bi-file-code" style={{ color: 'var(--color-primary)' }}></i> iFrame Embed Code
+                    </div>
+                    <div style={{ position: 'relative' }}>
+                      <pre style={{
+                        background: '#f8fafc', border: '1.5px solid #e5e7eb', borderRadius: 10,
+                        padding: '14px 16px', fontSize: 12, color: '#334155', margin: 0,
+                        overflowX: 'auto', whiteSpace: 'pre-wrap', wordBreak: 'break-all',
+                        fontFamily: 'monospace', lineHeight: 1.7
+                      }}>{iframeCode}</pre>
+                      <button onClick={() => copy(iframeCode, setCopiedIframe)} style={{
+                        position: 'absolute', top: 10, right: 10,
+                        background: copiedIframe ? '#dcfce7' : '#fff',
+                        border: `1.5px solid ${copiedIframe ? '#16a34a' : '#e5e7eb'}`,
+                        color: copiedIframe ? '#16a34a' : '#6b7280',
+                        borderRadius: 7, padding: '4px 12px', fontSize: 12, fontWeight: 700, cursor: 'pointer',
+                        display: 'flex', alignItems: 'center', gap: 5, transition: 'all 0.2s'
+                      }}>
+                        <i className={`bi ${copiedIframe ? 'bi-check2' : 'bi-clipboard'}`}></i>
+                        {copiedIframe ? 'Copied!' : 'Copy'}
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* API link */}
+                  <div>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: '#374151', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <i className="bi bi-link-45deg" style={{ color: 'var(--color-primary)' }}></i> Direct API URL
+                    </div>
+                    <div style={{ position: 'relative' }}>
+                      <div style={{
+                        background: '#f8fafc', border: '1.5px solid #e5e7eb', borderRadius: 10,
+                        padding: '12px 90px 12px 16px', fontSize: 12, color: '#334155',
+                        fontFamily: 'monospace', wordBreak: 'break-all'
+                      }}>{apiUrl}</div>
+                      <button onClick={() => copy(apiUrl, setCopiedApi)} style={{
+                        position: 'absolute', top: '50%', right: 10, transform: 'translateY(-50%)',
+                        background: copiedApi ? '#dcfce7' : '#fff',
+                        border: `1.5px solid ${copiedApi ? '#16a34a' : '#e5e7eb'}`,
+                        color: copiedApi ? '#16a34a' : '#6b7280',
+                        borderRadius: 7, padding: '4px 12px', fontSize: 12, fontWeight: 700, cursor: 'pointer',
+                        display: 'flex', alignItems: 'center', gap: 5, transition: 'all 0.2s'
+                      }}>
+                        <i className={`bi ${copiedApi ? 'bi-check2' : 'bi-clipboard'}`}></i>
+                        {copiedApi ? 'Copied!' : 'Copy'}
+                      </button>
+                    </div>
+                    <div style={{ fontSize: 11, color: '#9ca3af', marginTop: 6 }}>
+                      Returns JSON array of featured alumni. Open CORS — safe to call from any website.
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+            );
+          })()}
+
         </main>
       </div>
     </div>
