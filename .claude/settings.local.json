@@ -10,7 +10,8 @@
     ],
     "additionalDirectories": [
       "f:\\sudha\\react-alumni\\src",
-      "f:\\sudha\\react-alumni"
+      "f:\\sudha\\react-alumni",
+      "f:\\sudha\\alumni-main\\backend\\middleware"
     ]
   }
 }

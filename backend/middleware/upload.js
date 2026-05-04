@@ -17,11 +17,11 @@ const upload = multer({
   storage,
   limits: { fileSize: 5 * 1024 * 1024 },
   fileFilter: (req, file, cb) => {
-    const allowed = /jpeg|jpg|png|gif/;
+    const allowed = /jpeg|jpg|png|gif|webp/;
     const extOk = allowed.test(path.extname(file.originalname).toLowerCase());
-    const mimeOk = allowed.test(file.mimetype);
+    const mimeOk = /image\/(jpeg|jpg|png|gif|webp)/.test(file.mimetype);
     if (extOk && mimeOk) return cb(null, true);
-    cb(new Error('Only images are allowed (jpeg, jpg, png, gif)'));
+    cb(new Error('Only images are allowed (jpeg, jpg, png, gif, webp)'));
   },
 });
 
