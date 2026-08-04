@@ -30,6 +30,7 @@ function Broadcast() {
   const [deleting, setDeleting]     = useState(null);
   const [resending, setResending]   = useState(null);
   const [loading, setLoading]       = useState(false);
+  const [activeTab, setActiveTab]   = useState('create');
 
   useEffect(() => {
     fetchBroadcasts();
@@ -107,6 +108,7 @@ function Broadcast() {
     setForm({ subject: b.subject, message: b.message, file: null, preview: null, removeAttachment: false });
     setStatus(null);
     if (fileRef.current) fileRef.current.value = '';
+    setActiveTab('create');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -231,7 +233,45 @@ function Broadcast() {
 
         <main style={{ flex: 1, padding: '28px', overflow: 'auto' }}>
 
+          {/* Tabs */}
+          <div style={{ display: 'flex', gap: 8, marginBottom: 20 }}>
+            <button
+              onClick={() => setActiveTab('create')}
+              style={{
+                display: 'flex', alignItems: 'center', gap: 8,
+                padding: '10px 20px', borderRadius: 10, border: 'none', cursor: 'pointer',
+                fontSize: 14, fontWeight: 700,
+                background: activeTab === 'create' ? 'var(--color-primary)' : '#fff',
+                color:      activeTab === 'create' ? '#fff' : '#6b7280',
+                boxShadow: '0 1px 4px rgba(0,0,0,0.07)',
+              }}
+            >
+              <i className={`bi ${editId ? 'bi-pencil-square' : 'bi-send-fill'}`}></i>
+              {editId ? 'Edit Broadcast' : 'New Broadcast Message'}
+            </button>
+            <button
+              onClick={() => setActiveTab('list')}
+              style={{
+                display: 'flex', alignItems: 'center', gap: 8,
+                padding: '10px 20px', borderRadius: 10, border: 'none', cursor: 'pointer',
+                fontSize: 14, fontWeight: 700,
+                background: activeTab === 'list' ? 'var(--color-primary)' : '#fff',
+                color:      activeTab === 'list' ? '#fff' : '#6b7280',
+                boxShadow: '0 1px 4px rgba(0,0,0,0.07)',
+              }}
+            >
+              <i className="bi bi-clock-history"></i>
+              Broadcast History
+              <span style={{
+                background: activeTab === 'list' ? 'rgba(255,255,255,0.25)' : '#f3f4f6',
+                color:      activeTab === 'list' ? '#fff' : '#6b7280',
+                borderRadius: 20, padding: '1px 9px', fontSize: 12, fontWeight: 700
+              }}>{broadcasts.length}</span>
+            </button>
+          </div>
+
           {/* Compose Card */}
+          {activeTab === 'create' && (
           <div style={{ background: '#fff', borderRadius: 14, boxShadow: '0 1px 4px rgba(0,0,0,0.07)', marginBottom: 28, overflow: 'hidden' }}>
             <div style={{ padding: '18px 24px', borderBottom: '1px solid #f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -354,8 +394,10 @@ function Broadcast() {
               </div>
             </div>
           </div>
+          )}
 
           {/* History Table */}
+          {activeTab === 'list' && (
           <div style={{ background: '#fff', borderRadius: 14, boxShadow: '0 1px 4px rgba(0,0,0,0.07)', overflow: 'hidden' }}>
             <div style={{ padding: '18px 24px', borderBottom: '1px solid #f3f4f6', display: 'flex', alignItems: 'center', gap: 8 }}>
               <i className="bi bi-clock-history" style={{ color: 'var(--color-primary)' }}></i>
@@ -371,6 +413,9 @@ function Broadcast() {
               <div style={{ textAlign: 'center', padding: 48, color: '#9ca3af' }}>
                 <i className="bi bi-megaphone" style={{ fontSize: 40 }}></i>
                 <p style={{ marginTop: 10 }}>No broadcasts sent yet.</p>
+                <button onClick={() => setActiveTab('create')} style={{ marginTop: 10, background: 'var(--color-primary)', color: '#fff', border: 'none', borderRadius: 8, padding: '8px 18px', fontWeight: 700, fontSize: 13, cursor: 'pointer' }}>
+                  Send your first broadcast
+                </button>
               </div>
             ) : (
               <div style={{ overflowX: 'auto' }}>
@@ -445,6 +490,7 @@ function Broadcast() {
               </div>
             )}
           </div>
+          )}
         </main>
       </div>
     </div>

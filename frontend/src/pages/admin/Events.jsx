@@ -398,7 +398,10 @@ export default function Events() {
         ) : events.length === 0 ? (
           <div style={{ textAlign: 'center', padding: 56, color: '#9ca3af' }}>
             <i className="bi bi-calendar-x" style={{ fontSize: 42 }}></i>
-            <p style={{ marginTop: 12, fontWeight: 500 }}>No events yet. Create one above.</p>
+            <p style={{ marginTop: 12, fontWeight: 500 }}>No events yet.</p>
+            <button onClick={() => setActiveTab('create')} style={{ marginTop: 10, background: 'var(--color-primary)', color: '#fff', border: 'none', borderRadius: 8, padding: '8px 18px', fontWeight: 700, fontSize: 13, cursor: 'pointer' }}>
+              Create your first event
+            </button>
           </div>
         ) : (
           <div style={{ overflowX: 'auto' }}>
@@ -485,6 +488,7 @@ export default function Events() {
           </div>
         )}
       </div>
+      )}
 
       {/* ── Event Detail Modal ── */}
       {selectedEvent && (
