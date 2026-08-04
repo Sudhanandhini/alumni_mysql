@@ -2,7 +2,7 @@
 import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 const NAV = [
   { key: '/admin',            icon: 'bi-grid-fill',        label: 'Dashboard'          },
@@ -31,7 +31,7 @@ export default function AdminLayout({ children, title }) {
   };
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', background: '#f0f2f5', fontFamily: 'Inter, system-ui, sans-serif' }}>
+    <div style={{ display: 'flex', minHeight: '100vh', background: '#f0f2f5', fontFamily: 'Poppins, system-ui, sans-serif' }}>
 
       {/* â”€â”€ Sidebar â”€â”€ */}
       <aside style={{

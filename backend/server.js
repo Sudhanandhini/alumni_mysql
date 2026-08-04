@@ -45,10 +45,10 @@ apiRouter.use('/',      adminRoutes);
 apiRouter.use('/stats', statsRoutes);
 
 if (BASE_PATH) {
-  app.use(`${BASE_PATH}/api`, apiRouter);
-  console.log('API routes mounted at: ' + BASE_PATH + '/api');
+  app.use(BASE_PATH, apiRouter);
+  console.log('API routes mounted at: ' + BASE_PATH);
 }
-app.use('/api', apiRouter);
+app.use('/', apiRouter);
 
 app.use((req, res) => res.status(404).json({ error: 'No matching route', path: req.originalUrl }));
 
@@ -58,7 +58,7 @@ connectDatabase()
   .then(() => {
     app.listen(PORT, () => {
       console.log('Server running on http://localhost:' + PORT);
-      console.log('Test API: http://localhost:' + PORT + '/api/test');
+      console.log('Test API: http://localhost:' + PORT + '/test');
       console.log('Uploads: ' + uploadDir);
     });
   });

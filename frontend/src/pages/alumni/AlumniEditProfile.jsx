@@ -2,7 +2,7 @@
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 const API_BASE = API_URL.replace(/\/api\/?$/, '');
 
 // Color constants — driven by CSS variables (change in index.css to update everywhere)
@@ -294,7 +294,7 @@ function AlumniEditProfile() {
   );
 
   return (
-    <div style={{ minHeight: '100vh', background: '#f5f6f8', fontFamily: 'Inter, system-ui, sans-serif' }}>
+    <div style={{ minHeight: '100vh', background: '#f5f6f8', fontFamily: 'Poppins, system-ui, sans-serif' }}>
 
       {/* ── Toast ── */}
       {toast && (

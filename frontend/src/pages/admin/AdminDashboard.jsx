@@ -2,7 +2,7 @@
 import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 
-const API_URL  = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const API_URL  = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 const API_BASE = API_URL.replace(/\/api\/?$/, '');
 
 const EVT_CAT_COLORS = {
@@ -108,7 +108,7 @@ function AdminDashboard() {
   };
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', background: '#f0f2f5', fontFamily: 'Inter, sans-serif' }}>
+    <div style={{ display: 'flex', minHeight: '100vh', background: '#f0f2f5', fontFamily: 'Poppins, sans-serif' }}>
 
       {/* â”€â”€ Left Sidebar â”€â”€ */}
       <aside style={{
@@ -478,7 +478,7 @@ function AdminDashboard() {
           {/* ── Featured Alumni Embed ── */}
           {(() => {
             const origin = window.location.origin;
-            const basePath = import.meta.env.BASE_URL?.replace(/\/$/, '') || '/alumni_app';
+            const basePath = import.meta.env.BASE_URL?.replace(/\/$/, '') || '/alumni';
             const embedUrl  = `${origin}${basePath}/embed/featured-alumni?limit=${embedLimit}&cols=${embedCols}&theme=${embedTheme}`;
             const apiBase   = API_URL.startsWith('http') ? API_URL : `${origin}${API_URL.startsWith('/') ? '' : '/'}${API_URL}`;
             const apiUrl    = `${apiBase}/featured-alumni?limit=${embedLimit}`;

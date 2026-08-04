@@ -193,7 +193,7 @@ router.get('/featured-alumni', async (req, res) => {
     const limit = Math.min(parseInt(req.query.limit) || 20, 50);
     const [rows] = await db.query(
       `SELECT id, name, photo, current_status, institution, batch,
-              work_location, designation, organization_name, department
+              work_location, designation, organization_name, department, industry
        FROM alumni
        WHERE approval_status = 'approved' AND is_deleted = 0 AND is_featured = 1
        ORDER BY id DESC

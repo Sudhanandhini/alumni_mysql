@@ -1,7 +1,7 @@
 Options -MultiViews
 RewriteEngine On
-RewriteBase /alumni_app/
+RewriteBase /alumni/
 RewriteRule ^index\.html$ - [L]
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule . /alumni_app/index.html [L]
+RewriteRule . /alumni/index.html [L]

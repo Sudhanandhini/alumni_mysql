@@ -85,7 +85,7 @@ function Layout() {
 
 function App() {
   return (
-    <Router basename="/alumni_app">
+    <Router basename="/alumni">
       <Layout />
     </Router>
   );

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import AdminLayout from '../../components/AdminLayout';
 
-const API_URL  = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const API_URL  = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 const API_BASE = API_URL.replace(/\/api\/?$/, '');
 
 const departments = [
@@ -128,7 +128,7 @@ function ManageAlumni() {
       {/* Featured Alumni Embed Info */}
       {(() => {
         const siteOrigin = window.location.origin;
-        const basePath   = '/alumni_app';
+        const basePath   = '/alumni';
         const embedUrl   = `${siteOrigin}${basePath}/embed/featured-alumni`;
         const apiBase    = API_URL.startsWith('http') ? API_URL : `${siteOrigin}${API_URL.startsWith('/') ? '' : '/'}${API_URL}`;
         const apiUrl     = `${apiBase}/featured-alumni`;
@@ -423,7 +423,7 @@ function ManageAlumni() {
             <div style={{
               position: 'fixed', top: 0, right: 0, bottom: 0, width: 480, maxWidth: '95vw',
               background: '#fff', zIndex: 1001, display: 'flex', flexDirection: 'column',
-              boxShadow: '-4px 0 32px rgba(0,0,0,0.18)', fontFamily: 'Inter, sans-serif',
+              boxShadow: '-4px 0 32px rgba(0,0,0,0.18)', fontFamily: 'Poppins, sans-serif',
               animation: 'slideIn 0.25s ease'
             }}>
               <style>{`@keyframes slideIn{from{transform:translateX(100%)}to{transform:translateX(0)}}`}</style>

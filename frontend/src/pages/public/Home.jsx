@@ -10,7 +10,7 @@ import '../../components/AlumniCards.css';
 import hero from "../../assets/po.jpg"
 
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
 const API_BASE = API_URL.replace(/\/api\/?$/, '');
 
@@ -295,7 +295,7 @@ function Home() {
 
               {/* Heading */}
               <h1 style={{
-                fontSize: 'clamp(2.6rem, 5vw, 4rem)', fontWeight: 900,
+                fontSize: 'clamp(2.6rem, 5vw, 4rem)', fontWeight: 500,
                 lineHeight: 1.08, marginBottom: 20, color: '#111827'
               }}>
                 Our<br />Distinguished<br />
@@ -434,8 +434,8 @@ function Home() {
                         padding: '28px 20px 24px',
                         display: 'flex',
                         flexDirection: 'column',
-                        alignItems: 'center',
-                        textAlign: 'center',
+                        alignItems: 'flex-start',
+                        textAlign: 'left',
                         position: 'relative',
                       }}
                     >
@@ -458,7 +458,7 @@ function Home() {
                         width: 88, height: 88,
                         borderRadius: '50%',
                         overflow: 'hidden',
-                       
+                        alignSelf: 'center',
                         boxShadow: '0 4px 16px rgba(25,127,230,0.18)',
                         marginBottom: 16,
                         flexShrink: 0,
@@ -472,7 +472,7 @@ function Home() {
                       </div>
 
                       {/* Name */}
-                      <h5 style={{ fontSize: '1.0rem', fontWeight: 800, color: '#111827', marginBottom: 14,  textTransform: 'capitalize'}}>
+                      <h5 style={{ fontSize: '1.0rem', fontWeight: 800, color: '#111827', marginBottom: 14, textTransform: 'capitalize', alignSelf: 'center' }}>
                         {alumnus.name || '—'}
                       </h5>
 
@@ -486,15 +486,23 @@ function Home() {
                       )} */}
 
                       {/* Divider */}
-                      <div style={{ width: 40, height: 2, background: '#e5e7eb', borderRadius: 2, marginBottom: 14 }} />
+                      <div style={{ width: 40, height: 2, background: '#e5e7eb', borderRadius: 2, marginBottom: 14, alignSelf: 'center' }} />
 
                       {/* Details */}
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: 7, alignItems: 'center', width: '100%' }}>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 7, alignItems: 'flex-start', width: '100%' }}>
                         {alumnus.institution && (
                           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                             <i className="bi bi-mortarboard" style={{ color: '#9ca3af', fontSize: 13, flexShrink: 0 }}></i>
                             <span style={{ fontSize: '0.80rem', color: '#6b7280' }}>
                               {alumnus.institution}{alumnus.batch ? `, Class of ${alumnus.batch}` : ''}
+                            </span>
+                          </div>
+                        )}
+                        {alumnus.industry && (
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                            <i className="bi bi-briefcase" style={{ color: '#9ca3af', fontSize: 13, flexShrink: 0 }}></i>
+                            <span style={{ fontSize: '0.80rem', color: '#6b7280' }}>
+                              {alumnus.industry}
                             </span>
                           </div>
                         )}
@@ -802,7 +810,7 @@ function Home() {
 
             <div style={{ position: 'relative', maxWidth: 560 }}>
               <h2 style={{
-                fontSize: 'clamp(1.5rem, 3.5vw, 2.1rem)', fontWeight: 900,
+                fontSize: 'clamp(1.5rem, 3.5vw, 2.1rem)', 
                 color: '#fff', marginBottom: 14, lineHeight: 1.2
               }}>
                 Ready to re-connect with<br />your community?

@@ -33,7 +33,7 @@ function Login() {
   };
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', background: '#f4f6fa', fontFamily: 'Inter, system-ui, sans-serif' }}>
+    <div style={{ display: 'flex', minHeight: '100vh', background: '#f4f6fa', fontFamily: 'Poppins, system-ui, sans-serif' }}>
 
       {/* Left panel */}
       <div className="d-none d-lg-flex" style={{ width: 420, flexShrink: 0, flexDirection: 'column', background: 'linear-gradient(160deg, var(--color-primary) 0%, var(--color-primary-dark) 55%, var(--color-primary-darker) 100%)', padding: '52px 44px', justifyContent: 'space-between', position: 'relative', overflow: 'hidden' }}>

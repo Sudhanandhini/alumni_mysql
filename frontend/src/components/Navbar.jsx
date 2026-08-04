@@ -27,7 +27,7 @@ function Navbar() {
       position: 'sticky',
       top: 0,
       zIndex: 1000,
-      fontFamily: 'Inter, system-ui, sans-serif',
+      fontFamily: 'Poppins, system-ui, sans-serif',
     }}>
       <div style={{
         maxWidth: 1200, margin: '0 auto', padding: '0 24px',

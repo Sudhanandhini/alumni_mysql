@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 
-const API_URL  = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const API_URL  = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 const API_BASE = API_URL.replace(/\/api\/?$/, '');
 
 const NAV = [
@@ -141,7 +141,7 @@ function Broadcast() {
   const fmtDate = (d) => new Date(d).toLocaleString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', background: '#f0f2f5', fontFamily: 'Inter, sans-serif' }}>
+    <div style={{ display: 'flex', minHeight: '100vh', background: '#f0f2f5', fontFamily: 'Poppins, sans-serif' }}>
 
       {/* Sidebar */}
       <aside style={{
@@ -258,7 +258,7 @@ function Broadcast() {
                   placeholder="e.g. Happy Independence Day!"
                   value={form.subject}
                   onChange={e => { setForm(p => ({ ...p, subject: e.target.value })); setStatus(null); }}
-                  style={{ width: '100%', padding: '10px 14px', borderRadius: 8, fontSize: 14, border: '1.5px solid #e5e7eb', outline: 'none', boxSizing: 'border-box', fontFamily: 'Inter, sans-serif' }}
+                  style={{ width: '100%', padding: '10px 14px', borderRadius: 8, fontSize: 14, border: '1.5px solid #e5e7eb', outline: 'none', boxSizing: 'border-box', fontFamily: 'Poppins, sans-serif' }}
                 />
               </div>
               <div style={{ marginBottom: 18 }}>
@@ -268,7 +268,7 @@ function Broadcast() {
                   placeholder="Type your message here. It will be emailed to all approved alumni."
                   value={form.message}
                   onChange={e => { setForm(p => ({ ...p, message: e.target.value })); setStatus(null); }}
-                  style={{ width: '100%', padding: '10px 14px', borderRadius: 8, fontSize: 14, border: '1.5px solid #e5e7eb', outline: 'none', resize: 'vertical', boxSizing: 'border-box', fontFamily: 'Inter, sans-serif' }}
+                  style={{ width: '100%', padding: '10px 14px', borderRadius: 8, fontSize: 14, border: '1.5px solid #e5e7eb', outline: 'none', resize: 'vertical', boxSizing: 'border-box', fontFamily: 'Poppins, sans-serif' }}
                 />
               </div>
 

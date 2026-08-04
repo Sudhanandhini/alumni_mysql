@@ -2,7 +2,7 @@
 import axios from 'axios';
 import AdminLayout from '../../components/AdminLayout';
 
-const API_URL  = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const API_URL  = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 const API_BASE = API_URL.replace(/\/api\/?$/, '');
 
 const departments = [
@@ -346,7 +346,7 @@ function PendingApprovals() {
 
               <div style={{ padding: '0 28px 28px' }}>
                 {/* Photo + name + status */}
-                <div style={{ display: 'flex', alignItems: 'flex-end', gap: 18, marginTop: -30, marginBottom: 4 }}>
+                <div style={{ display: 'flex', alignItems: 'flex-end', gap: 18, marginTop: 20, marginBottom: 10 }}>
                   {a.photo
                     ? <img src={`${API_BASE}${a.photo}`} alt={a.name} style={{ width: 80, height: 80, borderRadius: '50%', objectFit: 'cover', border: '4px solid #fff', boxShadow: '0 2px 10px rgba(0,0,0,0.15)', flexShrink: 0 }} />
                     : <div style={{ width: 80, height: 80, borderRadius: '50%', border: '4px solid #fff', background: 'linear-gradient(135deg,var(--color-primary),var(--color-primary-dark))', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 800, fontSize: 24, boxShadow: '0 2px 10px rgba(0,0,0,0.15)', flexShrink: 0 }}>

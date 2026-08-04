@@ -25,7 +25,7 @@ export default {
         sidebar: 'var(--color-sidebar)',
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
+        sans: ['Poppins', 'system-ui', 'sans-serif'],
       },
       boxShadow: {
         card:    '0 1px 4px rgba(0,0,0,0.07)',

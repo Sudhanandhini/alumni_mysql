@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import AdminLayout from '../../components/AdminLayout';
 
-const API_URL  = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const API_URL  = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 const API_BASE = API_URL.replace(/\/api\/?$/, '');
 
 const CATEGORIES = [
@@ -53,6 +53,7 @@ export default function Events() {
   const [status, setStatus]         = useState({ type: '', msg: '' });
   const [saving, setSaving]         = useState(false);
   const [selectedEvent, setSelectedEvent] = useState(null);
+  const [activeTab, setActiveTab]   = useState('create');
   const fileRef                     = useRef();
 
   useEffect(() => { fetchEvents(); }, []);
@@ -102,6 +103,7 @@ export default function Events() {
     setImagePreview(null);
     setRemoveImage(false);
     setStatus({ type: '', msg: '' });
+    setActiveTab('create');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -178,7 +180,45 @@ export default function Events() {
 
   return (
     <AdminLayout title="Events">
+      {/* ── Tabs ── */}
+      <div style={{ display: 'flex', gap: 8, marginBottom: 20 }}>
+        <button
+          onClick={() => setActiveTab('create')}
+          style={{
+            display: 'flex', alignItems: 'center', gap: 8,
+            padding: '10px 20px', borderRadius: 10, border: 'none', cursor: 'pointer',
+            fontSize: 14, fontWeight: 700,
+            background: activeTab === 'create' ? 'var(--color-primary)' : '#fff',
+            color:      activeTab === 'create' ? '#fff' : '#6b7280',
+            boxShadow: '0 1px 4px rgba(0,0,0,0.07)',
+          }}
+        >
+          <i className={`bi ${editId ? 'bi-pencil-square' : 'bi-calendar-plus-fill'}`}></i>
+          {editId ? 'Edit Event' : 'Create New Event'}
+        </button>
+        <button
+          onClick={() => setActiveTab('list')}
+          style={{
+            display: 'flex', alignItems: 'center', gap: 8,
+            padding: '10px 20px', borderRadius: 10, border: 'none', cursor: 'pointer',
+            fontSize: 14, fontWeight: 700,
+            background: activeTab === 'list' ? 'var(--color-primary)' : '#fff',
+            color:      activeTab === 'list' ? '#fff' : '#6b7280',
+            boxShadow: '0 1px 4px rgba(0,0,0,0.07)',
+          }}
+        >
+          <i className="bi bi-calendar3"></i>
+          All Events
+          <span style={{
+            background: activeTab === 'list' ? 'rgba(255,255,255,0.25)' : '#f3f4f6',
+            color:      activeTab === 'list' ? '#fff' : '#6b7280',
+            borderRadius: 20, padding: '1px 9px', fontSize: 12, fontWeight: 700
+          }}>{events.length}</span>
+        </button>
+      </div>
+
       {/* ── Form ── */}
+      {activeTab === 'create' && (
       <div style={{ background: '#fff', borderRadius: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.07)', padding: '28px 32px', marginBottom: 28 }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
           <div style={{ fontWeight: 700, fontSize: 16, color: '#111827', display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -340,8 +380,10 @@ export default function Events() {
           </button>
         </form>
       </div>
+      )}
 
       {/* ── Events List ── */}
+      {activeTab === 'list' && (
       <div style={{ background: '#fff', borderRadius: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.07)', overflow: 'hidden' }}>
         <div style={{ padding: '18px 28px', borderBottom: '1px solid #f3f4f6', display: 'flex', alignItems: 'center', gap: 10 }}>
           <i className="bi bi-calendar3" style={{ color: 'var(--color-primary)', fontSize: 16 }}></i>

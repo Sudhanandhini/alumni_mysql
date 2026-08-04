@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 function FeaturedAlumniEmbed() {
   const [alumni, setAlumni]   = useState([]);
@@ -37,7 +37,7 @@ function FeaturedAlumniEmbed() {
   };
 
   return (
-    <div style={{ background: bg, padding: '24px 16px 20px', fontFamily: 'Inter,sans-serif', minHeight: '100%', boxSizing: 'border-box' }}>
+    <div style={{ background: bg, padding: '24px 16px 20px', fontFamily: 'Poppins,sans-serif', minHeight: '100%', boxSizing: 'border-box' }}>
 
       {/* Title */}
       <div style={{ textAlign: 'center', marginBottom: 24 }}>
