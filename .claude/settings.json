@@ -1,8 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Read(//f/sudha/alumni-main/**)",
-      "Read(//f/sudha/alumni-anthony/**)"
-    ]
-  }
-}
