@@ -430,8 +430,11 @@ function Home() {
                         border: '1px solid #e5e7eb',
                         boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
                         transition: 'all 0.25s ease',
-                        margin: '8px 4px 16px',
+                        // margin: '8px 4px 16px',
                         padding: '28px 20px 24px',
+                        // height: 340,
+                        boxSizing: 'border-box',
+                        overflow: 'hidden',
                         display: 'flex',
                         flexDirection: 'column',
                         alignItems: 'flex-start',
@@ -489,27 +492,30 @@ function Home() {
                       <div style={{ width: 40, height: 2, background: '#e5e7eb', borderRadius: 2, marginBottom: 14, alignSelf: 'center' }} />
 
                       {/* Details */}
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: 7, alignItems: 'flex-start', width: '100%' }}>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 7, alignItems: 'flex-start', width: '100%', marginTop: 'auto' }}>
                         {alumnus.institution && (
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                            <i className="bi bi-mortarboard" style={{ color: '#9ca3af', fontSize: 13, flexShrink: 0 }}></i>
-                            <span style={{ fontSize: '0.80rem', color: '#6b7280' }}>
+                          <div style={{ display: 'flex', alignItems: 'flex-start', gap: 6, minHeight: 36 }}>
+                            <i className="bi bi-mortarboard" style={{ color: '#9ca3af', fontSize: 13, flexShrink: 0, marginTop: 2 }}></i>
+                            <span style={{
+                              fontSize: '0.80rem', color: '#6b7280', lineHeight: '18px',
+                              display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden'
+                            }}>
                               {alumnus.institution}{alumnus.batch ? `, Class of ${alumnus.batch}` : ''}
                             </span>
                           </div>
                         )}
                         {alumnus.industry && (
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 6, width: '100%' }}>
                             <i className="bi bi-briefcase" style={{ color: '#9ca3af', fontSize: 13, flexShrink: 0 }}></i>
-                            <span style={{ fontSize: '0.80rem', color: '#6b7280' }}>
+                            <span style={{ fontSize: '0.80rem', color: '#6b7280', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                               {alumnus.industry}
                             </span>
                           </div>
                         )}
                         {alumnus.work_location && (
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 6, width: '100%' }}>
                             <i className="bi bi-geo-alt" style={{ color: '#9ca3af', fontSize: 13, flexShrink: 0 }}></i>
-                            <span style={{ fontSize: '0.80rem', color: '#6b7280' }}>
+                            <span style={{ fontSize: '0.80rem', color: '#6b7280', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                               {alumnus.work_location}
                             </span>
                           </div>

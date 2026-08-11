@@ -68,6 +68,8 @@ async function runMigrations() {
     await addIfMissing('social_links', 'TEXT DEFAULT NULL');
     await addIfMissing('show_contact', 'TINYINT(1) NOT NULL DEFAULT 0');
     await addIfMissing('is_featured',  'TINYINT(1) NOT NULL DEFAULT 1');
+    await addIfMissing('referral_code', 'VARCHAR(64) DEFAULT NULL');
+    await addIfMissing('referred_by', 'INT DEFAULT NULL');
 
     // Make previously NOT NULL columns nullable (no longer required in new form)
     const makeNullable = async (col, type) => {

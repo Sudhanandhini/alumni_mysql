@@ -1017,6 +1017,7 @@ function UserRegistration() {
     skills: '', bio: '', achievements: '',
   });
   const [socialLinks, setSocialLinks] = useState([]);
+  const refCode = new URLSearchParams(window.location.search).get('ref') || '';
 
   const startTimer = (secs = 60) => {
     setResendTimer(secs);
@@ -1183,6 +1184,7 @@ function UserRegistration() {
       education_level: formData.education_level || '',
       work_city: formData.work_city || '',
       parent_name: formData.parent_name || '',
+      ref: refCode,
     };
     Object.entries(fields).forEach(([k, v]) => fd.append(k, v));
     if (selectedImage) fd.append('photo', selectedImage);
@@ -1233,6 +1235,17 @@ function UserRegistration() {
               <div style={{ fontSize: 12, color: '#aaa' }}>Alumni Registration Portal</div>
             </div>
           </div>
+
+          {refCode && (
+            <div style={{
+              display: 'flex', alignItems: 'center', gap: 10,
+              background: '#eff6ff', border: '1.5px solid #bfdbfe', borderRadius: 10,
+              padding: '10px 16px', marginBottom: 24, fontSize: 13, color: '#1d4ed8', fontWeight: 600
+            }}>
+              <i className="bi bi-person-hearts" style={{ fontSize: 16 }}></i>
+              You were referred by a friend! They'll be notified once you register.
+            </div>
+          )}
 
           {/* Step indicator */}
           <StepIndicator step={step} total={TOTAL_STEPS} />

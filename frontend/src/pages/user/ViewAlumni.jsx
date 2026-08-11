@@ -59,6 +59,13 @@ function ViewAlumni() {
   const [activeEvtTab, setActiveEvtTab]   = useState('all');
   const [selectedEvent, setSelectedEvent] = useState(null);
 
+  const [referralLink, setReferralLink]     = useState('');
+  const [referralLoading, setReferralLoading] = useState(false);
+  const [myReferrals, setMyReferrals]       = useState([]);
+  const [referralsLoading, setReferralsLoading] = useState(false);
+  const [referralActionId, setReferralActionId] = useState(null);
+  const [copied, setCopied]                 = useState(false);
+
   const [filters, setFilters] = useState({
     searchTerm: '', batch: '', department: '', status: '', location: ''
   });
@@ -90,6 +97,10 @@ function ViewAlumni() {
       .then(r => setEvents(Array.isArray(r.data) ? r.data : []))
       .catch(() => {})
       .finally(() => setEventsLoading(false));
+    if (localStorage.getItem('alumniToken')) {
+      fetchReferralLink();
+      fetchMyReferrals();
+    }
   }, []);
 
   useEffect(() => { applyFilters(); }, [alumni, filters]);
@@ -102,6 +113,57 @@ function ViewAlumni() {
       setFilteredAlumni(res.data);
     } catch { alert('Failed to fetch alumni data'); }
     finally { setLoading(false); }
+  };
+
+  const fetchReferralLink = async () => {
+    const token = localStorage.getItem('alumniToken');
+    if (!token) return;
+    try {
+      setReferralLoading(true);
+      const res = await axios.get(`${API_URL}/alumni/me/referral-link`, { headers: { Authorization: `Bearer ${token}` } });
+      setReferralLink(res.data.link || '');
+    } catch { /* silently ignore */ }
+    finally { setReferralLoading(false); }
+  };
+
+  const fetchMyReferrals = async () => {
+    const token = localStorage.getItem('alumniToken');
+    if (!token) return;
+    try {
+      setReferralsLoading(true);
+      const res = await axios.get(`${API_URL}/alumni/me/referrals`, { headers: { Authorization: `Bearer ${token}` } });
+      setMyReferrals(Array.isArray(res.data) ? res.data : []);
+    } catch { /* silently ignore */ }
+    finally { setReferralsLoading(false); }
+  };
+
+  const copyReferralLink = () => {
+    if (!referralLink) return;
+    navigator.clipboard.writeText(referralLink).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  };
+
+  const handleReferralApprove = async (id) => {
+    const token = localStorage.getItem('alumniToken');
+    setReferralActionId(id);
+    try {
+      await axios.put(`${API_URL}/alumni/me/referrals/${id}/approve`, {}, { headers: { Authorization: `Bearer ${token}` } });
+      setMyReferrals(prev => prev.map(r => r.id === id ? { ...r, approval_status: 'approved' } : r));
+    } catch { alert('Failed to approve this referral.'); }
+    finally { setReferralActionId(null); }
+  };
+
+  const handleReferralReject = async (id) => {
+    if (!window.confirm('Reject this referral?')) return;
+    const token = localStorage.getItem('alumniToken');
+    setReferralActionId(id);
+    try {
+      await axios.put(`${API_URL}/alumni/me/referrals/${id}/reject`, {}, { headers: { Authorization: `Bearer ${token}` } });
+      setMyReferrals(prev => prev.map(r => r.id === id ? { ...r, approval_status: 'rejected' } : r));
+    } catch { alert('Failed to reject this referral.'); }
+    finally { setReferralActionId(null); }
   };
 
   const applyFilters = () => {
@@ -212,6 +274,26 @@ function ViewAlumni() {
               </button>
             );
           })}
+          {isAlumniLoggedIn && (() => {
+            const active = activeTab === 'refer';
+            const pendingCount = myReferrals.filter(r => r.approval_status === 'pending').length;
+            return (
+              <button onClick={() => { setActiveTab('refer'); setSelectedEvent(null); }} style={{
+                width: '100%', display: 'flex', alignItems: 'center', gap: 12,
+                padding: '11px 12px', borderRadius: 10, border: 'none', cursor: 'pointer',
+                marginBottom: 4, background: active ? 'rgba(25,127,230,0.18)' : 'transparent',
+                color: active ? '#93c5fd' : 'rgba(255,255,255,0.65)',
+                fontWeight: active ? 700 : 500, fontSize: 14,
+                transition: 'all 0.15s', whiteSpace: 'nowrap', overflow: 'hidden'
+              }}>
+                <i className="bi bi-share-fill" style={{ fontSize: 18, flexShrink: 0 }}></i>
+                {sidebarOpen && <span style={{ flex: 1, textAlign: 'left' }}>Refer Friend</span>}
+                {sidebarOpen && pendingCount > 0 && (
+                  <span style={{ background: '#d97706', color: '#fff', borderRadius: 20, padding: '1px 7px', fontSize: 10, fontWeight: 700 }}>{pendingCount}</span>
+                )}
+              </button>
+            );
+          })()}
         </nav>
 
         {/* Bottom: user + logout */}
@@ -258,7 +340,7 @@ function ViewAlumni() {
               <i className="bi bi-list"></i>
             </button>
             <h1 style={{ fontWeight: 700, fontSize: 18, color: 'var(--color-secondary)', margin: 0 }}>
-              {activeTab === 'dashboard' ? 'My Dashboard' : activeTab === 'events' ? 'Events' : 'Connect'}
+              {activeTab === 'dashboard' ? 'My Dashboard' : activeTab === 'events' ? 'Events' : activeTab === 'refer' ? 'Refer Friend' : 'Connect'}
             </h1>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
@@ -838,6 +920,106 @@ function ViewAlumni() {
                   )}
                 </div>
               )}
+            </div>
+          )}
+
+          {/* ══════ REFER FRIEND TAB ══════ */}
+          {activeTab === 'refer' && isAlumniLoggedIn && (
+            <div>
+              {/* Referral link card */}
+              <div style={{ background: '#fff', borderRadius: 16, padding: 24, boxShadow: '0 1px 4px rgba(0,0,0,0.07)', marginBottom: 24 }}>
+                <div style={{ fontWeight: 700, fontSize: 15, color: 'var(--color-secondary)', marginBottom: 6, display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <i className="bi bi-share-fill" style={{ color: 'var(--color-primary)' }}></i> Your Referral Link
+                </div>
+                <div style={{ fontSize: 13, color: '#6b7280', marginBottom: 16 }}>
+                  Share this link with a friend. When they register, it goes to admin for approval — you'll see it here too and can approve or reject it yourself.
+                </div>
+                {referralLoading ? (
+                  <div style={{ padding: '10px 0' }}>
+                    <div className="spinner-border" style={{ width: '1.5rem', height: '1.5rem', color: 'var(--color-primary)' }}></div>
+                  </div>
+                ) : (
+                  <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+                    <input readOnly value={referralLink} onClick={e => e.target.select()}
+                      style={{ flex: '1 1 260px', padding: '11px 14px', border: '1.5px solid #e5e7eb', borderRadius: 10, fontSize: 13, color: '#374151', background: '#f9fafb', outline: 'none' }} />
+                    <button onClick={copyReferralLink} style={{
+                      background: copied ? '#16a34a' : 'var(--color-primary)', color: '#fff', border: 'none',
+                      borderRadius: 10, padding: '11px 20px', fontWeight: 700, fontSize: 13, cursor: 'pointer',
+                      display: 'flex', alignItems: 'center', gap: 7, whiteSpace: 'nowrap'
+                    }}>
+                      <i className={`bi ${copied ? 'bi-check-lg' : 'bi-clipboard-fill'}`}></i>
+                      {copied ? 'Copied!' : 'Copy Link'}
+                    </button>
+                    <a href={`https://wa.me/?text=${encodeURIComponent('Join our alumni network! ' + referralLink)}`}
+                      target="_blank" rel="noopener noreferrer"
+                      style={{
+                        background: '#16a34a18', color: '#16a34a', border: '1.5px solid #16a34a40',
+                        borderRadius: 10, padding: '11px 18px', fontWeight: 700, fontSize: 13, textDecoration: 'none',
+                        display: 'flex', alignItems: 'center', gap: 7, whiteSpace: 'nowrap'
+                      }}>
+                      <i className="bi bi-whatsapp"></i> Share
+                    </a>
+                  </div>
+                )}
+              </div>
+
+              {/* My Referrals */}
+              <div style={{ background: '#fff', borderRadius: 16, padding: 24, boxShadow: '0 1px 4px rgba(0,0,0,0.07)' }}>
+                <div style={{ fontWeight: 700, fontSize: 15, color: 'var(--color-secondary)', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <i className="bi bi-people-fill" style={{ color: 'var(--color-primary)' }}></i> My Referrals
+                  <span style={{ background: '#eff6ff', color: '#2563eb', borderRadius: 20, padding: '1px 10px', fontSize: 12, fontWeight: 700 }}>{myReferrals.length}</span>
+                </div>
+
+                {referralsLoading ? (
+                  <div style={{ textAlign: 'center', padding: '20px 0' }}>
+                    <div className="spinner-border" style={{ width: '1.5rem', height: '1.5rem', color: 'var(--color-primary)' }}></div>
+                  </div>
+                ) : myReferrals.length === 0 ? (
+                  <div style={{ textAlign: 'center', padding: '30px 0', color: '#9ca3af' }}>
+                    <i className="bi bi-person-plus" style={{ fontSize: 36 }}></i>
+                    <p style={{ marginTop: 10, fontSize: 13 }}>No one has registered with your link yet.</p>
+                  </div>
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                    {myReferrals.map(r => {
+                      const as_ = r.approval_status === 'approved'
+                        ? { bg: '#dcfce7', text: '#16a34a', icon: 'bi-check-circle-fill' }
+                        : r.approval_status === 'rejected'
+                        ? { bg: '#fee2e2', text: '#dc2626', icon: 'bi-x-circle-fill' }
+                        : { bg: '#fef9c3', text: '#d97706', icon: 'bi-hourglass-split' };
+                      return (
+                        <div key={r.id} style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '12px 14px', borderRadius: 12, border: '1px solid #f3f4f6' }}>
+                          {r.photo
+                            ? <img src={`${API_BASE}${r.photo}`} alt={r.name} style={{ width: 44, height: 44, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
+                            : <div style={{ width: 44, height: 44, borderRadius: '50%', background: 'linear-gradient(135deg,var(--color-primary),var(--color-primary-dark))', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 800, fontSize: 15, flexShrink: 0 }}>
+                                {r.name?.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
+                              </div>
+                          }
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <div style={{ fontWeight: 700, fontSize: 14, color: '#111827' }}>{r.name}</div>
+                            <div style={{ fontSize: 12, color: '#9ca3af', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.email}</div>
+                          </div>
+                          <span style={{ background: as_.bg, color: as_.text, borderRadius: 20, padding: '3px 10px', fontSize: 11, fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: 4, textTransform: 'capitalize', flexShrink: 0 }}>
+                            <i className={`bi ${as_.icon}`}></i>{r.approval_status}
+                          </span>
+                          {r.approval_status === 'pending' && (
+                            <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
+                              <button onClick={() => handleReferralApprove(r.id)} disabled={referralActionId === r.id}
+                                style={{ background: '#dcfce7', color: '#16a34a', border: 'none', borderRadius: 8, padding: '6px 12px', cursor: 'pointer', fontWeight: 700, fontSize: 12 }}>
+                                {referralActionId === r.id ? <span className="spinner-border spinner-border-sm"></span> : 'Approve'}
+                              </button>
+                              <button onClick={() => handleReferralReject(r.id)} disabled={referralActionId === r.id}
+                                style={{ background: '#fee2e2', color: '#dc2626', border: 'none', borderRadius: 8, padding: '6px 12px', cursor: 'pointer', fontWeight: 700, fontSize: 12 }}>
+                                Reject
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
             </div>
           )}
         </main>

@@ -245,6 +245,11 @@ function PendingApprovals() {
                             <div onClick={() => setSelectedAlumni(a)} style={{ fontWeight: 600, color: 'var(--color-secondary)', cursor: 'pointer', marginBottom: 2 }}>{a.name}</div>
                             <div style={{ fontSize: 12, color: '#9ca3af' }}>{a.email}</div>
                             {a.designation && <div style={{ fontSize: 11, color: '#6b7280', marginTop: 1 }}>{a.designation}{a.organization_name ? ` · ${a.organization_name}` : ''}</div>}
+                            {a.referred_by_name && (
+                              <div style={{ fontSize: 11, color: '#7c3aed', marginTop: 3, display: 'inline-flex', alignItems: 'center', gap: 4, background: '#f5f3ff', borderRadius: 20, padding: '1px 8px' }}>
+                                <i className="bi bi-share-fill"></i>Referred by {a.referred_by_name}
+                              </div>
+                            )}
                           </div>
                         </div>
                       </td>
@@ -374,6 +379,7 @@ function PendingApprovals() {
                   <Field label="Parent Name" value={a.parent_name} />
                   <Field label="Username (auto)" value={a.username} />
                   <Field label="Program Type" value={a.program_type} />
+                  <Field label="Referred By" value={a.referred_by_name} />
                 </div>
 
                 {/* === ACADEMIC INFO === */}

@@ -3,11 +3,13 @@ const router = express.Router();
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
+const crypto = require('crypto');
 const path = require('path');
 const fs = require('fs');
 const { requireDb, normalizeForDb, getDb } = require('../config/db');
 const { upload, runMulter } = require('../middleware/upload');
 const { verifyAlumniToken } = require('../middleware/auth');
+const { sendApprovalEmail } = require('../utils/mailer');
 
 const ALUMNI_JWT_SECRET = process.env.ALUMNI_JWT_SECRET || 'your-alumni-secret-key-here-change-in-production';
 
@@ -222,22 +224,24 @@ router.get('/alumni', async (req, res) => {
 
     let whereClause;
     if (showDeleted) {
-      whereClause = 'WHERE is_deleted = 1';
+      whereClause = 'WHERE a.is_deleted = 1';
     } else if (showAll) {
-      whereClause = 'WHERE is_deleted = 0';
+      whereClause = 'WHERE a.is_deleted = 0';
     } else {
-      whereClause = "WHERE approval_status = 'approved' AND is_deleted = 0";
+      whereClause = "WHERE a.approval_status = 'approved' AND a.is_deleted = 0";
     }
 
     const [results] = await db.query(
-      `SELECT id, name, email, phone, gender, dob, batch, department, address, photo,
-        linkedin, bio, current_status, organization_name, designation, industry,
-        work_location, experience_years, skills, achievements, higher_education, institution,
-        approval_status, is_deleted, attended_program, program_type, facebook, enrollment_number,
-        completion_year, functional_area, employment_type, seniority_level,
-        country, city, education_level, work_city, created_at,
-        parent_name, ug_college, pg_college, doctorate_name, social_links, username, show_contact
-       FROM alumni ${whereClause} ORDER BY id DESC`
+      `SELECT a.id, a.name, a.email, a.phone, a.gender, a.dob, a.batch, a.department, a.address, a.photo,
+        a.linkedin, a.bio, a.current_status, a.organization_name, a.designation, a.industry,
+        a.work_location, a.experience_years, a.skills, a.achievements, a.higher_education, a.institution,
+        a.approval_status, a.is_deleted, a.attended_program, a.program_type, a.facebook, a.enrollment_number,
+        a.completion_year, a.functional_area, a.employment_type, a.seniority_level,
+        a.country, a.city, a.education_level, a.work_city, a.created_at,
+        a.parent_name, a.ug_college, a.pg_college, a.doctorate_name, a.social_links, a.username, a.show_contact,
+        a.referred_by, r.name AS referred_by_name
+       FROM alumni a LEFT JOIN alumni r ON r.id = a.referred_by
+       ${whereClause} ORDER BY a.id DESC`
     );
     res.json(results);
   } catch (err) {
@@ -331,6 +335,77 @@ router.put('/alumni/me/privacy', verifyAlumniToken, async (req, res) => {
   }
 });
 
+// ── Refer a Friend ────────────────────────────────────────────────────────────
+
+router.get('/alumni/me/referral-link', verifyAlumniToken, async (req, res) => {
+  try {
+    const db = getDb();
+    if (!requireDb(res)) return;
+    const [[me]] = await db.query('SELECT referral_code FROM alumni WHERE id = ?', [req.alumniId]);
+    if (!me) return res.status(404).json({ message: 'Alumni not found' });
+
+    let code = me.referral_code;
+    if (!code) {
+      code = crypto.randomBytes(8).toString('hex');
+      await db.query('UPDATE alumni SET referral_code = ? WHERE id = ?', [code, req.alumniId]);
+    }
+    const frontendUrl = process.env.CLIENT_URL || 'http://localhost:5173';
+    res.json({ code, link: `${frontendUrl}/register?ref=${code}` });
+  } catch (err) {
+    console.error('Error getting referral link:', err);
+    res.status(500).json({ error: 'Database error', message: err.message });
+  }
+});
+
+router.get('/alumni/me/referrals', verifyAlumniToken, async (req, res) => {
+  try {
+    const db = getDb();
+    if (!requireDb(res)) return;
+    const [rows] = await db.query(
+      `SELECT id, name, email, photo, current_status, institution, batch, approval_status, created_at
+       FROM alumni WHERE referred_by = ? ORDER BY created_at DESC`,
+      [req.alumniId]
+    );
+    res.json(rows);
+  } catch (err) {
+    console.error('Error fetching referrals:', err);
+    res.status(500).json({ error: 'Database error', message: err.message });
+  }
+});
+
+router.put('/alumni/me/referrals/:id/approve', verifyAlumniToken, async (req, res) => {
+  try {
+    const db = getDb();
+    if (!requireDb(res)) return;
+    const [[referred]] = await db.query('SELECT id, name, email, referred_by FROM alumni WHERE id = ?', [req.params.id]);
+    if (!referred || referred.referred_by !== req.alumniId) {
+      return res.status(403).json({ message: 'You can only approve people you referred' });
+    }
+    await db.query("UPDATE alumni SET approval_status = 'approved' WHERE id = ?", [req.params.id]);
+    await sendApprovalEmail(referred);
+    res.json({ message: 'Referral approved successfully' });
+  } catch (err) {
+    console.error('Error approving referral:', err);
+    res.status(500).json({ error: 'Database error', message: err.message });
+  }
+});
+
+router.put('/alumni/me/referrals/:id/reject', verifyAlumniToken, async (req, res) => {
+  try {
+    const db = getDb();
+    if (!requireDb(res)) return;
+    const [[referred]] = await db.query('SELECT id, referred_by FROM alumni WHERE id = ?', [req.params.id]);
+    if (!referred || referred.referred_by !== req.alumniId) {
+      return res.status(403).json({ message: 'You can only reject people you referred' });
+    }
+    await db.query("UPDATE alumni SET approval_status = 'rejected' WHERE id = ?", [req.params.id]);
+    res.json({ message: 'Referral rejected successfully' });
+  } catch (err) {
+    console.error('Error rejecting referral:', err);
+    res.status(500).json({ error: 'Database error', message: err.message });
+  }
+});
+
 router.get('/alumni/check-username/:username', async (req, res) => {
   try {
     const db = getDb();
@@ -377,7 +452,7 @@ router.post('/alumni/register', runMulter(upload.single('photo')), async (req, r
       work_location, experience_years, skills, achievements, higher_education, institution,
       attended_program, program_type, facebook, enrollment_number, completion_year,
       functional_area, employment_type, seniority_level, country, city, education_level, work_city,
-      parent_name, ug_college, pg_college, doctorate_name, social_links
+      parent_name, ug_college, pg_college, doctorate_name, social_links, ref
     } = body;
 
     if (!username || !password) return res.status(400).json({ message: 'Username and password are required' });
@@ -389,6 +464,12 @@ router.post('/alumni/register', runMulter(upload.single('photo')), async (req, r
     if (email) {
       const [existingEmail] = await db.query('SELECT id FROM alumni WHERE email = ?', [email]);
       if (existingEmail && existingEmail.length > 0) return res.status(400).json({ message: 'Email already registered' });
+    }
+
+    let referredBy = null;
+    if (ref) {
+      const [[referrer]] = await db.query('SELECT id FROM alumni WHERE referral_code = ?', [ref]);
+      if (referrer) referredBy = referrer.id;
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -403,14 +484,15 @@ router.post('/alumni/register', runMulter(upload.single('photo')), async (req, r
         attended_program, program_type, facebook, enrollment_number, completion_year,
         functional_area, employment_type, seniority_level, country, city, education_level, work_city,
         parent_name, ug_college, pg_college, doctorate_name, social_links,
-        approval_status
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending')`,
+        referred_by, approval_status
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending')`,
       [username, hashedPassword, name, email, phone, gender, dob, batch, department, address,
        photo, linkedin, bio, current_status, organization_name, designation, industry,
        work_location, expYearsVal, skills, achievements, higher_education, institution,
        attended_program, program_type, facebook, enrollment_number, completion_year,
        functional_area, employment_type, seniority_level, country, city, education_level, work_city,
-       parent_name || null, ug_college || null, pg_college || null, doctorate_name || null, social_links || null]
+       parent_name || null, ug_college || null, pg_college || null, doctorate_name || null, social_links || null,
+       referredBy]
     );
 
     try {
